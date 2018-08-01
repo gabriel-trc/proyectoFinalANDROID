@@ -10,33 +10,40 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-import ort.proyecto_final.mvdmart.RegistroMateriasPrimasActivity;
+import ort.proyecto_final.mvdmart.activities.RegistroMateriasPrimasActivity;
 
-public class RegistroMateriasPrimas {
+public class RegistroMateriasPrimasServerCall {
 
     private RegistroMateriasPrimasActivity activity;
     private Context context;
     private HashMap<String, String> params;
 
-    public RegistroMateriasPrimas(final RegistroMateriasPrimasActivity activity, final JSONObject sendObject) {
+    public RegistroMateriasPrimasServerCall(final RegistroMateriasPrimasActivity activity, final JSONObject sendObject) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
 
-        String url = "http://192.168.1.110:45455/api/Test/MetodoPost";
+        String url = "http://192.168.1.44:45455/api/partida/registro";
 
         final String requestBody = sendObject.toString();
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.i("VOLLEY", response);
+                try {
+
+                    JSONObject obj = new JSONObject(response);
+
+                    Log.d("My App", obj.toString());
+
+                } catch (Throwable t) {
+                    Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
+                }
             }
         }, new Response.ErrorListener() {
             @Override

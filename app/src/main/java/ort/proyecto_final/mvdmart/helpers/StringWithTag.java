@@ -1,5 +1,9 @@
 package ort.proyecto_final.mvdmart.helpers;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,13 +19,24 @@ public class StringWithTag {
 
     public static List<StringWithTag> arrayCondicionEnRegistroMaterias() {
         List<StringWithTag> ret = new ArrayList<StringWithTag>();
+        ret.add(new StringWithTag("Seleccione una condición",  -1));
         ret.add(new StringWithTag("ACEPTABLE", 1));
         ret.add(new StringWithTag("DAÑO MENOR", 2));
         ret.add(new StringWithTag("DAÑO MAYOR", 3));
-        ret.add(new StringWithTag("COLOR IN.", 4));
+        ret.add(new StringWithTag("COLOR INACEPTABLE", 4));
         return ret;
     }
 
+    public static List<StringWithTag> convertJSONArrayToAarrayFrigorificos(JSONArray jsonArray) throws JSONException {
+        List<StringWithTag> ret = new ArrayList<StringWithTag>();
+        ret.add(new StringWithTag("Seleccione un frigorifico",  -1));
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject object = jsonArray.getJSONObject(i);
+            ret.add(new StringWithTag(object.getString("Nombre"),  Integer.parseInt(object.getString("Codigo"))));
+        }
+        return ret;
+    }
+    
     public static List<StringWithTag> arrayFrigorificos() {
         List<StringWithTag> ret = new ArrayList<StringWithTag>();
         ret.add(new StringWithTag("COLONIA S.A.", 1));

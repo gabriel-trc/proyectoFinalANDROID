@@ -9,7 +9,7 @@
     android:focusableInTouchMode="true"
     android:minHeight="155dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".RegistroMateriasPrimasActivity"
+    tools:context=".activities.RegistroMateriasPrimasActivity"
     tools:layout_editor_absoluteY="89dp"
     tools:showIn="@layout/activity_registro_materias_primas">
 
@@ -34,20 +34,24 @@
         android:id="@+id/ddFrigorificos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
     <EditText
-        android:id="@+id/cantBolsas"
+        android:id="@+id/cantConservadoras"
         android:layout_width="67dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:ems="10"
-        android:hint="Bolsas"
+        android:hint="Conservadoras"
         android:inputType="number"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintStart_toEndOf="@+id/ddFrigorificos"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
@@ -55,45 +59,41 @@
         android:id="@+id/peso"
         android:layout_width="76dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Gramos"
         android:inputType="number"
-        app:layout_constraintStart_toEndOf="@+id/cantBolsas"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
+        app:layout_constraintStart_toEndOf="@+id/cantConservadoras"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
     <EditText
         android:id="@+id/temperatura"
         android:layout_width="114dp"
         android:layout_height="49dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Temperatura"
         android:inputType="number"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintStart_toEndOf="@+id/peso"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
-
-    <TextView
-        android:id="@+id/tpHora"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:text="Hora"
-        app:layout_constraintEnd_toStartOf="@+id/ddCondicion"
-        app:layout_constraintStart_toEndOf="@+id/temperatura"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
     <Spinner
         android:id="@+id/ddCondicion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toStartOf="@+id/nroCote"
+        app:layout_constraintStart_toEndOf="@+id/temperatura"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
     <TextView
@@ -140,7 +140,7 @@
         android:id="@+id/textView10"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="48dp"
         android:layout_marginTop="8dp"
         android:text="Nro. de cote"
         android:textAppearance="@android:style/TextAppearance.Medium"
@@ -152,13 +152,15 @@
 
     <EditText
         android:id="@+id/nroCote"
-        android:layout_width="166dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="32dp"
         android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Nro Cote"
-        android:inputType="number"
+        android:inputType="text"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
@@ -169,10 +171,9 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:text="Agregar"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline"
@@ -202,32 +203,68 @@
         app:layout_constraintGuide_begin="114dp" />
 
     <TextView
-        android:id="@+id/textView8"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:text="Hora"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        app:layout_constraintBottom_toTopOf="@+id/guideline2"
-        app:layout_constraintEnd_toStartOf="@+id/textView9"
-        app:layout_constraintStart_toEndOf="@+id/textView7"
-        app:layout_constraintTop_toTopOf="@+id/guideline" />
-
-    <TextView
         android:id="@+id/textView9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="24dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="Condición aceptable"
+        android:text="Condición"
         android:textAppearance="@android:style/TextAppearance.Medium"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toStartOf="@+id/textView10"
+        app:layout_constraintStart_toEndOf="@+id/textView7"
         app:layout_constraintTop_toTopOf="@+id/guideline" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="206dp" />
+
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="0dp"
+        android:layout_height="312dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/btnFinalizar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnAgregar">
+
+        <TableLayout
+            android:id="@+id/tablaPartidas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:isScrollContainer="true"
+            android:orientation="horizontal"
+            android:stretchColumns="*">
+
+
+        </TableLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <Button
+        android:id="@+id/btnFinalizar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="FINALIZAR"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </android.support.constraint.ConstraintLayout>
