@@ -10,6 +10,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
@@ -24,7 +25,7 @@ public class RegistroMateriasPrimasServerCall {
     private Context context;
     private HashMap<String, String> params;
 
-    public RegistroMateriasPrimasServerCall(final RegistroMateriasPrimasActivity activity, final JSONObject sendObject) {
+    public RegistroMateriasPrimasServerCall(final RegistroMateriasPrimasActivity activity, final JSONArray sendObject) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
 

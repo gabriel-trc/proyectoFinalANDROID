@@ -141,14 +141,9 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity implements
     }
 
     private void sendPartidas() {
-        JSONObject send = new JSONObject();
+        JSONArray send = new JSONArray();
         for(int i = 0; i < partidas.size(); i++ ){
-
-            try {
-                send.put(i+" ",partidas.get(i).toJSONObject());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            send.put(partidas.get(i));
         }
         new RegistroMateriasPrimasServerCall(this,send);
     }
