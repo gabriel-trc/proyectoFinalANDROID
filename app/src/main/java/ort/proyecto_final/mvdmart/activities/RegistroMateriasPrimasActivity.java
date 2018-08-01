@@ -167,9 +167,6 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity implements
                 partidas.add(partida);
                 cleanFields();
                 createRows();
-                JSONObject send = partida.toJSONObject();
-
-                new RegistroMateriasPrimasServerCall(this,send);
             } else {
                 Toast errorToast = Toast.makeText(this.getApplicationContext(), "Atención: Hay campos incorrectos.", Toast.LENGTH_LONG);
                 errorToast.show();

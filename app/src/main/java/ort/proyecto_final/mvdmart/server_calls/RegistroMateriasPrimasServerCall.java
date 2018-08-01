@@ -28,7 +28,7 @@ public class RegistroMateriasPrimasServerCall {
         this.activity = activity;
         this.context = activity.getApplicationContext();
 
-        String url = "http://192.168.1.44:45455/api/partida/registro";
+        String url = "http://192.168.1.44:45455/api/partida/registromultiple";
 
         final String requestBody = sendObject.toString();
 
