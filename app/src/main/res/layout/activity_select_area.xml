@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MainActivity">
+    tools:context=".activities.SelectAreaActivity">
 
-    <include layout="@layout/content_main" />
-
-
+    <include layout="@layout/content_select_area" />
+    <include layout="@layout/spinner_loader" />
 </android.support.design.widget.CoordinatorLayout>

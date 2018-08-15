@@ -40,4 +40,11 @@ public class Config {
         return activity.getSharedPreferences(Constants.MyPREFERENCES, Context.MODE_PRIVATE).getString("frigorificos","");
     }
 
+    public static void setPartidasPendientes (Activity activity, String pPartidasPendientes){
+        assignSharedPreferences(activity,"partidasPendientes", pPartidasPendientes);
+    }
+
+    public static String getPartidasPendientes (Activity activity){
+        return activity.getSharedPreferences(Constants.MyPREFERENCES, Context.MODE_PRIVATE).getString("partidasPendientes","");
+    }
 }

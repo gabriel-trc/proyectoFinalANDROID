@@ -1,0 +1,6 @@
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/listViewAdapter"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:scrollbars="horizontal"
+    android:visibility="invisible" />

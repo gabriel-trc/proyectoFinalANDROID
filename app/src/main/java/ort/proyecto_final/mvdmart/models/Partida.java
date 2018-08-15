@@ -9,23 +9,24 @@ import java.util.Date;
 
 public class Partida {
 
-    private static int autoincrementId = 1;
-    private int localId, numeroOperario, idFrigorifico,cantConservadoras, temperatura, peso, posFrigorifico;
-    private String fechaHora, numCote, condicion;
-
-
+    private int localId, numeroOperario, idFrigorifico, cantConservadoras, temperatura, peso, posFrigorifico;
+    private String fechaHora, numCote;
 
     //region Helper Getter's and Setter's
 
-    public int getAutoincrementId() { return autoincrementId; }
-
     public int getLocalId() { return localId; }
 
-    public void setLocalId(int localId) { this.localId = localId; }
+    public void setLocalId(int localId) {
+        this.localId = localId;
+    }
 
-    public int getNumeroOperario() { return numeroOperario; }
+    public int getNumeroOperario() {
+        return numeroOperario;
+    }
 
-    public void setNumeroOperario(int numeroOperario) { this.numeroOperario = numeroOperario; }
+    public void setNumeroOperario(int numeroOperario) {
+        this.numeroOperario = numeroOperario;
+    }
 
     public int getIdFrigorifico() {
         return idFrigorifico;
@@ -57,14 +58,6 @@ public class Partida {
         this.fechaHora = fechaHora;
     }
 
-    public String getCondicion() {
-        return condicion;
-    }
-
-    public void setCondicion(String condicion) {
-        this.condicion = condicion;
-    }
-
     public String getNumCote() {
         return numCote;
     }
@@ -81,34 +74,36 @@ public class Partida {
         this.peso = peso;
     }
 
-    public int getPosFrigorifico() { return posFrigorifico; }
+    public int getPosFrigorifico() {
+        return posFrigorifico;
+    }
 
-    public void setPosFrigorifico(int posFrigorifico) { this.posFrigorifico = posFrigorifico; }
+    public void setPosFrigorifico(int posFrigorifico) {
+        this.posFrigorifico = posFrigorifico;
+    }
     //endregion
-
 
     public Partida() {
 
     }
 
-    public Partida(int idFrigorifico, int cantConservadoras, int peso, int temperatura, String fechaHora, String condicion, String numCote, int posFrigorifico, int numeroOperario) {
-        this.localId = this.getAutoincrementId();
+    public Partida(int idFrigorifico, int cantConservadoras, int peso, int temperatura, String fechaHora, String numCote, int posFrigorifico, int numeroOperario) {
         this.idFrigorifico = idFrigorifico;
         this.cantConservadoras = cantConservadoras;
         this.peso = peso;
         this.temperatura = temperatura;
         this.fechaHora = fechaHora;
-        this.condicion = condicion;
         this.numCote = numCote;
         this.posFrigorifico = posFrigorifico;
         this.numeroOperario = numeroOperario;
-        autoincrementId++;
     }
 
-    public static boolean validar(int cantBolsas, int temperatura) {
-        if (cantBolsas > 0 && temperatura > 0)
+    public static boolean validar(int cantConservadoras, int temperatura, int pesoTotal, String numeroCote, int posFrigorifico) {
+        if (cantConservadoras > 0 && cantConservadoras < 100 && temperatura > -100 && temperatura < 100 && numeroCote.length() < 50 &&
+        pesoTotal > 0 && pesoTotal < 2000 && posFrigorifico >= 1)
             return true;
-        return false;
+        else
+            return false;
     }
 
     public JSONObject toJSONObject() {
@@ -126,6 +121,5 @@ public class Partida {
         }
         return jsonBody;
     }
-
 
 }

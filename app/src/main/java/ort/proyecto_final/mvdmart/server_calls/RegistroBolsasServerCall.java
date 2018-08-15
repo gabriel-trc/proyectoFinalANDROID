@@ -4,8 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
-import android.view.View;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -18,26 +16,27 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-
-import ort.proyecto_final.mvdmart.activities.RegistroMateriasPrimasActivity;
+import ort.proyecto_final.mvdmart.activities.IdentificacionBolsasActivity;
+import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 
-public class RegistroMateriasPrimasServerCall {
+public class RegistroBolsasServerCall {
 
-    private RegistroMateriasPrimasActivity activity;
+    private IdentificacionBolsasActivity activity;
     private Context context;
-    private HashMap<String, String> params;
 
-    public RegistroMateriasPrimasServerCall(final RegistroMateriasPrimasActivity activity, final JSONArray partidas) {
+    public RegistroBolsasServerCall(final IdentificacionBolsasActivity activity, final JSONArray bolsas, final int idPartida, final boolean finalizar) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
 
-        String url = Constants.DOMAIN + "/api/partida/registro";
+        String url = Constants.DOMAIN + "/api/partida/identificar";
         JSONObject sendObject = new JSONObject();
         try {
-            sendObject.put("partidas", partidas);
+            sendObject.put("BolsasDeSangre", bolsas);
+            sendObject.put("CodigoPartida", idPartida);
+            sendObject.put("CodigoOperario", Config.getNumeroOperario(activity));
+            sendObject.put("Finalizar", finalizar);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -50,7 +49,10 @@ public class RegistroMateriasPrimasServerCall {
                             activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
                                 Toast.makeText(context, "Registros guardados", Toast.LENGTH_LONG).show();
-                                activity.limpiarTabla();
+                                if (finalizar)
+                                    activity.finish();
+                                else
+                                    activity.vaciarArrayBolsas();
                             } else {
                                 String[] errores = HelpersFunctions.errores(response.getJSONArray("mensajes"));
                                 final int partidaId = response.getInt("retorno");
@@ -61,7 +63,7 @@ public class RegistroMateriasPrimasServerCall {
                                 builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.dismiss();
-                                        activity.onResponseErrorPartida(partidaId);
+                                        // activity.onResponseErrorPartida(partidaId);
                                     }
                                 });
                                 AlertDialog alert = builder.create();

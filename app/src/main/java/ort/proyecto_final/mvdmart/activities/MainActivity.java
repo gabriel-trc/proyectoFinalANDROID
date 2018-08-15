@@ -4,23 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import ort.proyecto_final.mvdmart.R;
-import ort.proyecto_final.mvdmart.activities.RegistroMateriasPrimasActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
-import ort.proyecto_final.mvdmart.server_calls.GetAllFrigorificosServerCall;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,9 +25,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        new GetAllFrigorificosServerCall(this);
         Config.setNumeroOperario(this, null);
         inicializarVistas();
+    }
+
+    @Override
+    protected void onRestart(){
+        super.onRestart();
+        Config.setNumeroOperario(this, null);
     }
 
     private void inicializarVistas() {
@@ -56,9 +55,8 @@ public class MainActivity extends AppCompatActivity {
             toast.show();
         } else {
             Config.setNumeroOperario(this, txtNumeroOperario.getText().toString());
-            Intent goToNextActivity = new Intent(getApplicationContext(), RegistroMateriasPrimasActivity.class);
+            Intent goToNextActivity = new Intent(getApplicationContext(), SelectAreaActivity.class);
             startActivity(goToNextActivity);
-            finish();
         }
     }
 

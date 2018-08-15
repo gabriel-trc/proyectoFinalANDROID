@@ -16,23 +16,24 @@ import ort.proyecto_final.mvdmart.activities.SelectAreaActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 
-public class GetAllFrigorificosServerCall {
-
+public class GetAllPartidasPendientesServerCall {
     private SelectAreaActivity activity;
     private Context context;
 
-    public GetAllFrigorificosServerCall(final SelectAreaActivity activity) {
+    public GetAllPartidasPendientesServerCall(final SelectAreaActivity activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
-        String url = Constants.DOMAIN + "/api/frigorifico/todos/" + Config.getNumeroOperario(activity);
+        String url = Constants.DOMAIN + "/api/partida/pendientes/" + Config.getNumeroOperario(activity);
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            Config.setPartidasPendientes(activity, response.getString("retorno"));
                             activity.finalizarLoader();
-                            Config.setFrigorificos(activity, response.getString("retorno"));
+                            activity.alertSelectPartida();
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
                         }
@@ -53,7 +54,20 @@ public class GetAllFrigorificosServerCall {
                             Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
                         }
                     }
-                });
+                })
+//        {
+//            /**
+//             * Passing some request headers
+//             */
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                HashMap<String, String> headers = new HashMap<String, String>();
+//                //headers.put("Content-Type", "application/json");
+//                headers.put("idOperario", Config.getNumeroOperario(activity));
+//                return headers;
+//            }
+//        }
+                ;
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }

@@ -17,9 +17,8 @@ public class StringWithTag {
         tag = tagPart;
     }
 
-    public static List<StringWithTag> arrayCondicionEnRegistroMaterias() {
+    public static List<StringWithTag> arrayCondicion() {
         List<StringWithTag> ret = new ArrayList<StringWithTag>();
-        ret.add(new StringWithTag("Seleccione una condición",  -1));
         ret.add(new StringWithTag("ACEPTABLE", 1));
         ret.add(new StringWithTag("DAÑO MENOR", 2));
         ret.add(new StringWithTag("DAÑO MAYOR", 3));
@@ -36,23 +35,19 @@ public class StringWithTag {
         }
         return ret;
     }
-    
-    public static List<StringWithTag> arrayFrigorificos() {
+
+    public static List<StringWithTag> convertJSONArrayToAarrayPartidasPendientes(JSONArray jsonArray) throws JSONException {
         List<StringWithTag> ret = new ArrayList<StringWithTag>();
-        ret.add(new StringWithTag("COLONIA S.A.", 1));
-        ret.add(new StringWithTag("LAS PIEDRAS S.A.", 2));
-        ret.add(new StringWithTag("CANELONES S.A.", 3));
-        ret.add(new StringWithTag("MAT. CARRASCO S.A.", 4));
-        ret.add(new StringWithTag("SCHNECK", 5));
-        ret.add(new StringWithTag("MAT. PANDO", 6));
-        ret.add(new StringWithTag("DURAZNO", 7));
-        ret.add(new StringWithTag("LA CABALLADA", 8));
-        ret.add(new StringWithTag("CATTIVELLI HNOS.", 9));
-        ret.add(new StringWithTag("SAN JACINTO", 10));
-        ret.add(new StringWithTag("LAS MORAS", 11));
-        ret.add(new StringWithTag("SARUBBI", 12));
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject object = jsonArray.getJSONObject(i);
+            String stringList = object.getJSONObject("frigorifico").getString("nombre");
+            String[] fecha = object.getString("fecha").substring(0,10).split("-");
+            stringList += ". Fecha: " + fecha[2] + "-" + fecha[1] + "-" + fecha[0];
+            ret.add(new StringWithTag(stringList,  object.getInt("id")));
+        }
         return ret;
     }
+
 
     @Override
     public String toString() {
