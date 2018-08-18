@@ -13,6 +13,7 @@ public class HelpersFunctions {
             Integer.parseInt(str);
             return true;
         } catch (NumberFormatException nfe) {
+
         }
         return false;
     }

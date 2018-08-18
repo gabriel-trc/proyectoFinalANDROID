@@ -13,4 +13,5 @@
     <string name="title_activity_loading">LoadingActivity</string>
     <string name="title_activity_select_area">SelectAreaActivity</string>
     <string name="title_activity_identificacion_bolsas">IdentificacionBolsasActivity</string>
+    <string name="title_activity_separacion_items">SeparacionItemsActivity</string>
 </resources>

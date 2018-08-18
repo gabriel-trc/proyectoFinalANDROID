@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void ingresar() {
-        if (TextUtils.isEmpty(txtNumeroOperario.getText()) && HelpersFunctions.isIntegerParseInt(txtNumeroOperario.getText().toString())) {
+        if (!HelpersFunctions.isIntegerParseInt(txtNumeroOperario.getText().toString())) {
             Toast toast = Toast.makeText(this.getApplicationContext(), "Ingrese correctamente su número de operario", Toast.LENGTH_LONG);
             toast.show();
         } else {

@@ -2,7 +2,6 @@ package ort.proyecto_final.mvdmart.activities;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -21,17 +20,14 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import ort.proyecto_final.mvdmart.R;
 import ort.proyecto_final.mvdmart.config.Config;
@@ -40,12 +36,10 @@ import ort.proyecto_final.mvdmart.helpers.StringWithTag;
 import ort.proyecto_final.mvdmart.models.Partida;
 import ort.proyecto_final.mvdmart.server_calls.RegistroMateriasPrimasServerCall;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
-
 public class RegistroMateriasPrimasActivity extends AppCompatActivity {
 
     private Partida partidaToModify = null;
-    private TextView fecha;
+    private TextView txtFecha;
     private EditText txtCantConservadoras, txtPeso, txtTemperatura, txtNCote;
     private Button btnAgregar, btnFinalizar;
     private int idFrigorifico, posFrigorifico, numOperario;
@@ -64,8 +58,8 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
         inicializarVistas();
     }
 
-
     private void inicializarVistas() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         JSONArray obj = null;
         List<StringWithTag> frigorificos = null;
         spinnerLoader = findViewById(R.id.spinner_loader);
@@ -108,23 +102,22 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
         btnFinalizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!partidas.isEmpty()) {
-                    spinnerLoader.setVisibility(View.VISIBLE);
+                if (!partidas.isEmpty())
                     sendPartidas();
-                }
+                else
+                    Toast.makeText(RegistroMateriasPrimasActivity.this, "Atención: No tienes ninguna partida.", Toast.LENGTH_LONG).show();
+
             }
         });
-
-
-        fecha = findViewById(R.id.fecha);
-        fecha.setText(horaEnFormato(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)));
-        fecha.setOnClickListener(new View.OnClickListener() {
+        txtFecha = findViewById(R.id.fecha);
+        txtFecha.setText(horaEnFormato(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)));
+        txtFecha.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(RegistroMateriasPrimasActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        fecha.setText(horaEnFormato(year, month, dayOfMonth));
+                        txtFecha.setText(horaEnFormato(year, month, dayOfMonth));
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
                 datePickerDialog.show();
@@ -144,35 +137,70 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
     }
 
     private void sendPartidas() {
-        JSONArray send = new JSONArray();
-        for (int i = 0; i < partidas.size(); i++) {
-            send.put(partidas.get(i).toJSONObject());
+        if (btnAgregar.getText().equals("Agregar")) {
+            JSONArray send = new JSONArray();
+            for (int i = 0; i < partidas.size(); i++) {
+                send.put(partidas.get(i).toJSONObject());
+            }
+            iniciarLoader();
+            new RegistroMateriasPrimasServerCall(this, send);
+        } else {
+            Toast.makeText(this.getApplicationContext(), "Atención: Debes terminar de modificar la partida.", Toast.LENGTH_LONG).show();
         }
-        iniciarLoader();
-        new RegistroMateriasPrimasServerCall(this, send);
+
+    }
+
+    //TODO se podria refactoriar, y dejarlo en una sola funcion. Nno hay tiempo ahora mismo.
+    private boolean chequearCamposCompletosYTiposDatos() {
+        boolean camposCompletos = true;
+        String camposIncompletos = "Atención, debe completar los siguientes campos:";
+        int largoStringCampos = camposIncompletos.length();
+        if (idFrigorifico == -1)
+            camposIncompletos += " frigorífico,";
+        if (!HelpersFunctions.isIntegerParseInt(txtCantConservadoras.getText().toString()))
+            camposIncompletos += " cantidad de conservadoras,";
+        if (!HelpersFunctions.isIntegerParseInt(txtPeso.getText().toString()))
+            camposIncompletos += " peso,";
+        if (!HelpersFunctions.isIntegerParseInt(txtTemperatura.getText().toString()))
+            camposIncompletos += " temperatura.";
+        if (camposIncompletos.length() != largoStringCampos) {
+            camposCompletos = false;
+            Toast.makeText(this.getApplicationContext(), camposIncompletos, Toast.LENGTH_LONG).show();
+        }
+        return camposCompletos;
     }
 
     private void addPartida() {
-
-        if (HelpersFunctions.isIntegerParseInt(txtCantConservadoras.getText().toString()) && HelpersFunctions.isIntegerParseInt(txtPeso.getText().toString()) &&
-                HelpersFunctions.isIntegerParseInt(txtTemperatura.getText().toString())) {
+        if (chequearCamposCompletosYTiposDatos()) {
             int cantConservadoras = Integer.parseInt(txtCantConservadoras.getText().toString());
             int pesoTotal = Integer.parseInt(txtPeso.getText().toString());
             int temperatura = Integer.parseInt(txtTemperatura.getText().toString());
             String numeroCote = txtNCote.getText().toString().replaceAll("\\s+", "");
-            String fechaHora = fecha.getText() +" 00:00:00";
-                if (Partida.validar(cantConservadoras, temperatura, pesoTotal, numeroCote, posFrigorifico)) {
-                Partida partida = new Partida(idFrigorifico, cantConservadoras, pesoTotal, temperatura, fechaHora, numeroCote, posFrigorifico, numOperario);
-                partidas.add(partida);
-                cleanFields();
-                createRows();
-            } else {
-                Toast errorToast = Toast.makeText(this.getApplicationContext(), "Atención: Hay campos incorrectos.", Toast.LENGTH_LONG);
-                errorToast.show();
+            String fechaHora = txtFecha.getText().toString();
+            String valida;
+            try {
+                valida = Partida.validar(cantConservadoras, temperatura, pesoTotal, numeroCote, idFrigorifico);
+                if (valida == "Ok") {
+                    Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, pesoTotal, temperatura, fechaHora, numeroCote, numOperario);
+                    partidas.add(partida);
+                    cleanFields();
+                    createRows();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(RegistroMateriasPrimasActivity.this);
+                    builder.setTitle("DATOS INVALIDOS");
+                    builder.setMessage(valida);
+                    //   builder.setIcon(R.drawable.ic_launcher_foreground);
+                    builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+            } catch (JSONException e) {
+                Toast.makeText(this.getApplicationContext(), "Atención: Campos mal formateados. Si perciste, comunicarlo.", Toast.LENGTH_LONG).show();
             }
-        } else {
-            Toast errorToast = Toast.makeText(this.getApplicationContext(), "Atención: Debe completar todos los campos.", Toast.LENGTH_LONG);
-            errorToast.show();
         }
     }
 
@@ -335,11 +363,11 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
         txtTemperatura.setText(partida.getTemperatura() + "");
         txtNCote.setText(partida.getNumCote() + "");
         dropDownFrigorificos.setSelection(partida.getPosFrigorifico());
+        txtFecha.setText(partida.getFecha() + "");
     }
 
 
     //region Manejo loader
-
     public void iniciarLoader() {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         spinnerLoader.setVisibility(View.VISIBLE);
@@ -349,7 +377,5 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
         spinnerLoader.setVisibility(View.INVISIBLE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
-
-
     //endregion
 }

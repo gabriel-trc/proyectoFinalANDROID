@@ -23,10 +23,11 @@ import ort.proyecto_final.mvdmart.helpers.StringWithTag;
 import ort.proyecto_final.mvdmart.server_calls.ComenzarIdentificacionPartidaServerCall;
 import ort.proyecto_final.mvdmart.server_calls.GetAllFrigorificosServerCall;
 import ort.proyecto_final.mvdmart.server_calls.GetAllPartidasPendientesServerCall;
+import ort.proyecto_final.mvdmart.server_calls.ObtenerItemsIdentificadosServerCall;
 
 public class SelectAreaActivity extends AppCompatActivity {
 
-    private Button btnLogout, btnRegistrpCentrifugacion, btnRegistroSeparacion, btnRegistroDescarte, btnIdentificacionBolsa, btnRegistroMaterias;
+    private Button btnLogout,  btnRegistroSeparacion, btnIdentificacionBolsa, btnRegistroMaterias;
     public ConstraintLayout spinnerLoader;
     private SelectAreaActivity activity;
     private ArrayAdapter<StringWithTag> partidasPendientesArray;
@@ -69,6 +70,17 @@ public class SelectAreaActivity extends AppCompatActivity {
             public void onClick(View v) {
                 iniciarLoader();
                 new GetAllPartidasPendientesServerCall(activity);
+            }
+        });
+
+        btnRegistroSeparacion= findViewById(R.id.btnRegistroSeparacion);
+        btnRegistroSeparacion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent goToNextActivity = new Intent(getApplicationContext(), SeparacionItemsActivity.class);
+                startActivity(goToNextActivity);
+
+
             }
         });
     }

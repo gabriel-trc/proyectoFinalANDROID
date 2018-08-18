@@ -28,7 +28,7 @@ public class StringWithTag {
 
     public static List<StringWithTag> convertJSONArrayToAarrayFrigorificos(JSONArray jsonArray) throws JSONException {
         List<StringWithTag> ret = new ArrayList<StringWithTag>();
-        ret.add(new StringWithTag("Seleccione un frigorifico",  -1));
+        ret.add(new StringWithTag("Seleccione uno",  -1));
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject object = jsonArray.getJSONObject(i);
             ret.add(new StringWithTag(object.getString("Nombre"),  Integer.parseInt(object.getString("Codigo"))));

@@ -12,7 +12,9 @@ public class Bolsa implements Comparable<Bolsa> {
 
     //region Helper Getter's and Setter's
 
-    public int getLocalId() { return localId; }
+    public int getLocalId() {
+        return localId;
+    }
 
     public void setLocalId(int localId) {
         this.localId = localId;
@@ -51,8 +53,8 @@ public class Bolsa implements Comparable<Bolsa> {
     }
     //endregion
 
-    public Bolsa() {
-
+    public Bolsa(String pCodigo) {
+        this.codigoBolsa = pCodigo;
     }
 
     public Bolsa(int pPeso, int pCondicion) {
@@ -81,12 +83,17 @@ public class Bolsa implements Comparable<Bolsa> {
 
     public void generarCodigo(String codigoBolsa, int nroUltimaBolsa) {
         int largoNroUltima = (nroUltimaBolsa + "").length();
-        String codigo = codigoBolsa.substring(0,codigoBolsa.length() - largoNroUltima);
+        String codigo = codigoBolsa.substring(0, codigoBolsa.length() - largoNroUltima);
         setCodigoBolsa(codigo + nroUltimaBolsa);
     }
 
     @Override
     public int compareTo(@NonNull Bolsa b) {
         return this.codigoBolsa.compareTo(b.codigoBolsa);
+    }
+
+    @Override
+    public String toString() {
+        return this.codigoBolsa;
     }
 }

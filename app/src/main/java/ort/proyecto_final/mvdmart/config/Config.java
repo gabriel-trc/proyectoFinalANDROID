@@ -47,4 +47,12 @@ public class Config {
     public static String getPartidasPendientes (Activity activity){
         return activity.getSharedPreferences(Constants.MyPREFERENCES, Context.MODE_PRIVATE).getString("partidasPendientes","");
     }
+
+    public static void setItemsPendientesSeparacion (Activity activity, String pItemsPendientes){
+        assignSharedPreferences(activity,"itemsPendientes", pItemsPendientes);
+    }
+
+    public static String getItemsPendientesSeparacion (Activity activity){
+        return activity.getSharedPreferences(Constants.MyPREFERENCES, Context.MODE_PRIVATE).getString("itemsPendientes","");
+    }
 }
