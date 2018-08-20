@@ -10,9 +10,14 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ListAdapter;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +31,7 @@ import java.util.List;
 
 import ort.proyecto_final.mvdmart.R;
 import ort.proyecto_final.mvdmart.models.BotellaSuero;
+import ort.proyecto_final.mvdmart.models.ExtraccionSueroDeBolsa;
 import ort.proyecto_final.mvdmart.models.Item;
 import ort.proyecto_final.mvdmart.models.Partida;
 import ort.proyecto_final.mvdmart.server_calls.CambiarItemIdentificadoServerCall;
@@ -37,15 +43,18 @@ import ort.proyecto_final.mvdmart.server_calls.SeleccionarItemServerCall;
 
 public class SeparacionItemsActivity extends AppCompatActivity {
     private BotellaSuero botellaSueroSeleccionada;
-    private Button btnSeleccionarItem, btnSeleccionarBotellaSuero;
+    private Button btnSeleccionarItem, btnSeleccionarBotellaSuero, btnAgregarExtraaccionSuero;
     private ExpandableListView expandableListView;
     private ExpandableListAdapter expandableListAdapter;
     private List<String> expandableListTitle;
     private HashMap<String, List<Item>> expandableListDetail;
     private ConstraintLayout spinnerLoader;
     private Item itemSeleccionado, nuevoItemSeleccionado;
-    private TextView alertTitle, txtItemPreSeleccionado, txtBotellaSuero;
+    private TextView alertTitle, txtItemPreSeleccionado, txtBotellaSuero, txtDisponibleBotellaSuero;
     private HashMap<String, Integer> objetosEnVista = new HashMap<>();
+    private TableLayout tablaExtraccionesSuero;
+    ArrayList<ExtraccionSueroDeBolsa> extraccionSueroDeBolsas = new ArrayList<>();
+    private EditText txtCantidadExtracionSuero;
 
 
     @Override
@@ -57,8 +66,11 @@ public class SeparacionItemsActivity extends AppCompatActivity {
     }
 
     private void iniciarVistas() {
+        txtCantidadExtracionSuero = findViewById(R.id.txtCantidadExtracionSuero);
+        tablaExtraccionesSuero = findViewById(R.id.tablaExtraccionSuero);
         txtItemPreSeleccionado = findViewById(R.id.txtItemPreSeleccionado);
         txtBotellaSuero = findViewById(R.id.txtBotellaSuero);
+        txtDisponibleBotellaSuero = findViewById(R.id.txtDisponibleBotellaSuero);
         btnSeleccionarItem = findViewById(R.id.btnSeleccionarItem);
         btnSeleccionarItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +87,22 @@ public class SeparacionItemsActivity extends AppCompatActivity {
                 new ObtenerBotellasDeSueroServerCall(SeparacionItemsActivity.this);
             }
         });
+
+        btnAgregarExtraaccionSuero = findViewById(R.id.btnAgregarExtraaccionSuero);
+        btnAgregarExtraaccionSuero.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(botellaSueroSeleccionada != null && itemSeleccionado != null){
+                    agregarNuevaExtraccion();
+                }
+            }
+        });
+    }
+
+    private void agregarNuevaExtraccion() {
+        extraccionSueroDeBolsas.add(new ExtraccionSueroDeBolsa(itemSeleccionado.getCodigo(),itemSeleccionado.getTipo(), botellaSueroSeleccionada.getCodigo(), Double.parseDouble(txtCantidadExtracionSuero.getText().toString())));
+        createRows();
+        txtDisponibleBotellaSuero.setText("Disponible: " + (500 - Double.parseDouble(txtCantidadExtracionSuero.getText().toString())));
 
     }
 
@@ -158,24 +186,32 @@ public class SeparacionItemsActivity extends AppCompatActivity {
         itemSeleccionado();
     }
 
-
     public void alertSeleccionarBotella(JSONArray botellas) {
         ArrayList<BotellaSuero> botellasSuero = new ArrayList<>();
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(SeparacionItemsActivity.this);
         if (botellas.length() > 0) {
-            //        for(int i=0; i < botellas.length(); i++){
-//            botellasSuero.add(new BotellaSuero());
-
-//        }
-// mBuilder.setTitle("Seleccione una partida");
-            // final ListAdapter adaptador = new ArrayAdapter<StringWithTag>(this, android.R.layout.select_dialog_singlechoice, partidas);
-//            mBuilder.setSingleChoiceItems(adaptador, -1, new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    StringWithTag partidaSeleccionada = (StringWithTag) ((AlertDialog) dialog).getListView().getItemAtPosition(which);
-//                    idPartida = partidaSeleccionada.tag;
-//                }
-//            });
+            for (int i = 0; i < botellas.length(); i++) {
+                try {
+                    botellasSuero.add(new BotellaSuero(botellas.getJSONObject(i).getString("codigo"), botellas.getJSONObject(i).getDouble("cantidad")));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            mBuilder.setTitle("Seleccione una partida");
+            final ListAdapter adaptador = new ArrayAdapter<BotellaSuero>(this, android.R.layout.select_dialog_singlechoice, botellasSuero);
+            mBuilder.setSingleChoiceItems(adaptador, -1, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    botellaSueroSeleccionada = (BotellaSuero) ((AlertDialog) dialog).getListView().getItemAtPosition(which);
+                }
+            });
+            mBuilder.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {//TODO override del listener del positive button para que no cierre el dialogo, si no escojio botella
+                    iniciarNuevaBotellaSuero(botellaSueroSeleccionada);
+                    dialog.dismiss();
+                }
+            });
         } else {
             mBuilder.setTitle("No hay botellas de suero disponible");
             mBuilder.setMessage("No hay ninguna botella de suero para completar.\nDebe agregar una nueva.");
@@ -188,18 +224,77 @@ public class SeparacionItemsActivity extends AppCompatActivity {
                 }
             });
         }
-
-
         mBuilder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         });
-
         AlertDialog mDialog = mBuilder.create();
         mDialog.show();
+    }
 
+    public void iniciarNuevaBotellaSuero(BotellaSuero botella) {
+        botellaSueroSeleccionada = botella;
+        txtBotellaSuero.setText(botellaSueroSeleccionada.getCodigo().toString());
+        txtDisponibleBotellaSuero.setText("Disponible: " + (500 - botellaSueroSeleccionada.getCantidad()));
+    }
+
+    private void createRows() {
+        tablaExtraccionesSuero.removeAllViews();
+        for (int i = 0; i < extraccionSueroDeBolsas.size(); i++) {
+            extraccionSueroDeBolsas.get(i).setLocalId(i);
+            TableRow row = new TableRow(this);
+            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+            row.setLayoutParams(lp);
+            row.setId(i/*partidas.get(i).getLocalId()*/);
+            final TextView columnaCodigoItem = new TextView(this.getApplicationContext());
+            columnaCodigoItem.setText(extraccionSueroDeBolsas.get(i).getCodigo());
+            columnaCodigoItem.setTextColor(0xFF000000);
+            columnaCodigoItem.setBackgroundColor(Color.parseColor("#f7f7f7"));
+            row.addView(columnaCodigoItem);
+            final TextView columnaCantidadExtraida = new TextView(this.getApplicationContext());
+            columnaCantidadExtraida.setText(extraccionSueroDeBolsas.get(i).getCantidad() + "");
+            columnaCantidadExtraida.setTextColor(0xFF000000);
+            row.addView(columnaCantidadExtraida);
+            final TextView columnaCodigoBotellaSuero = new TextView(this.getApplicationContext());
+            columnaCodigoBotellaSuero.setText(extraccionSueroDeBolsas.get(i).getCodigoBotellaDeSuero());
+            columnaCodigoBotellaSuero.setTextColor(0xFF000000);
+            row.addView(columnaCodigoBotellaSuero);
+
+            final Button rowEditBtn = new Button(this);
+            rowEditBtn.setBackgroundResource(R.drawable.ic_edit_row);
+            rowEditBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                   // questionEditPartida(((TableRow) v.getParent()).getId());
+                }
+            });
+            row.addView(rowEditBtn);
+            final Button rowDeleteBtn = new Button(this);
+            rowDeleteBtn.setBackgroundResource(R.drawable.ic_delete_row);
+            rowDeleteBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //removePartidaById(((TableRow) v.getParent()).getId());
+                }
+            });
+            row.addView(rowDeleteBtn);
+            tablaExtraccionesSuero.addView(row);
+
+            final TableRow trSep = new TableRow(this);
+            TableLayout.LayoutParams trParamsSep = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
+            trParamsSep.setMargins(0, 0, 0, 0);
+            trSep.setLayoutParams(trParamsSep);
+            TextView tvSep = new TextView(this);
+            TableRow.LayoutParams tvSepLay = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+            tvSepLay.span = 5;
+            tvSep.setLayoutParams(tvSepLay);
+            tvSep.setBackgroundColor(Color.parseColor("#d9d9d9"));
+            tvSep.setHeight(1);
+            trSep.addView(tvSep);
+            tablaExtraccionesSuero.addView(trSep, trParamsSep);
+        }
     }
 
 
@@ -214,12 +309,6 @@ public class SeparacionItemsActivity extends AppCompatActivity {
         spinnerLoader.setVisibility(View.INVISIBLE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
-
-    public void iniciarNuevaBotellaSuero(String retorno) {
-        botellaSueroSeleccionada = new BotellaSuero(retorno, 500);
-        txtBotellaSuero.setText(botellaSueroSeleccionada.getCodigo().toString());
-    }
-
 
     //endregion
 }

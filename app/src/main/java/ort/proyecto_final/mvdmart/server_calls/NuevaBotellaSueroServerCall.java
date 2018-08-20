@@ -23,6 +23,7 @@ import ort.proyecto_final.mvdmart.activities.SelectAreaActivity;
 import ort.proyecto_final.mvdmart.activities.SeparacionItemsActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
+import ort.proyecto_final.mvdmart.models.BotellaSuero;
 
 public class NuevaBotellaSueroServerCall {
     private SeparacionItemsActivity activity;
@@ -41,7 +42,7 @@ public class NuevaBotellaSueroServerCall {
                             activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
 
-                                activity.iniciarNuevaBotellaSuero(response.getString("retorno"));
+                                activity.iniciarNuevaBotellaSuero(new BotellaSuero(response.getString("retorno"),0.0));
                             } else {
                                 JSONArray errorArray = response.getJSONArray("mensajes");
                                 AlertDialog.Builder builder = new AlertDialog.Builder(activity);

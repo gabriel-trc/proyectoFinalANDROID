@@ -38,7 +38,6 @@ public class ComenzarIdentificacionPartidaServerCall {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-
                             if (response.getBoolean("suceso")) {
                                 Intent goToNextActivity = new Intent(context, IdentificacionBolsasActivity.class);
                                 goToNextActivity.putExtra("idPartida",idPartida);

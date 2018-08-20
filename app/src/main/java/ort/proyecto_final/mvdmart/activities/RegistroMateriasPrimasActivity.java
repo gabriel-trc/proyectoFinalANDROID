@@ -1,7 +1,10 @@
 package ort.proyecto_final.mvdmart.activities;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,8 +12,11 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,6 +26,7 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -39,12 +46,12 @@ import ort.proyecto_final.mvdmart.server_calls.RegistroMateriasPrimasServerCall;
 public class RegistroMateriasPrimasActivity extends AppCompatActivity {
 
     private Partida partidaToModify = null;
-    private TextView txtFecha;
+    private TextView txtFecha, txtHora;
     private EditText txtCantConservadoras, txtPeso, txtTemperatura, txtNCote;
     private Button btnAgregar, btnFinalizar;
-    private int idFrigorifico, posFrigorifico, numOperario;
+    private int idFrigorifico, posFrigorifico, numeroOperario;
     private ArrayList<Partida> partidas = new ArrayList<>();
-    private TableLayout tablaPartidas;
+    private TableLayout tablaRegistroPartidas;
     private ArrayAdapter<StringWithTag> frigorificosArray;
     private Spinner dropDownFrigorificos;
     public ConstraintLayout spinnerLoader;
@@ -54,18 +61,17 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro_materias_primas);
-        numOperario = Integer.parseInt(Config.getNumeroOperario(this));
+        numeroOperario = Integer.parseInt(Config.getNumeroOperario(this));
         inicializarVistas();
     }
 
     private void inicializarVistas() {
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         JSONArray obj = null;
         List<StringWithTag> frigorificos = null;
         spinnerLoader = findViewById(R.id.spinner_loader);
-        tablaPartidas = findViewById(R.id.tablaPartidas);
+        tablaRegistroPartidas = findViewById(R.id.tablaPartidas);
         dropDownFrigorificos = findViewById(R.id.ddFrigorificos);
-        //esto hay que revisar, no se asegura que la llamada al servidor este completa
+        //TODO esto hay que revisar, no se asegura que la llamada al servidor este completa, posible parche.preguntar antes de iniciar la actividad si hay frigorificos
         try {
             obj = new JSONArray(Config.getFrigorificos(this));
             frigorificos = StringWithTag.convertJSONArrayToAarrayFrigorificos(obj);
@@ -92,10 +98,11 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
         btnAgregar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (((AppCompatButton) v).getText().equals("Agregar"))
-                    addPartida();
+                if (((AppCompatButton) v).getText().equals(getResources().getString(R.string.btnAgregar)))
+                    agregarPartida();
                 else
-                    modifyPartida();
+                    modificarPartida();
+                HelpersFunctions.esconderTecado(RegistroMateriasPrimasActivity.this);
             }
         });
         btnFinalizar = findViewById(R.id.btnFinalizar);
@@ -103,40 +110,82 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!partidas.isEmpty())
-                    sendPartidas();
+                    enviarRegistrosDePartidas();
                 else
                     Toast.makeText(RegistroMateriasPrimasActivity.this, "Atención: No tienes ninguna partida.", Toast.LENGTH_LONG).show();
-
+                HelpersFunctions.esconderTecado(RegistroMateriasPrimasActivity.this);
+            }
+        });
+        txtHora = findViewById(R.id.hora);
+        txtHora.setText(calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
+        txtHora.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog timePickerDialog = new TimePickerDialog(RegistroMateriasPrimasActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        txtHora.setText(horaEnFormato(hourOfDay,minute));
+                    }
+                }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+                timePickerDialog.show();
             }
         });
         txtFecha = findViewById(R.id.fecha);
-        txtFecha.setText(horaEnFormato(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)));
+        txtFecha.setText(fechaEnFormato(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)));
         txtFecha.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(RegistroMateriasPrimasActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        txtFecha.setText(horaEnFormato(year, month, dayOfMonth));
+                        txtFecha.setText(fechaEnFormato(year, month, dayOfMonth));
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
                 datePickerDialog.show();
             }
         });
         txtCantConservadoras = findViewById(R.id.cantConservadoras);
+        txtCantConservadoras.setTransformationMethod(null);
         txtPeso = findViewById(R.id.peso);
+        txtPeso.setTransformationMethod(null);
         txtTemperatura = findViewById(R.id.temperatura);
+        txtTemperatura.setTransformationMethod(null);
         txtNCote = findViewById(R.id.nroCote);
+        txtNCote.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    HelpersFunctions.esconderTecado(RegistroMateriasPrimasActivity.this);
+                }
+                return false;
+            }
+        });
     }
 
-    private String horaEnFormato(int year, int month, int dayOfMonth) {
-        int realMonth = month + 1;
-        String sMonth = (realMonth < 10) ? "0" + realMonth : realMonth + "";
-        String sDay = (dayOfMonth < 10) ? "0" + dayOfMonth : dayOfMonth + "";
-        return (sDay + "-" + sMonth + "-" + year);
+    private void agregarPartida() {
+        if (chequearCamposCompletosYTiposDatos()) {
+            int cantConservadoras = Integer.parseInt(txtCantConservadoras.getText().toString());
+            int pesoTotal = Integer.parseInt(txtPeso.getText().toString());
+            int temperatura = Integer.parseInt(txtTemperatura.getText().toString());
+            String numeroCote = txtNCote.getText().toString().replaceAll("\\s+", "");
+            String fechaHora = txtFecha.getText().toString() + txtHora.getText();
+            try {
+                String esValida = Partida.validar(cantConservadoras, temperatura, pesoTotal, numeroCote, idFrigorifico);
+                if (esValida == "Ok") {
+                    Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, pesoTotal, temperatura, fechaHora, numeroCote, numeroOperario);
+                    partidas.add(partida);
+                    limpiarCampos();
+                    crearTablaRegistroParttidas();
+                } else {
+                    HelpersFunctions.alertDatosInvalidos(RegistroMateriasPrimasActivity.this,esValida).show();
+                }
+            } catch (JSONException e) {
+                Toast.makeText(this.getApplicationContext(), "Atención: Campos mal formateados. Si perciste, comunicarlo.", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
-    private void sendPartidas() {
+    private void enviarRegistrosDePartidas() {
         if (btnAgregar.getText().equals("Agregar")) {
             JSONArray send = new JSONArray();
             for (int i = 0; i < partidas.size(); i++) {
@@ -150,8 +199,35 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
 
     }
 
-    //TODO se podria refactoriar, y dejarlo en una sola funcion. Nno hay tiempo ahora mismo.
+    private void modificarPartida() {
+        if (partidaToModify != null && chequearCamposCompletosYTiposDatos()) {
+            try {
+                String esValida = Partida.validar(Integer.parseInt(txtCantConservadoras.getText().toString()), Integer.parseInt(txtTemperatura.getText().toString()), Integer.parseInt(txtPeso.getText().toString()), txtNCote.getText().toString(), idFrigorifico);
+                if (esValida == "Ok") {
+                    int indexPartida = partidas.indexOf(partidaToModify);
+                    partidas.get(indexPartida).setCantConservadoras(Integer.parseInt(txtCantConservadoras.getText().toString()));
+                    partidas.get(indexPartida).setPeso(Integer.parseInt(txtPeso.getText().toString()));
+                    partidas.get(indexPartida).setTemperatura(Integer.parseInt(txtTemperatura.getText().toString()));
+                    partidas.get(indexPartida).setNumCote(txtNCote.getText().toString());
+                    partidas.get(indexPartida).setIdFrigorifico(idFrigorifico);
+                    partidas.get(indexPartida).setPosFrigorifico(posFrigorifico);
+                    partidas.get(indexPartida).setFecha( txtFecha.getText().toString() + txtHora.getText());
+                    partidaToModify = null;
+                    limpiarCampos();
+                    btnAgregar.setText(R.string.btnAgregar);
+                    btnAgregar.setBackgroundResource(android.R.color.holo_green_dark);
+                    crearTablaRegistroParttidas();
+                } else {
+                    HelpersFunctions.alertDatosInvalidos(RegistroMateriasPrimasActivity.this,esValida).show();
+                }
+            } catch (JSONException e) {
+                Toast.makeText(this.getApplicationContext(), "Atención: Campos mal formateados. Si perciste, comunicarlo.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     private boolean chequearCamposCompletosYTiposDatos() {
+        //TODO se podria refactoriar, y dejarlo en una sola funcion. Nno hay tiempo ahora mismo.
         boolean camposCompletos = true;
         String camposIncompletos = "Atención, debe completar los siguientes campos:";
         int largoStringCampos = camposIncompletos.length();
@@ -170,62 +246,33 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
         return camposCompletos;
     }
 
-    private void addPartida() {
-        if (chequearCamposCompletosYTiposDatos()) {
-            int cantConservadoras = Integer.parseInt(txtCantConservadoras.getText().toString());
-            int pesoTotal = Integer.parseInt(txtPeso.getText().toString());
-            int temperatura = Integer.parseInt(txtTemperatura.getText().toString());
-            String numeroCote = txtNCote.getText().toString().replaceAll("\\s+", "");
-            String fechaHora = txtFecha.getText().toString();
-            String valida;
-            try {
-                valida = Partida.validar(cantConservadoras, temperatura, pesoTotal, numeroCote, idFrigorifico);
-                if (valida == "Ok") {
-                    Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, pesoTotal, temperatura, fechaHora, numeroCote, numOperario);
-                    partidas.add(partida);
-                    cleanFields();
-                    createRows();
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(RegistroMateriasPrimasActivity.this);
-                    builder.setTitle("DATOS INVALIDOS");
-                    builder.setMessage(valida);
-                    //   builder.setIcon(R.drawable.ic_launcher_foreground);
-                    builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.dismiss();
-                        }
-                    });
-                    AlertDialog alert = builder.create();
-                    alert.show();
-                }
-            } catch (JSONException e) {
-                Toast.makeText(this.getApplicationContext(), "Atención: Campos mal formateados. Si perciste, comunicarlo.", Toast.LENGTH_LONG).show();
-            }
-        }
+    private String fechaEnFormato(int año, int mes, int dia) {
+        int mesReal = mes + 1;
+        String sMes = (mesReal < 10) ? "0" + mesReal : mesReal + "";
+        String sDia = (dia < 10) ? "0" + dia : dia + "";
+        return (sDia + "-" + sMes + "-" + año);
     }
 
-    private void modifyPartida() {
-        if (partidaToModify != null) {
-            int indexPartida = partidas.indexOf(partidaToModify);
-            partidas.get(indexPartida).setCantConservadoras(Integer.parseInt(txtCantConservadoras.getText().toString()));
-            partidas.get(indexPartida).setPeso(Integer.parseInt(txtPeso.getText().toString()));
-            partidas.get(indexPartida).setTemperatura(Integer.parseInt(txtTemperatura.getText().toString()));
-            partidas.get(indexPartida).setNumCote(txtNCote.getText().toString());
-            partidas.get(indexPartida).setIdFrigorifico(idFrigorifico);
-            partidas.get(indexPartida).setPosFrigorifico(posFrigorifico);
-            partidaToModify = null;
-            cleanFields();
-            btnAgregar.setText("Agregar");
-            createRows();
-        }
+    private String horaEnFormato(int hora, int minutos) {
+        String sHora = (hora < 10) ? "0" + hora : hora + "";
+        String sMinutos = (minutos < 10) ? "0" + minutos : minutos + "";
+        return (sHora + ":" + sMinutos);
     }
+
+
+
+
+
+
+
+
 
     public void limpiarTabla() {
-        tablaPartidas.removeAllViews();
+        tablaRegistroPartidas.removeAllViews();
     }
 
-    private void createRows() {
-        tablaPartidas.removeAllViews();
+    private void crearTablaRegistroParttidas() {
+        tablaRegistroPartidas.removeAllViews();
         for (int i = 0; i < partidas.size(); i++) {
             partidas.get(i).setLocalId(i);
             TableRow row = new TableRow(this);
@@ -271,7 +318,7 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
                 }
             });
             row.addView(rowDeleteBtn);
-            tablaPartidas.addView(row);
+            tablaRegistroPartidas.addView(row);
 
             final TableRow trSep = new TableRow(this);
             TableLayout.LayoutParams trParamsSep = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
@@ -284,11 +331,11 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
             tvSep.setBackgroundColor(Color.parseColor("#d9d9d9"));
             tvSep.setHeight(1);
             trSep.addView(tvSep);
-            tablaPartidas.addView(trSep, trParamsSep);
+            tablaRegistroPartidas.addView(trSep, trParamsSep);
         }
     }
 
-    private void cleanFields() {
+    private void limpiarCampos() {
         txtCantConservadoras.setText("");
         txtPeso.setText("");
         txtTemperatura.setText("");
@@ -317,7 +364,7 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
                 partidas.remove(getPartidaById(partidaId));
-                createRows();
+                crearTablaRegistroParttidas();
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -336,9 +383,11 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
         builder.setMessage("¿Quiere editar ese registro?");
         //builder.setIcon(R.drawable.ic_launcher_foreground);
         builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            @SuppressLint("ResourceAsColor")
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
-                btnAgregar.setText("Modificar");
+                btnAgregar.setText(R.string.btnModificar);
+                btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
                 setPartida(partidaToModify);
             }
         });
@@ -363,7 +412,8 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
         txtTemperatura.setText(partida.getTemperatura() + "");
         txtNCote.setText(partida.getNumCote() + "");
         dropDownFrigorificos.setSelection(partida.getPosFrigorifico());
-        txtFecha.setText(partida.getFecha() + "");
+        txtFecha.setText(partida.getFecha().substring(0,10));
+        txtHora.setText(partida.getFecha().substring(10,15));
     }
 
 

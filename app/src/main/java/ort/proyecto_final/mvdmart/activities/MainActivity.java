@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import ort.proyecto_final.mvdmart.R;
@@ -36,11 +39,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void inicializarVistas() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-        txtNumeroOperario = (EditText) findViewById(R.id.txtNumeroOperario);
-        txtNumeroOperario.setTransformationMethod(new NumericKeyBoardTransformationMethod());
-        btnIngresar = (Button) findViewById(R.id.btnIngresar);
+
+        txtNumeroOperario = findViewById(R.id.txtNumeroOperario);
+        txtNumeroOperario.setTransformationMethod(null);
+        txtNumeroOperario.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    HelpersFunctions.esconderTecado(MainActivity.this);
+                }
+                return false;
+            }
+        });
+        btnIngresar = findViewById(R.id.btnIngresar);
         btnIngresar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,10 +72,5 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Para mostrar solamente el teclado numerico, se usa el inputType numberPassword; luego con esta clase interna se transforma el * en el número ingresado.
-    private class NumericKeyBoardTransformationMethod extends PasswordTransformationMethod {
-        @Override
-        public CharSequence getTransformation(CharSequence source, View view) {
-            return source;
-        }
-    }
+
 }
