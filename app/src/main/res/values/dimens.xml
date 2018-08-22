@@ -1,3 +1,5 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="titulo_tabla">25dp</dimen>
+    <dimen name="texto_tabla">20dp</dimen>
 </resources>

@@ -4,8 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
-import android.view.View;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -24,7 +22,7 @@ import ort.proyecto_final.mvdmart.activities.RegistroMateriasPrimasActivity;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 
-public class RegistroMateriasPrimasServerCall {
+public class RegistroMateriasPrimasServerCall  {
 
     private RegistroMateriasPrimasActivity activity;
     private Context context;
@@ -52,20 +50,8 @@ public class RegistroMateriasPrimasServerCall {
                                 Toast.makeText(context, "Registros guardados", Toast.LENGTH_LONG).show();
                                 activity.limpiarTabla();
                             } else {
-                                String[] errores = HelpersFunctions.errores(response.getJSONArray("mensajes"));
-                                final int partidaId = response.getInt("retorno");
-                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                                builder.setTitle(errores[0]);
-                                builder.setMessage(errores[1]);
-                                //builder.setIcon(R.drawable.ic_launcher_foreground);
-                                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.dismiss();
-                                        activity.onResponseErrorPartida(partidaId);
-                                    }
-                                });
-                                AlertDialog alert = builder.create();
-                                alert.show();
+                                Object partidaId = response.getInt("retorno");
+                                activity.alert(activity,HelpersFunctions.errores(response.getJSONArray("mensajes")),partidaId);
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
@@ -75,17 +61,23 @@ public class RegistroMateriasPrimasServerCall {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         activity.finalizarLoader();
+                        String errorMensaje[] = new String[2];
+                        errorMensaje[0] = "Error en el servidor";
                         if (error.getClass().equals(TimeoutError.class)) {
-                            Toast.makeText(context, "No se pudo conectar con el servidor", Toast.LENGTH_LONG).show();
+                            errorMensaje[1] = "No se pudo conectar con el servidor";
                         } else if (error.networkResponse != null) {
                             switch (error.networkResponse.statusCode) {
+                                case 500:
+                                    errorMensaje[1] = "Código 500 – Internal Server Error\n";
+                                    break;
                                 case 502:
-                                    Toast.makeText(context, "Error servidor 502", Toast.LENGTH_LONG).show();
+                                    errorMensaje[1] = "Código 502 – Bad Gateway\n";
                                     break;
                             }
                         } else {
-                            Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
+                            errorMensaje[1] = "Error en servidor\n";
                         }
+                        activity.alert(activity,errorMensaje,null);
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);

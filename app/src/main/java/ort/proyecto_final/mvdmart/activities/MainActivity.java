@@ -18,8 +18,9 @@ import android.widget.Toast;
 import ort.proyecto_final.mvdmart.R;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
+import ort.proyecto_final.mvdmart.server_calls.LoginUsuarioServerCall;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends ActivityMadre {
 
     private Button btnIngresar;
     private EditText txtNumeroOperario;
@@ -33,20 +34,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onRestart(){
+    protected void onRestart() {
         super.onRestart();
         Config.setNumeroOperario(this, null);
     }
 
-    private void inicializarVistas() {
-
+    public void inicializarVistas() {
+        spinnerLoader = findViewById(R.id.spinner_loader);
         txtNumeroOperario = findViewById(R.id.txtNumeroOperario);
         txtNumeroOperario.setTransformationMethod(null);
         txtNumeroOperario.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    HelpersFunctions.esconderTecado(MainActivity.this);
+                    esconderTecado(MainActivity.this);
                 }
                 return false;
             }
@@ -62,15 +63,26 @@ public class MainActivity extends AppCompatActivity {
 
     public void ingresar() {
         if (!HelpersFunctions.isIntegerParseInt(txtNumeroOperario.getText().toString())) {
-            Toast toast = Toast.makeText(this.getApplicationContext(), "Ingrese correctamente su número de operario", Toast.LENGTH_LONG);
-            toast.show();
+            Toast.makeText(this.getApplicationContext(), "Ingrese correctamente su número de operario", Toast.LENGTH_LONG).show();
+            limpiarCampos();
         } else {
-            Config.setNumeroOperario(this, txtNumeroOperario.getText().toString());
-            Intent goToNextActivity = new Intent(getApplicationContext(), SelectAreaActivity.class);
-            startActivity(goToNextActivity);
+            iniciarLoader();
+            new LoginUsuarioServerCall(this, txtNumeroOperario.getText().toString());
         }
     }
 
-    //Para mostrar solamente el teclado numerico, se usa el inputType numberPassword; luego con esta clase interna se transforma el * en el número ingresado.
+    @Override
+    public void limpiarCampos() {
+        txtNumeroOperario.setText("");
+    }
 
+    @Override
+    public void customOnErrorResponseVolley(Object object) {
+
+    }
+
+    @Override
+    public void customAlertFunction(Object object) {
+
+    }
 }

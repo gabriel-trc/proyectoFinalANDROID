@@ -1,22 +1,19 @@
 package ort.proyecto_final.mvdmart.activities;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -34,6 +31,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 import ort.proyecto_final.mvdmart.R;
@@ -43,9 +41,9 @@ import ort.proyecto_final.mvdmart.helpers.StringWithTag;
 import ort.proyecto_final.mvdmart.models.Partida;
 import ort.proyecto_final.mvdmart.server_calls.RegistroMateriasPrimasServerCall;
 
-public class RegistroMateriasPrimasActivity extends AppCompatActivity {
+public class RegistroMateriasPrimasActivity extends ActivityMadre {
 
-    private Partida partidaToModify = null;
+    private Partida partidaParaModificar = null;
     private TextView txtFecha, txtHora;
     private EditText txtCantConservadoras, txtPeso, txtTemperatura, txtNCote;
     private Button btnAgregar, btnFinalizar;
@@ -54,7 +52,7 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
     private TableLayout tablaRegistroPartidas;
     private ArrayAdapter<StringWithTag> frigorificosArray;
     private Spinner dropDownFrigorificos;
-    public ConstraintLayout spinnerLoader;
+
     private final Calendar calendar = Calendar.getInstance();
 
     @Override
@@ -65,7 +63,8 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
         inicializarVistas();
     }
 
-    private void inicializarVistas() {
+    @Override
+    public void inicializarVistas() {
         JSONArray obj = null;
         List<StringWithTag> frigorificos = null;
         spinnerLoader = findViewById(R.id.spinner_loader);
@@ -102,43 +101,39 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
                     agregarPartida();
                 else
                     modificarPartida();
-                HelpersFunctions.esconderTecado(RegistroMateriasPrimasActivity.this);
+                esconderTecado(RegistroMateriasPrimasActivity.this);
             }
         });
         btnFinalizar = findViewById(R.id.btnFinalizar);
         btnFinalizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!partidas.isEmpty())
-                    enviarRegistrosDePartidas();
-                else
-                    Toast.makeText(RegistroMateriasPrimasActivity.this, "Atención: No tienes ninguna partida.", Toast.LENGTH_LONG).show();
-                HelpersFunctions.esconderTecado(RegistroMateriasPrimasActivity.this);
+                enviarRegistrosDePartidas();
             }
         });
         txtHora = findViewById(R.id.hora);
-        txtHora.setText(calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
+        txtHora.setText(HelpersFunctions.horaEnFormato(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE)));
         txtHora.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TimePickerDialog timePickerDialog = new TimePickerDialog(RegistroMateriasPrimasActivity.this, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        txtHora.setText(horaEnFormato(hourOfDay,minute));
+                        txtHora.setText(HelpersFunctions.horaEnFormato(hourOfDay, minute));
                     }
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
                 timePickerDialog.show();
             }
         });
         txtFecha = findViewById(R.id.fecha);
-        txtFecha.setText(fechaEnFormato(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)));
+        txtFecha.setText(HelpersFunctions.fechaEnFormato(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)));
         txtFecha.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(RegistroMateriasPrimasActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        txtFecha.setText(fechaEnFormato(year, month, dayOfMonth));
+                        txtFecha.setText(HelpersFunctions.fechaEnFormato(year, month, dayOfMonth));
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
                 datePickerDialog.show();
@@ -155,7 +150,7 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    HelpersFunctions.esconderTecado(RegistroMateriasPrimasActivity.this);
+                    esconderTecado(RegistroMateriasPrimasActivity.this);
                 }
                 return false;
             }
@@ -168,57 +163,63 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
             int pesoTotal = Integer.parseInt(txtPeso.getText().toString());
             int temperatura = Integer.parseInt(txtTemperatura.getText().toString());
             String numeroCote = txtNCote.getText().toString().replaceAll("\\s+", "");
-            String fechaHora = txtFecha.getText().toString() + txtHora.getText();
+            String fecha = txtFecha.getText().toString();
+            String hora = txtHora.getText().toString();
             try {
-                String esValida = Partida.validar(cantConservadoras, temperatura, pesoTotal, numeroCote, idFrigorifico);
-                if (esValida == "Ok") {
-                    Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, pesoTotal, temperatura, fechaHora, numeroCote, numeroOperario);
+                String[] esValida = Partida.validar(cantConservadoras, temperatura, pesoTotal, numeroCote, idFrigorifico);
+                if (esValida[1] == "Ok") {
+                    Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, pesoTotal, temperatura, fecha, hora, numeroCote, numeroOperario);
                     partidas.add(partida);
                     limpiarCampos();
-                    crearTablaRegistroParttidas();
+                    crearTablaRegistroPartidas();
                 } else {
-                    HelpersFunctions.alertDatosInvalidos(RegistroMateriasPrimasActivity.this,esValida).show();
+                    alert(RegistroMateriasPrimasActivity.this, esValida, null);
                 }
             } catch (JSONException e) {
-                Toast.makeText(this.getApplicationContext(), "Atención: Campos mal formateados. Si perciste, comunicarlo.", Toast.LENGTH_LONG).show();
+                Toast.makeText(RegistroMateriasPrimasActivity.this, "Atención: Campos mal formateados. Si perciste, comunicarlo.", Toast.LENGTH_LONG).show();
             }
         }
     }
 
     private void enviarRegistrosDePartidas() {
-        if (btnAgregar.getText().equals("Agregar")) {
-            JSONArray send = new JSONArray();
-            for (int i = 0; i < partidas.size(); i++) {
-                send.put(partidas.get(i).toJSONObject());
+        if (!partidas.isEmpty()) {
+            if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar))) {
+                JSONArray jsonPartidas = new JSONArray();
+                for (int i = 0; i < partidas.size(); i++) {
+                    jsonPartidas.put(partidas.get(i).toJSONObject());
+                }
+                iniciarLoader();
+                new RegistroMateriasPrimasServerCall(this, jsonPartidas);
+            } else {
+                Toast.makeText(RegistroMateriasPrimasActivity.this, "Atención: Debes terminar de modificar la partida.", Toast.LENGTH_LONG).show();
             }
-            iniciarLoader();
-            new RegistroMateriasPrimasServerCall(this, send);
         } else {
-            Toast.makeText(this.getApplicationContext(), "Atención: Debes terminar de modificar la partida.", Toast.LENGTH_LONG).show();
+            Toast.makeText(RegistroMateriasPrimasActivity.this, "Atención: No tienes ninguna partida.", Toast.LENGTH_LONG).show();
         }
 
     }
 
     private void modificarPartida() {
-        if (partidaToModify != null && chequearCamposCompletosYTiposDatos()) {
+        if (partidaParaModificar != null && chequearCamposCompletosYTiposDatos()) {
             try {
-                String esValida = Partida.validar(Integer.parseInt(txtCantConservadoras.getText().toString()), Integer.parseInt(txtTemperatura.getText().toString()), Integer.parseInt(txtPeso.getText().toString()), txtNCote.getText().toString(), idFrigorifico);
-                if (esValida == "Ok") {
-                    int indexPartida = partidas.indexOf(partidaToModify);
+                String[] esValida = Partida.validar(Integer.parseInt(txtCantConservadoras.getText().toString()), Integer.parseInt(txtTemperatura.getText().toString()), Integer.parseInt(txtPeso.getText().toString()), txtNCote.getText().toString(), idFrigorifico);
+                if (esValida[1] == "Ok") {
+                    int indexPartida = partidas.indexOf(partidaParaModificar);
                     partidas.get(indexPartida).setCantConservadoras(Integer.parseInt(txtCantConservadoras.getText().toString()));
                     partidas.get(indexPartida).setPeso(Integer.parseInt(txtPeso.getText().toString()));
                     partidas.get(indexPartida).setTemperatura(Integer.parseInt(txtTemperatura.getText().toString()));
                     partidas.get(indexPartida).setNumCote(txtNCote.getText().toString());
                     partidas.get(indexPartida).setIdFrigorifico(idFrigorifico);
                     partidas.get(indexPartida).setPosFrigorifico(posFrigorifico);
-                    partidas.get(indexPartida).setFecha( txtFecha.getText().toString() + txtHora.getText());
-                    partidaToModify = null;
+                    partidas.get(indexPartida).setFecha(txtFecha.getText().toString());
+                    partidas.get(indexPartida).setHora(txtHora.getText().toString());
+                    partidaParaModificar = null;
                     limpiarCampos();
                     btnAgregar.setText(R.string.btnAgregar);
                     btnAgregar.setBackgroundResource(android.R.color.holo_green_dark);
-                    crearTablaRegistroParttidas();
+                    crearTablaRegistroPartidas();
                 } else {
-                    HelpersFunctions.alertDatosInvalidos(RegistroMateriasPrimasActivity.this,esValida).show();
+                    alert(RegistroMateriasPrimasActivity.this, esValida, null);
                 }
             } catch (JSONException e) {
                 Toast.makeText(this.getApplicationContext(), "Atención: Campos mal formateados. Si perciste, comunicarlo.", Toast.LENGTH_LONG).show();
@@ -246,79 +247,143 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
         return camposCompletos;
     }
 
-    private String fechaEnFormato(int año, int mes, int dia) {
-        int mesReal = mes + 1;
-        String sMes = (mesReal < 10) ? "0" + mesReal : mesReal + "";
-        String sDia = (dia < 10) ? "0" + dia : dia + "";
-        return (sDia + "-" + sMes + "-" + año);
-    }
-
-    private String horaEnFormato(int hora, int minutos) {
-        String sHora = (hora < 10) ? "0" + hora : hora + "";
-        String sMinutos = (minutos < 10) ? "0" + minutos : minutos + "";
-        return (sHora + ":" + sMinutos);
-    }
-
-
-
-
-
-
-
-
-
-    public void limpiarTabla() {
+    private void crearTablaRegistroPartidas() {
         tablaRegistroPartidas.removeAllViews();
-    }
+        for (int i = -1; i < partidas.size(); i++) {
+            TableRow fila = new TableRow(this);
+            fila.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT, 15f));
+            if (i < 0)
+                fila.setBackgroundColor(Color.rgb(36, 123, 160));
+            else {
+                partidas.get(i).setLocalId(i);
+                fila.setId(i/*partidas.get(i).getLocalId()*/);
+                fila.setBackgroundColor((i % 2 == 0) ? Color.rgb(112, 193, 179) : Color.rgb(178, 219, 191));
+            }
 
-    private void crearTablaRegistroParttidas() {
-        tablaRegistroPartidas.removeAllViews();
-        for (int i = 0; i < partidas.size(); i++) {
-            partidas.get(i).setLocalId(i);
-            TableRow row = new TableRow(this);
-            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
-            row.setLayoutParams(lp);
-            row.setId(i/*partidas.get(i).getLocalId()*/);
-            final TextView rowFrigorifico = new TextView(this.getApplicationContext());
-            rowFrigorifico.setText(frigorificosArray.getItem(partidas.get(i).getPosFrigorifico()).string);
-            rowFrigorifico.setTextColor(0xFF000000);
-            rowFrigorifico.setBackgroundColor(Color.parseColor("#f7f7f7"));
-            row.addView(rowFrigorifico);
-            final TextView rowCantidadConservadoras = new TextView(this.getApplicationContext());
-            rowCantidadConservadoras.setText(partidas.get(i).getCantConservadoras() + "");
-            rowCantidadConservadoras.setTextColor(0xFF000000);
-            row.addView(rowCantidadConservadoras);
-            final TextView rowPeso = new TextView(this.getApplicationContext());
-            rowPeso.setText(partidas.get(i).getPeso() + "");
-            rowPeso.setTextColor(0xFF000000);
-            row.addView(rowPeso);
-            final TextView rowTemperatura = new TextView(this.getApplicationContext());
-            rowTemperatura.setText(partidas.get(i).getTemperatura() + "");
-            rowTemperatura.setTextColor(0xFF000000);
-            row.addView(rowTemperatura);
-            final TextView rowCote = new TextView(this.getApplicationContext());
-            rowCote.setText(partidas.get(i).getNumCote() + "");
-            rowCote.setTextColor(0xFF000000);
-            row.addView(rowCote);
-            final Button rowEditBtn = new Button(this);
-            rowEditBtn.setBackgroundResource(R.drawable.ic_edit_row);
-            rowEditBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    questionEditPartida(((TableRow) v.getParent()).getId());
-                }
-            });
-            row.addView(rowEditBtn);
-            final Button rowDeleteBtn = new Button(this);
-            rowDeleteBtn.setBackgroundResource(R.drawable.ic_delete_row);
-            rowDeleteBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    removePartidaById(((TableRow) v.getParent()).getId());
-                }
-            });
-            row.addView(rowDeleteBtn);
-            tablaRegistroPartidas.addView(row);
+            TextView columnaFrigorifico = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaFrigorifico.setText("Frigorifico");
+            else
+                columnaFrigorifico.setText(frigorificosArray.getItem(partidas.get(i).getPosFrigorifico()).string);
+            columnaFrigorifico.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaFrigorifico.setGravity(Gravity.CENTER);
+            columnaFrigorifico.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaFrigorifico, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2.5f));
+
+            TextView columnaFecha = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaFecha.setText("Fecha");
+            else
+                columnaFecha.setText(partidas.get(i).getFecha());
+            columnaFecha.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaFecha.setGravity(Gravity.CENTER);
+            columnaFecha.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaFecha, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+
+            TextView columnaHora = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaHora.setText("Hora");
+            else
+                columnaHora.setText(partidas.get(i).getHora());
+            columnaHora.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaHora.setGravity(Gravity.CENTER);
+            columnaHora.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaHora, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+
+            TextView columnaConservadoras = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaConservadoras.setText("Conservadoras");
+            else
+                columnaConservadoras.setText(partidas.get(i).getCantConservadoras() + "");
+            columnaConservadoras.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaConservadoras.setGravity(Gravity.CENTER);
+            columnaConservadoras.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaConservadoras, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
+
+            TextView columnaPeso = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaPeso.setText("Peso");
+            else
+                columnaPeso.setText(partidas.get(i).getPeso() + "");
+            columnaPeso.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaPeso.setGravity(Gravity.CENTER);
+            columnaPeso.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaPeso, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+
+            TextView columnaTemperatura = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaTemperatura.setText("Temperatura");
+            else
+                columnaTemperatura.setText(partidas.get(i).getTemperatura() + "");
+            columnaTemperatura.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaTemperatura.setGravity(Gravity.CENTER);
+            columnaTemperatura.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaTemperatura, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
+
+            TextView columnaNumeroCote = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaNumeroCote.setText("Número de cote");
+            else
+                columnaNumeroCote.setText(partidas.get(i).getNumCote() + "");
+            columnaNumeroCote.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaNumeroCote.setGravity(Gravity.CENTER);
+            columnaNumeroCote.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaNumeroCote, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
+
+            if (i < 0) {
+                TextView columnaModificar = new TextView(this.getApplicationContext());
+                columnaModificar.setText("Modificar");
+                columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaModificar.setGravity(Gravity.CENTER);
+                columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+            } else {
+                Button columnaModificar = new Button(this);
+                columnaModificar.setText(R.string.btnModificar);
+                columnaModificar.setBackgroundResource(android.R.color.holo_orange_dark);
+                columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaModificar.setGravity(Gravity.CENTER);
+                columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                columnaModificar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        HashMap<String, Integer> obj = new HashMap<>();
+                        obj.put("funcion", 1);
+                        obj.put("id", (((TableRow) v.getParent()).getId()));
+                        alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"Atención", "¿Quiere editar este registro?"}, obj);
+                    }
+                });
+                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+            }
+
+            if (i < 0) {
+                TextView columnaBorrar = new TextView(this.getApplicationContext());
+                columnaBorrar.setText("Borrar");
+                columnaBorrar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaBorrar.setGravity(Gravity.CENTER);
+                columnaBorrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+            } else {
+                Button columnaBorrar = new Button(this);
+                columnaBorrar.setText("BORRAR");
+                columnaBorrar.setBackgroundResource(android.R.color.holo_red_dark);
+                columnaBorrar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaBorrar.setGravity(Gravity.CENTER);
+                columnaBorrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                columnaBorrar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                       // preguntaEliminarPartida(((TableRow) v.getParent()).getId());
+                        HashMap<String, Integer> obj = new HashMap<>();
+                        obj.put("funcion", 2);
+                        obj.put("id", (((TableRow) v.getParent()).getId()));
+                        alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"Atención", "¿Quiere borrar este registro?"}, obj);
+                    }
+                });
+                fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+            }
+
+            tablaRegistroPartidas.addView(fila);
 
             final TableRow trSep = new TableRow(this);
             TableLayout.LayoutParams trParamsSep = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
@@ -326,21 +391,28 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
             trSep.setLayoutParams(trParamsSep);
             TextView tvSep = new TextView(this);
             TableRow.LayoutParams tvSepLay = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
-            tvSepLay.span = 7;
+            tvSepLay.span = 9;
             tvSep.setLayoutParams(tvSepLay);
-            tvSep.setBackgroundColor(Color.parseColor("#d9d9d9"));
-            tvSep.setHeight(1);
+            tvSep.setBackgroundColor(Color.rgb(243, 255, 189));
+            tvSep.setHeight(4);
             trSep.addView(tvSep);
             tablaRegistroPartidas.addView(trSep, trParamsSep);
         }
     }
 
-    private void limpiarCampos() {
+    public void limpiarTabla() {
+        tablaRegistroPartidas.removeAllViews();
+    }
+
+    @Override
+    public void limpiarCampos() {
         txtCantConservadoras.setText("");
         txtPeso.setText("");
         txtTemperatura.setText("");
         txtNCote.setText("");
         dropDownFrigorificos.setSelection(0);
+        txtHora.setText(HelpersFunctions.horaEnFormato(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE)));
+        txtFecha.setText(HelpersFunctions.fechaEnFormato(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)));
     }
 
     private Partida getPartidaById(int idPartida) {
@@ -353,79 +425,37 @@ public class RegistroMateriasPrimasActivity extends AppCompatActivity {
         return ret;
     }
 
-    private void removePartidaById(int id) {
-        //investigar para crear el alert con un helperfunctino
-        final int partidaId = id;
-        AlertDialog.Builder builder = new AlertDialog.Builder(RegistroMateriasPrimasActivity.this);
-        builder.setTitle(R.string.app_name);
-        builder.setMessage("¿Quiere borrar ese registro?");
-        //   builder.setIcon(R.drawable.ic_launcher_foreground);
-        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-                partidas.remove(getPartidaById(partidaId));
-                crearTablaRegistroParttidas();
-            }
-        });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
+    @Override
+    public void customOnErrorResponseVolley(Object partidaId) {
+        partidaParaModificar = getPartidaById((Integer) partidaId);
+        btnAgregar.setText(R.string.btnModificar);
+        btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
+        setearPartida(partidaParaModificar);
     }
 
-    private void questionEditPartida(int partidaId) {
-        partidaToModify = getPartidaById(partidaId);
-        AlertDialog.Builder builder = new AlertDialog.Builder(RegistroMateriasPrimasActivity.this);
-        builder.setTitle(R.string.app_name);
-        builder.setMessage("¿Quiere editar ese registro?");
-        //builder.setIcon(R.drawable.ic_launcher_foreground);
-        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-            @SuppressLint("ResourceAsColor")
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-                btnAgregar.setText(R.string.btnModificar);
-                btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
-                setPartida(partidaToModify);
-            }
-        });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
+    @Override
+    public void customAlertFunction(Object object) {
+        HashMap<String, Integer> hashMap = (HashMap<String, Integer>) object;
+        if (hashMap.get("funcion") == 1) {
+            partidaParaModificar = getPartidaById(hashMap.get("id"));
+            btnAgregar.setText(R.string.btnModificar);
+            btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
+            setearPartida(partidaParaModificar);
+        } else {
+            partidas.remove(getPartidaById(hashMap.get("id")));
+            crearTablaRegistroPartidas();
+        }
+
     }
 
-    public void onResponseErrorPartida(int partidaId) {
-        partidaToModify = getPartidaById(partidaId);
-        btnAgregar.setText("Modificar");
-        setPartida(partidaToModify);
-    }
-
-    private void setPartida(Partida partida) {
+    private void setearPartida(Partida partida) {
         txtCantConservadoras.setText(partida.getCantConservadoras() + "");
         txtPeso.setText(partida.getPeso() + "");
         txtTemperatura.setText(partida.getTemperatura() + "");
         txtNCote.setText(partida.getNumCote() + "");
         dropDownFrigorificos.setSelection(partida.getPosFrigorifico());
-        txtFecha.setText(partida.getFecha().substring(0,10));
-        txtHora.setText(partida.getFecha().substring(10,15));
+        txtFecha.setText(partida.getFecha());
+        txtHora.setText(partida.getHora());
     }
 
-
-    //region Manejo loader
-    public void iniciarLoader() {
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        spinnerLoader.setVisibility(View.VISIBLE);
-    }
-
-    public void finalizarLoader() {
-        spinnerLoader.setVisibility(View.INVISIBLE);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-    }
-    //endregion
 }

@@ -7,6 +7,6 @@
     tools:context=".activities.MainActivity">
 
     <include layout="@layout/content_main" />
-
+    <include layout="@layout/spinner_loader" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -1,12 +1,8 @@
 package ort.proyecto_final.mvdmart.server_calls;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
-import android.view.View;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -16,56 +12,37 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.IdentificacionBolsasActivity;
+import ort.proyecto_final.mvdmart.activities.MainActivity;
 import ort.proyecto_final.mvdmart.activities.SelectAreaActivity;
-import ort.proyecto_final.mvdmart.activities.SeparacionItemsActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
-import ort.proyecto_final.mvdmart.models.Item;
+import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 
-public class SeleccionarItemServerCall {
-
-
-    private SeparacionItemsActivity activity;
+public class LoginUsuarioServerCall {
+    private MainActivity activity;
     private Context context;
 
-    public SeleccionarItemServerCall(final SeparacionItemsActivity activity, final Item item) {
+    public LoginUsuarioServerCall(final MainActivity activity, final String numeroOperario) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
-        String url = Constants.DOMAIN + "/api/item/seleccionar";
-
-        JSONObject sendObject = new JSONObject();
-        try {
-            sendObject.put("Item", item.toJSONObject());
-            sendObject.put("CodigoOperario", Config.getNumeroOperario(activity));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        String url = Constants.DOMAIN + "/api/operario/login/"+ numeroOperario;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, url, sendObject, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
                             if (response.getBoolean("suceso")) {
-                                activity.itemSeleccionado();
                                 activity.finalizarLoader();
+                                Config.setNumeroOperario(activity, numeroOperario + "");
+                                Intent goToNextActivity = new Intent(context, SelectAreaActivity.class);
+                                goToNextActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//TODO leer que hace este parche
+                                context.startActivity(goToNextActivity);
                             } else {
                                 JSONArray errorArray = response.getJSONArray("mensajes");
-                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                                builder.setTitle(errorArray.getString(0));
-                                builder.setMessage(errorArray.getString(1));
-                                //builder.setIcon(R.drawable.ic_launcher_foreground);
-                                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                AlertDialog alert = builder.create();
-                                alert.show();
+                                activity.alert(activity, HelpersFunctions.errores(errorArray), null);
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");

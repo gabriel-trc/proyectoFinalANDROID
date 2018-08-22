@@ -18,11 +18,19 @@ import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 public class Partida {
 
     private int localId, numeroOperario, idFrigorifico, cantConservadoras, temperatura, peso, posFrigorifico, id;
-    private String fecha, numCote, nombreFrigorifico;
+    private String fecha, hora, numCote, nombreFrigorifico;
     private ArrayList<Bolsa> bolsas;
 
     //region Helper Getter's and Setter's
 
+
+    public String getHora() {
+        return hora;
+    }
+
+    public void setHora(String hora) {
+        this.hora = hora;
+    }
 
     public int getId() {
         return id;
@@ -125,26 +133,28 @@ public class Partida {
 
     }
 
-    public Partida(int idFrigorifico, int posFrigorifico, int cantConservadoras, int peso, int temperatura, String fechaHora, String numCote, int numeroOperario) {
+    public Partida(int idFrigorifico, int posFrigorifico, int cantConservadoras, int peso, int temperatura, String fecha, String pHora, String numCote, int numeroOperario) {
         this.idFrigorifico = idFrigorifico;
         this.cantConservadoras = cantConservadoras;
         this.peso = peso;
         this.temperatura = temperatura;
-        this.fecha = fechaHora;
+        this.fecha = fecha;
+        this.hora = pHora;
         this.numCote = numCote;
         this.posFrigorifico = posFrigorifico;
         this.numeroOperario = numeroOperario;
     }
 
-    public Partida(int pId, String pNombreFrigorifico, String pNumeroCote, String pFecha, ArrayList<Bolsa>pBolsas) {
+    public Partida(int pId, String pNombreFrigorifico, String pNumeroCote, String pFecha, String pHora, ArrayList<Bolsa> pBolsas) {
         this.id = pId;
         this.nombreFrigorifico = pNombreFrigorifico;
         this.bolsas = pBolsas;
         this.numCote = pNumeroCote;
         this.fecha = pFecha;
+        this.hora = pHora;
     }
 
-    public static String validar(int cantConservadoras, int temperatura, int pesoTotal, String numeroCote, int idFrigorifico) throws JSONException {
+    public static String[] validar(int cantConservadoras, int temperatura, int pesoTotal, String numeroCote, int idFrigorifico) throws JSONException {
         boolean camposCompletos = true;
         String camposIncorrectos = "Debe arreglar los siguientes campos:\n";
         int largoStringCampos = camposIncorrectos.length();
@@ -161,14 +171,14 @@ public class Partida {
         if (camposIncorrectos.length() == largoStringCampos) {
             camposIncorrectos = "Ok";
         }
-        return camposIncorrectos;
+        return new String[]{"DATOS INVÁLIDOS", camposIncorrectos};
     }
 
     public JSONObject toJSONObject() {
         JSONObject jsonBody = new JSONObject();
         try {
             String[] splitFecha = this.fecha.split("-");
-            jsonBody.put("Fecha", splitFecha[2] + "-" + splitFecha[1] + "-" + splitFecha[0] + " 00:00:00");
+            jsonBody.put("Fecha", splitFecha[2] + "-" + splitFecha[1] + "-" + splitFecha[0] + " " + this.hora + ":00");
             jsonBody.put("CodigoFrigorifico", this.idFrigorifico);
             jsonBody.put("NumeroDeCote", this.numCote);
             jsonBody.put("Temperatura", this.temperatura);
@@ -202,10 +212,10 @@ public class Partida {
             JSONArray bolsas = partida.getJSONArray("bolsaDeSangre");
             ArrayList<Item> bolsasDeSangre = new ArrayList<>();
             for (int j = 0; j < bolsas.length(); j++) {
-                bolsasDeSangre.add(new Item(bolsas.getJSONObject(j).getString("codigo"),0));
+                bolsasDeSangre.add(new Item(bolsas.getJSONObject(j).getString("codigo"), 0));
             }
-            String llavePartida =  partida.getJSONObject("frigorifico").getString("nombre")+ " - " + partida.getString("fechaCompleta");
-            partidasParaSeparar.put(llavePartida,bolsasDeSangre);
+            String llavePartida = partida.getJSONObject("frigorifico").getString("nombre") + " - " + partida.getString("fechaCompleta");
+            partidasParaSeparar.put(llavePartida, bolsasDeSangre);
         }
         return partidasParaSeparar;
     }

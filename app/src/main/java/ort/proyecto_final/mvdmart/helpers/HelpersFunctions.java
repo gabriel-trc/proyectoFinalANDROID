@@ -14,9 +14,6 @@ import ort.proyecto_final.mvdmart.R;
 
 public class HelpersFunctions {
 
-    public HelpersFunctions() {
-    }
-
     public static boolean isIntegerParseInt(String str) {
         try {
             Integer.parseInt(str);
@@ -48,32 +45,19 @@ public class HelpersFunctions {
             }
         }
         return new String[]{titulo, mensaje};
-
     }
 
-    public static void esconderTecado(Activity activity) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //Find the currently focused view, so we can grab the correct window token from it.
-        View view = activity.getCurrentFocus();
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = new View(activity);
-        }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    public static String fechaEnFormato(int año, int mes, int dia) {
+        int mesReal = mes + 1;
+        String sMes = (mesReal < 10) ? "0" + mesReal : mesReal + "";
+        String sDia = (dia < 10) ? "0" + dia : dia + "";
+        return (sDia + "-" + sMes + "-" + año);
     }
 
-    public static android.app.AlertDialog alertDatosInvalidos(Context contexto, String mensaje) {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(contexto);
-        builder.setTitle(Html.fromHtml("<font color='#FF0000'>DATOS INVÁLIDOS</font>"));
-        builder.setMessage(mensaje);
-        builder.setIcon(R.drawable.ic_alert);
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        android.app.AlertDialog alert = builder.create();
-        return alert;
+    public static String horaEnFormato(int hora, int minutos) {
+        String sHora = (hora < 10) ? "0" + hora : hora + "";
+        String sMinutos = (minutos < 10) ? "0" + minutos : minutos + "";
+        return (sHora + ":" + sMinutos);
     }
 
 
