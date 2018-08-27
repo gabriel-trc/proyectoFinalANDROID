@@ -1,7 +1,6 @@
 package ort.proyecto_final.mvdmart.server_calls;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,13 +12,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
-import ort.proyecto_final.mvdmart.activities.SelectAreaActivity;
-import ort.proyecto_final.mvdmart.activities.SeparacionItemsActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
-import ort.proyecto_final.mvdmart.models.Partida;
 
 public class ObtenerItemsIdentificadosServerCall {
     private SeparacionItemsActivity activity;

@@ -16,24 +16,23 @@ import ort.proyecto_final.mvdmart.activities.SelectAreaActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 
-public class GetAllPartidasPendientesServerCall {
+public class TraerTodosLosFrigorificosServerCall {
+
     private SelectAreaActivity activity;
     private Context context;
 
-    public GetAllPartidasPendientesServerCall(final SelectAreaActivity activity) {
+    public TraerTodosLosFrigorificosServerCall(final SelectAreaActivity activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
-        String url = Constants.DOMAIN + "/api/partida/pendientes/" + Config.getNumeroOperario(activity);
-
+        String url = Constants.DOMAIN + "/api/frigorifico/todos/" + Config.getNumeroOperario(activity);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            Config.setPartidasPendientes(activity, response.getString("retorno"));
                             activity.finalizarLoader();
-                            activity.alertSelectPartida();
+                            Config.setFrigorificos(activity, response.getString("retorno"));
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
                         }
@@ -42,32 +41,25 @@ public class GetAllPartidasPendientesServerCall {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         activity.finalizarLoader();
+                        String errorMensaje[] = new String[2];
+                        errorMensaje[0] = "Error en el servidor";
                         if (error.getClass().equals(TimeoutError.class)) {
-                            Toast.makeText(context, "No se pudo conectar con el servidor", Toast.LENGTH_LONG).show();
+                            errorMensaje[1] = "No se pudo conectar con el servidor";
                         } else if (error.networkResponse != null) {
                             switch (error.networkResponse.statusCode) {
+                                case 500:
+                                    errorMensaje[1] = "Código 500 – Internal Server Error\n";
+                                    break;
                                 case 502:
-                                    Toast.makeText(context, "Error servidor 502", Toast.LENGTH_LONG).show();
+                                    errorMensaje[1] = "Código 502 – Bad Gateway\n";
                                     break;
                             }
                         } else {
-                            Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
+                            errorMensaje[1] = "Error en servidor\n";
                         }
+                        activity.alert(activity,errorMensaje,null);
                     }
-                })
-//        {
-//            /**
-//             * Passing some request headers
-//             */
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                HashMap<String, String> headers = new HashMap<String, String>();
-//                //headers.put("Content-Type", "application/json");
-//                headers.put("idOperario", Config.getNumeroOperario(activity));
-//                return headers;
-//            }
-//        }
-                ;
+                });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }

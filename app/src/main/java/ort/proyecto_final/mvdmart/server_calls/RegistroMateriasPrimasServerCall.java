@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 import ort.proyecto_final.mvdmart.activities.RegistroMateriasPrimasActivity;
+import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 
@@ -36,6 +37,7 @@ public class RegistroMateriasPrimasServerCall  {
         JSONObject sendObject = new JSONObject();
         try {
             sendObject.put("partidas", partidas);
+            sendObject.put("codigoOperario", Config.getNumeroOperario(activity));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -55,6 +57,7 @@ public class RegistroMateriasPrimasServerCall  {
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
+//TODO mostrar alert generico si entra al catch
                         }
                     }
                 }, new Response.ErrorListener() {

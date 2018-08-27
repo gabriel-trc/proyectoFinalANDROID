@@ -6,6 +6,8 @@
     <color name="colorPrimaryTransparent">#503F51B5</color>
     <color name="colorBlanco">#FFFFFF</color>
     <color name="colorBtnAgregar">@android:color/holo_green_dark</color>
+    <color name="colorBtnSeleccionar">@android:color/holo_green_light</color>
+    <color name="colorBtnCancelar">@android:color/holo_red_dark</color>
     <color name="colorBtnModificar">@android:color/holo_orange_dark</color>
     <color name="colorBtnFinalizar">@android:color/holo_blue_dark</color>
 </resources>

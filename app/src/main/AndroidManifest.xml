@@ -19,7 +19,7 @@
             android:label="@string/app_name"
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" >
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -51,11 +51,9 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustNothing" />
         <activity
-            android:name=".activities.SeparacionItemsActivity"
-            android:label="@string/title_activity_separacion_items"
-            android:screenOrientation="landscape"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustNothing" />
+            android:name=".activities.SeparacionSueroActivity"
+            android:label="@string/title_activity_separacion_suero"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

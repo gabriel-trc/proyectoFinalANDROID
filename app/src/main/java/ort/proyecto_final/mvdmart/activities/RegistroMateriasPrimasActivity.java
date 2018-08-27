@@ -1,10 +1,7 @@
 package ort.proyecto_final.mvdmart.activities;
 
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
@@ -47,7 +44,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
     private TextView txtFecha, txtHora;
     private EditText txtCantConservadoras, txtPeso, txtTemperatura, txtNCote;
     private Button btnAgregar, btnFinalizar;
-    private int idFrigorifico, posFrigorifico, numeroOperario;
+    private int idFrigorifico, posFrigorifico;
     private ArrayList<Partida> partidas = new ArrayList<>();
     private TableLayout tablaRegistroPartidas;
     private ArrayAdapter<StringWithTag> frigorificosArray;
@@ -59,7 +56,6 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro_materias_primas);
-        numeroOperario = Integer.parseInt(Config.getNumeroOperario(this));
         inicializarVistas();
     }
 
@@ -168,7 +164,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
             try {
                 String[] esValida = Partida.validar(cantConservadoras, temperatura, pesoTotal, numeroCote, idFrigorifico);
                 if (esValida[1] == "Ok") {
-                    Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, pesoTotal, temperatura, fecha, hora, numeroCote, numeroOperario);
+                    Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, pesoTotal, temperatura, fecha, hora, numeroCote);
                     partidas.add(partida);
                     limpiarCampos();
                     crearTablaRegistroPartidas();
@@ -196,7 +192,6 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
         } else {
             Toast.makeText(RegistroMateriasPrimasActivity.this, "Atención: No tienes ninguna partida.", Toast.LENGTH_LONG).show();
         }
-
     }
 
     private void modificarPartida() {
@@ -445,7 +440,6 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
             partidas.remove(getPartidaById(hashMap.get("id")));
             crearTablaRegistroPartidas();
         }
-
     }
 
     private void setearPartida(Partida partida) {

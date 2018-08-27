@@ -12,16 +12,15 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.SelectAreaActivity;
-import ort.proyecto_final.mvdmart.activities.SeparacionItemsActivity;
+import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 
 public class ObtenerBotellasDeSueroServerCall {
-    private SeparacionItemsActivity activity;
+    private SeparacionSueroActivity activity;
     private Context context;
 
-    public ObtenerBotellasDeSueroServerCall(final SeparacionItemsActivity activity) {
+    public ObtenerBotellasDeSueroServerCall(final SeparacionSueroActivity activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/botelladesuero/disponibles/" + Config.getNumeroOperario(activity);

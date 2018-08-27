@@ -60,10 +60,11 @@ public class Bolsa implements Comparable<Bolsa> {
     public Bolsa(int pPeso, int pCondicion) {
         this.peso = pPeso;
         this.condicion = pCondicion;
+        razonDescarte = "";
     }
 
-    public static boolean validar(int pPeso, int pCondicion) {
-        if (pCondicion >= 0 && pCondicion <= 3 && pPeso >= 0 && pPeso <= 2000)
+    public static boolean validar(int pPeso) {
+        if (pPeso >= 0 && pPeso <= 2000)
             return true;
         else
             return false;

@@ -34,6 +34,7 @@ public class LoginUsuarioServerCall {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
                                 activity.finalizarLoader();
                                 Config.setNumeroOperario(activity, numeroOperario + "");
@@ -52,17 +53,23 @@ public class LoginUsuarioServerCall {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         activity.finalizarLoader();
+                        String errorMensaje[] = new String[2];
+                        errorMensaje[0] = "Error en el servidor";
                         if (error.getClass().equals(TimeoutError.class)) {
-                            Toast.makeText(context, "No se pudo conectar con el servidor", Toast.LENGTH_LONG).show();
+                            errorMensaje[1] = "No se pudo conectar con el servidor";
                         } else if (error.networkResponse != null) {
                             switch (error.networkResponse.statusCode) {
+                                case 500:
+                                    errorMensaje[1] = "Código 500 – Internal Server Error\n";
+                                    break;
                                 case 502:
-                                    Toast.makeText(context, "Error servidor 502", Toast.LENGTH_LONG).show();
+                                    errorMensaje[1] = "Código 502 – Bad Gateway\n";
                                     break;
                             }
                         } else {
-                            Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
+                            errorMensaje[1] = "Error en servidor\n";
                         }
+                        activity.alert(activity,errorMensaje,null);
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);

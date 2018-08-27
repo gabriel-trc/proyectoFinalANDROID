@@ -17,7 +17,7 @@ import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 
 public class Partida {
 
-    private int localId, numeroOperario, idFrigorifico, cantConservadoras, temperatura, peso, posFrigorifico, id;
+    private int localId, idFrigorifico, cantConservadoras, temperatura, peso, posFrigorifico, id;
     private String fecha, hora, numCote, nombreFrigorifico;
     private ArrayList<Bolsa> bolsas;
 
@@ -62,14 +62,6 @@ public class Partida {
 
     public void setLocalId(int localId) {
         this.localId = localId;
-    }
-
-    public int getNumeroOperario() {
-        return numeroOperario;
-    }
-
-    public void setNumeroOperario(int numeroOperario) {
-        this.numeroOperario = numeroOperario;
     }
 
     public int getIdFrigorifico() {
@@ -133,7 +125,7 @@ public class Partida {
 
     }
 
-    public Partida(int idFrigorifico, int posFrigorifico, int cantConservadoras, int peso, int temperatura, String fecha, String pHora, String numCote, int numeroOperario) {
+    public Partida(int idFrigorifico, int posFrigorifico, int cantConservadoras, int peso, int temperatura, String fecha, String pHora, String numCote) {
         this.idFrigorifico = idFrigorifico;
         this.cantConservadoras = cantConservadoras;
         this.peso = peso;
@@ -142,7 +134,6 @@ public class Partida {
         this.hora = pHora;
         this.numCote = numCote;
         this.posFrigorifico = posFrigorifico;
-        this.numeroOperario = numeroOperario;
     }
 
     public Partida(int pId, String pNombreFrigorifico, String pNumeroCote, String pFecha, String pHora, ArrayList<Bolsa> pBolsas) {
@@ -155,7 +146,6 @@ public class Partida {
     }
 
     public static String[] validar(int cantConservadoras, int temperatura, int pesoTotal, String numeroCote, int idFrigorifico) throws JSONException {
-        boolean camposCompletos = true;
         String camposIncorrectos = "Debe arreglar los siguientes campos:\n";
         int largoStringCampos = camposIncorrectos.length();
         if (idFrigorifico == -1)
@@ -184,7 +174,6 @@ public class Partida {
             jsonBody.put("Temperatura", this.temperatura);
             jsonBody.put("PesoTotal", this.peso);
             jsonBody.put("CantidadDeConservadoras", this.cantConservadoras);
-            jsonBody.put("OperarioId", this.numeroOperario);
         } catch (JSONException e) {
             e.printStackTrace();
         }

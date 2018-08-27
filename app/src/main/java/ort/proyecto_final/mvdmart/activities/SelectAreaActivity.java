@@ -1,16 +1,12 @@
 package ort.proyecto_final.mvdmart.activities;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
@@ -24,16 +20,14 @@ import ort.proyecto_final.mvdmart.R;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.helpers.StringWithTag;
 import ort.proyecto_final.mvdmart.server_calls.ComenzarIdentificacionPartidaServerCall;
-import ort.proyecto_final.mvdmart.server_calls.GetAllFrigorificosServerCall;
-import ort.proyecto_final.mvdmart.server_calls.GetAllPartidasPendientesServerCall;
-import ort.proyecto_final.mvdmart.server_calls.ObtenerItemsIdentificadosServerCall;
+import ort.proyecto_final.mvdmart.server_calls.TraerTodosLosFrigorificosServerCall;
+import ort.proyecto_final.mvdmart.server_calls.TraerTodasLasPartidasPendientesServerCall;
 
-public class SelectAreaActivity extends AppCompatActivity {
+public class SelectAreaActivity extends ActivityMadre {
 
     private Button btnLogout,  btnRegistroSeparacion, btnIdentificacionBolsa, btnRegistroMaterias;
     private TextView txtOperario;
-    public ConstraintLayout spinnerLoader;
-    private int idPartida = -1;
+    private int idPartidaSelecionada = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +35,11 @@ public class SelectAreaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_area);
         spinnerLoader = findViewById(R.id.spinner_loader);
         iniciarLoader();
-        new GetAllFrigorificosServerCall(this);
+        new TraerTodosLosFrigorificosServerCall(this);
         inicializarVistas();
     }
 
-    private void inicializarVistas() {
+    public void inicializarVistas() {
         txtOperario = findViewById(R.id.txtOperario);
         txtOperario.setText("Número de operario: " + Config.getNumeroOperario(SelectAreaActivity.this));
         txtOperario.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 36);
@@ -73,7 +67,7 @@ public class SelectAreaActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 iniciarLoader();
-                new GetAllPartidasPendientesServerCall(SelectAreaActivity.this);
+                new TraerTodasLasPartidasPendientesServerCall(SelectAreaActivity.this);
             }
         });
 
@@ -83,19 +77,18 @@ public class SelectAreaActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent goToNextActivity = new Intent(getApplicationContext(), SeparacionItemsActivity.class);
                 startActivity(goToNextActivity);
-
-
             }
         });
     }
 
+    //TODO en caso de reusar el sialogo con single chice, refactoring del metodo para poder rutilizarlo
     public void alertSelectPartida() {
         List<StringWithTag> partidas = null;
         try {
             JSONArray obj = new JSONArray(Config.getPartidasPendientes(this));
             partidas = StringWithTag.convertJSONArrayToAarrayPartidasPendientes(obj);
         } catch (Throwable t) {
-            Log.e("My App", "Could not parse malformed JSON: \"" + Config.getFrigorificos(this) + "\"");
+            Log.e("My App", "Could not parse malformed JSON: \"" + Config.getPartidasPendientes(this) + "\"");
         }
         final ListAdapter adaptador = new ArrayAdapter<StringWithTag>(this, android.R.layout.select_dialog_singlechoice, partidas);
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(SelectAreaActivity.this);
@@ -105,7 +98,7 @@ public class SelectAreaActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     StringWithTag partidaSeleccionada = (StringWithTag) ((AlertDialog) dialog).getListView().getItemAtPosition(which);
-                    idPartida = partidaSeleccionada.tag;
+                    idPartidaSelecionada = partidaSeleccionada.tag;
                 }
             });
         }else{
@@ -120,8 +113,8 @@ public class SelectAreaActivity extends AppCompatActivity {
         mBuilder.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (adaptador.getCount() != 0 && idPartida != -1) {
-                    new ComenzarIdentificacionPartidaServerCall(SelectAreaActivity.this, idPartida);
+                if (adaptador.getCount() != 0 && idPartidaSelecionada != -1) {
+                    new ComenzarIdentificacionPartidaServerCall(SelectAreaActivity.this, idPartidaSelecionada);
                 }
                 dialog.dismiss();
             }
@@ -131,17 +124,19 @@ public class SelectAreaActivity extends AppCompatActivity {
     }
 
 
-    //region Manejo loader
+    @Override
+    public void limpiarCampos() {
 
-    public void iniciarLoader() {
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        spinnerLoader.setVisibility(View.VISIBLE);
-    }
-    public void finalizarLoader() {
-        spinnerLoader.setVisibility(View.INVISIBLE);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
-    //endregion
+    @Override
+    public void customOnErrorResponseVolley(Object object) {
+
+    }
+
+    @Override
+    public void customAlertFunction(Object object) {
+
+    }
 
 }

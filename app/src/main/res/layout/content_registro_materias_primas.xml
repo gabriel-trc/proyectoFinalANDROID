@@ -174,8 +174,8 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="4dp"
         android:ems="10"
-        android:imeOptions="actionNext"
         android:hint="Conservadoras"
+        android:imeOptions="actionNext"
         android:inputType="numberPassword"
         android:textAppearance="@android:style/TextAppearance.Medium"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
@@ -207,8 +207,8 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="4dp"
         android:ems="10"
-        android:imeOptions="actionNext"
         android:hint="Temperatura"
+        android:imeOptions="actionNext"
         android:inputType="numberPassword"
         android:textAppearance="@android:style/TextAppearance.Medium"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
@@ -224,8 +224,8 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="4dp"
         android:ems="10"
-        android:imeOptions="actionDone"
         android:hint="Número de cote"
+        android:imeOptions="actionDone"
         android:inputType="text"
         android:textAppearance="@android:style/TextAppearance.Medium"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
@@ -265,30 +265,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnAgregar" />
 
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/nestedScrollView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:clipToPadding="false"
-        app:layout_constraintBottom_toTopOf="@+id/guideline5"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider">
-
-        <TableLayout
-            android:id="@+id/tablaPartidas"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:isScrollContainer="true"
-            android:orientation="horizontal"
-            android:stretchColumns="*"></TableLayout>
-
-    </android.support.v4.widget.NestedScrollView>
-
     <android.support.constraint.Guideline
         android:id="@+id/guideline5"
         android:layout_width="wrap_content"
@@ -310,6 +286,32 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline5" />
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider"
+        app:layout_constraintVertical_bias="1.0">
+
+        <TableLayout
+            android:id="@+id/tablaPartidas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:isScrollContainer="true"
+            android:orientation="horizontal"
+            android:stretchColumns="*"></TableLayout>
+
+    </android.support.v4.widget.NestedScrollView>
 
 
 </android.support.constraint.ConstraintLayout>

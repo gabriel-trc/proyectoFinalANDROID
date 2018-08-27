@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">MVDMART</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_registro_materias_primas"><u>REGISTRO MATERIAS PRIMAS</u></string>
+    <string name="title_activity_registro_materias_primas"><u>REGISTROS DE MATERIAS PRIMAS</u></string>
     <string name="title_activity_loading">LoadingActivity</string>
     <string name="title_activity_select_area"><u>SELECCIÓN DE ÁREA DE TARBAJO</u></string>
-    <string name="title_activity_identificacion_bolsas"><u>IDENTIFICACIÓN DE BOLSAS DE SANGER</u></string>
-    <string name="title_activity_separacion_items">SeparacionItemsActivity</string>
+    <string name="title_activity_identificacion_bolsas"><u>IDENTIFICACIÓN DE BOLSAS DE SANGRE</u></string>
+    <string name="title_activity_separacion_items"><u>SEPRACIÓN DE SUERO</u></string>
     <string-array name="condiciones_array">
         <item>ACEPTABLE</item>
         <item>DAÑO MENOR</item>
@@ -17,5 +17,8 @@
     <string name="btnAgregar">AGREGAR</string>
     <string name="btnModificar">MODIFICAR</string>
     <string name="btnFinalizar">FINALIZAR</string>
-
+    <string name="btnCancelar">CANCELAR</string>
+    <string name="btnSeleccionar">SELECCIONAR</string>
+    <string name="btnCerrar">CERRAR</string>
+    <string name="title_activity_separacion_suero">SeparacionSueroActivity</string>
 </resources>

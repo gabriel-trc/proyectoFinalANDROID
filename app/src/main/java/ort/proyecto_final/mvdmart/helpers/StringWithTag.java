@@ -17,15 +17,6 @@ public class StringWithTag {
         tag = tagPart;
     }
 
-    public static List<StringWithTag> arrayCondicion() {
-        List<StringWithTag> ret = new ArrayList<StringWithTag>();
-        ret.add(new StringWithTag("ACEPTABLE", 1));
-        ret.add(new StringWithTag("DAÑO MENOR", 2));
-        ret.add(new StringWithTag("DAÑO MAYOR", 3));
-        ret.add(new StringWithTag("COLOR INACEPTABLE", 4));
-        return ret;
-    }
-
     public static List<StringWithTag> convertJSONArrayToAarrayFrigorificos(JSONArray jsonArray) throws JSONException {
         List<StringWithTag> ret = new ArrayList<StringWithTag>();
         ret.add(new StringWithTag("Seleccione uno",  -1));

@@ -1,21 +1,9 @@
 package ort.proyecto_final.mvdmart.activities;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import ort.proyecto_final.mvdmart.R;
-import ort.proyecto_final.mvdmart.server_calls.GetAllFrigorificosServerCall;
 
 public class LoadingActivity extends AppCompatActivity {
 
@@ -51,7 +39,7 @@ public class LoadingActivity extends AppCompatActivity {
 //
 //
 //        protected String doInBackground(Void... urls){
-//            GetAllFrigorificosServerCall serverCall = new GetAllFrigorificosServerCall(activity);
+//            TraerTodosLosFrigorificosServerCall serverCall = new TraerTodosLosFrigorificosServerCall(activity);
 //
 //        }
 //

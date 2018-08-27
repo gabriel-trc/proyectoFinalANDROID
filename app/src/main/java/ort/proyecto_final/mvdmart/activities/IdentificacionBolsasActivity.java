@@ -5,19 +5,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -25,39 +23,33 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 
 import ort.proyecto_final.mvdmart.R;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
-import ort.proyecto_final.mvdmart.helpers.StringWithTag;
 import ort.proyecto_final.mvdmart.models.Bolsa;
-import ort.proyecto_final.mvdmart.models.Partida;
 import ort.proyecto_final.mvdmart.server_calls.CancelarIdentificacionPartidaServerCall;
-import ort.proyecto_final.mvdmart.server_calls.GetAllPartidasPendientesServerCall;
 import ort.proyecto_final.mvdmart.server_calls.RegistroBolsasServerCall;
+import ort.proyecto_final.mvdmart.server_calls.RegistroMateriasPrimasServerCall;
 
-public class IdentificacionBolsasActivity extends AppCompatActivity {
+public class IdentificacionBolsasActivity extends ActivityMadre {
 
     private JSONObject partida;
-    private TextView txtPartida;
-    private EditText pesoGramos, razonDescarte;
-    private Button btnFinalizar, btnCancelar, btnEnviarBolsas;
-    private FloatingActionButton btnAgregar;
-    private int condicion, idPartida, bolsaId;
+    private TextView txtNombrePartida;
+    private EditText pesoGramos;
+    private Button btnFinalizar, btnCancelar, btnEnviarBolsas, btnAgregar;
+    private int condicion, idPartidaSeleccionada;
     private static int nroUltimaBolsa, nroUltimaBolsaRecibido;
     private String codigoBolsa;
     private ArrayList<Bolsa> bolsas = new ArrayList<>();
     private TableLayout tablaBolsas;
     private Spinner spinnerCondicion;
-    public ConstraintLayout spinnerLoader;
     private Bolsa bolsa;
-    private boolean modoEdicion = false;
     private IdentificacionBolsasActivity activity = this;
 
     @Override
@@ -65,18 +57,21 @@ public class IdentificacionBolsasActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_identificacion_bolsas);
         Intent intent = getIntent();
-        idPartida = intent.getIntExtra("idPartida", -1);
-        inizializeViews();
+        idPartidaSeleccionada = intent.getIntExtra("idPartida", -1);
+        inicializarVistas();
     }
 
-    private void inizializeViews() {
-        txtPartida = findViewById(R.id.txtPartida);
+    @Override
+    public void inicializarVistas() {
+        spinnerLoader = findViewById(R.id.spinner_loader);
+        txtNombrePartida = findViewById(R.id.txtNombrePartida);
         try {
             JSONArray partidas = new JSONArray(Config.getPartidasPendientes(this));
             for (int i = 0; i < partidas.length(); i++) {
-                if (partidas.getJSONObject(i).getInt("id") == idPartida) {
+                if (partidas.getJSONObject(i).getInt("id") == idPartidaSeleccionada) {
                     partida = partidas.getJSONObject(i);
-                    txtPartida.setText("Identificación de bolsas, partida de " + partida.getJSONObject("frigorifico").getString("nombre"));
+                    String[] fecha = partida.getString("fecha").substring(0,10).split("-");
+                    txtNombrePartida.setText("PARTIDA DE " + partida.getJSONObject("frigorifico").getString("nombre").toUpperCase() + " (" + fecha[2] + "-" + fecha[1] + "-" + fecha[0] + ")" );
                     codigoBolsa = partida.getString("codigoUltimaBolsa");
                     nroUltimaBolsa = partida.getInt("nroUltimaBolsa");
                     nroUltimaBolsaRecibido = nroUltimaBolsa;
@@ -84,9 +79,9 @@ public class IdentificacionBolsasActivity extends AppCompatActivity {
                 }
             }
         } catch (Throwable t) {
-            Log.e("My App", "Could not parse malformed JSON: \"" + Config.getFrigorificos(this) + "\"");
+            Log.e("My App", "Could not parse malformed JSON: \"" + Config.getPartidasPendientes(this) + "\"");
         }
-        spinnerLoader = findViewById(R.id.spinner_loader);
+
         spinnerCondicion = findViewById(R.id.spinnerCondicion);
         spinnerCondicion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -99,22 +94,24 @@ public class IdentificacionBolsasActivity extends AppCompatActivity {
 
             }
         });
+        //TODO refactor de nombres de id. poner diminutivo de que actividad pertenecen, al cerrar la aplicacio liberar parida
         pesoGramos = findViewById(R.id.pesoGramos);
-        btnAgregar = findViewById(R.id.btnAgregarbolsa);
+        pesoGramos.setTransformationMethod(null);
+        btnAgregar = findViewById(R.id.btnAgregarBolsa);
         btnAgregar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!modoEdicion)
+                if (((AppCompatButton) v).getText().equals(getResources().getString(R.string.btnAgregar)))
                     agregarBolsa();
                 else
                     modificarBolsa();
+                esconderTecado(IdentificacionBolsasActivity.this);
             }
         });
         btnEnviarBolsas = findViewById(R.id.btnAgregarBolsas);
         btnEnviarBolsas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iniciarLoader();
                 enviarBolsas(false);
             }
         });
@@ -122,7 +119,6 @@ public class IdentificacionBolsasActivity extends AppCompatActivity {
         btnFinalizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iniciarLoader();
                 enviarBolsas(true);
             }
         });
@@ -131,7 +127,7 @@ public class IdentificacionBolsasActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 iniciarLoader();
-                new CancelarIdentificacionPartidaServerCall(activity, idPartida);
+                new CancelarIdentificacionPartidaServerCall(activity, idPartidaSeleccionada);
             }
         });
         tablaBolsas = findViewById(R.id.tablaBolsas);
@@ -141,39 +137,45 @@ public class IdentificacionBolsasActivity extends AppCompatActivity {
         if (HelpersFunctions.isIntegerParseInt(pesoGramos.getText().toString())) {
             int peso = Integer.parseInt(pesoGramos.getText().toString());
             // if (true) {
-            if (Bolsa.validar(peso, condicion)) {
+            if (Bolsa.validar(peso)) {
                 Bolsa bolsa = new Bolsa(peso, condicion);
                 bolsas.add(bolsa);
                 nroUltimaBolsa++;
                 bolsa.generarCodigo(codigoBolsa, nroUltimaBolsa);
-                cleanFields();
-                createRows();
+                limpiarCampos();
+                crearTablasBolsas();
             } else {
-                Toast errorToast = Toast.makeText(this.getApplicationContext(), "Atención: Hay campos incorrectos.", Toast.LENGTH_LONG);
-                errorToast.show();
+                alert(IdentificacionBolsasActivity.this, new String[]{"DATOS INVÁLIDOS", "El peso debe de estar entre 0 y 2000."}, null);
             }
         } else {
-            Toast errorToast = Toast.makeText(this.getApplicationContext(), "Atención: Debe completar todos los campos.", Toast.LENGTH_LONG);
-            errorToast.show();
+            Toast.makeText(this.getApplicationContext(), "Atención: Debe completar todos los campos.", Toast.LENGTH_LONG).show();
         }
     }
 
-//    private void finalizarIdentificacion() {
-//        JSONArray send = new JSONArray();
-//        for (int i = 0; i < bolsas.size(); i++) {
-//            send.put(bolsas.get(i).toJSONObject());
-//        }
-//        new RegistroBolsasServerCall(this, send, idPartida);
-//    }
-
-    public void iniciarLoader() {
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        spinnerLoader.setVisibility(View.VISIBLE);
+    @Override
+    public void limpiarCampos() {
+        pesoGramos.setText("");
+        spinnerCondicion.setSelection(0);
     }
 
-    public void finalizarLoader() {
-        spinnerLoader.setVisibility(View.INVISIBLE);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    @Override
+    public void customOnErrorResponseVolley(Object object) {
+
+    }
+
+    @Override
+    public void customAlertFunction(Object object) {
+        HashMap<String, Integer> hashMap = (HashMap<String, Integer>) object;
+        if (hashMap.get("funcion") == 1) {
+            bolsa = getBolsaById(hashMap.get("id"));
+            btnAgregar.setText(R.string.btnModificar);
+            btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
+            setearBolsa(bolsa);
+        } else {
+            bolsas.remove(getBolsaById(hashMap.get("id")));
+            crearTablasBolsas();
+            nroUltimaBolsa--;
+        }
     }
 
     public void limpiarTabla() {
@@ -185,57 +187,126 @@ public class IdentificacionBolsasActivity extends AppCompatActivity {
         tablaBolsas.removeAllViews();
     }
 
-    private void createRows() {
+    private void crearTablasBolsas() {
         tablaBolsas.removeAllViews();
         Collections.sort(bolsas);
-        for (int i = 0; i < bolsas.size(); i++) {
-            bolsas.get(i).setLocalId(i);
-            TableRow row = new TableRow(this);
-            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
-            row.setLayoutParams(lp);
-            row.setId(i);
-            final TextView columnCodigo = new TextView(this.getApplicationContext());
-            columnCodigo.setText(bolsas.get(i).getCodigoBolsa());
-            columnCodigo.setTextColor(0xFF000000);
-            columnCodigo.setBackgroundColor(Color.parseColor("#f7f7f7"));
-            row.addView(columnCodigo);
-            final TextView columnPeso = new TextView(this.getApplicationContext());
-            columnPeso.setText(bolsas.get(i).getPeso() + "");
-            columnPeso.setTextColor(0xFF000000);
-            columnPeso.setBackgroundColor(Color.parseColor("#f7f7f7"));
-            row.addView(columnPeso);
-            final TextView columnCondicion = new TextView(this.getApplicationContext());
-            columnCondicion.setText(spinnerCondicion.getItemAtPosition(bolsas.get(i).getCondicion()) + "");
-            columnCondicion.setTextColor(0xFF000000);
-            row.addView(columnCondicion);
-            final Button columnEditBtn = new Button(this);
-            columnEditBtn.setBackgroundResource(R.drawable.ic_edit_row);
-            columnEditBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    questionEditBolsa(((TableRow) v.getParent()).getId());
-                }
-            });
-            row.addView(columnEditBtn);
-            final Button columnDeleteBtn = new Button(this);
-            columnDeleteBtn.setBackgroundResource(R.drawable.ic_delete_row);
-            columnDeleteBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    eliminarBolsa(((TableRow) v.getParent()).getId());
-                }
-            });
-            row.addView(columnDeleteBtn);
-            final Button columnDescartarBtn = new Button(this);
-            columnDescartarBtn.setBackgroundResource(R.color.colorAccent);
-            columnDescartarBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    descartarBolsa(((TableRow) v.getParent()).getId());
-                }
-            });
-            row.addView(columnDescartarBtn);
-            tablaBolsas.addView(row);
+        for (int i = -1; i < bolsas.size(); i++) {
+            TableRow fila = new TableRow(this);
+            fila.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT, 8f));
+            if (i < 0)
+                fila.setBackgroundColor(Color.rgb(36, 123, 160));
+            else {
+                bolsas.get(i).setLocalId(i);
+                fila.setId(i/*partidas.get(i).getLocalId()*/);
+                fila.setBackgroundColor((i % 2 == 0) ? Color.rgb(112, 193, 179) : Color.rgb(178, 219, 191));
+            }
+
+            TextView columnaCodigo = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaCodigo.setText("Código");
+            else
+                columnaCodigo.setText(bolsas.get(i).getCodigoBolsa());
+            columnaCodigo.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaCodigo.setGravity(Gravity.CENTER);
+            columnaCodigo.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaCodigo, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2));
+
+            TextView columnaPeso = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaPeso.setText("Peso");
+            else
+                columnaPeso.setText(bolsas.get(i).getPeso() + "");
+            columnaPeso.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaPeso.setGravity(Gravity.CENTER);
+            columnaPeso.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaPeso, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1));
+
+            TextView columnaCondicion = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaCondicion.setText("Condición");
+            else
+                columnaCondicion.setText(spinnerCondicion.getItemAtPosition(bolsas.get(i).getCondicion()).toString());
+            columnaCondicion.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaCondicion.setGravity(Gravity.CENTER);
+            columnaCondicion.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaCondicion, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+
+            if (i < 0) {
+                TextView columnaDescartar = new TextView(this.getApplicationContext());
+                columnaDescartar.setText("Descartar");
+                columnaDescartar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaDescartar.setGravity(Gravity.CENTER);
+                columnaDescartar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaDescartar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+            } else {
+                Button columnaDescartar = new Button(this);
+                columnaDescartar.setText("DESCARTAR");
+                columnaDescartar.setId(Integer.parseInt((bolsas.get(i).getCodigoBolsa()).substring(6)));
+                columnaDescartar.setBackgroundResource(android.R.color.holo_blue_dark);
+                columnaDescartar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaDescartar.setGravity(Gravity.CENTER);
+                columnaDescartar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                columnaDescartar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        alertDescarte(((TableRow) v.getParent()).getId(), v.getId());
+                    }
+                });
+                fila.addView(columnaDescartar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+            }
+
+            if (i < 0) {
+                TextView columnaModificar = new TextView(this.getApplicationContext());
+                columnaModificar.setText("Modificar");
+                columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaModificar.setGravity(Gravity.CENTER);
+                columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+            } else {
+                Button columnaModificar = new Button(this);
+                columnaModificar.setText(R.string.btnModificar);
+                columnaModificar.setBackgroundResource(android.R.color.holo_orange_dark);
+                columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaModificar.setGravity(Gravity.CENTER);
+                columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                columnaModificar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        HashMap<String, Integer> obj = new HashMap<>();
+                        obj.put("funcion", 1);
+                        obj.put("id", (((TableRow) v.getParent()).getId()));
+                        alertDosBotones(IdentificacionBolsasActivity.this, new String[]{"Atención", "¿Quiere editar este registro?"}, obj);
+                    }
+                });
+                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+            }
+
+            if (i < 0) {
+                TextView columnaBorrar = new TextView(this.getApplicationContext());
+                columnaBorrar.setText("Borrar");
+                columnaBorrar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaBorrar.setGravity(Gravity.CENTER);
+                columnaBorrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+            } else {
+                Button columnaBorrar = new Button(this);
+                columnaBorrar.setText("BORRAR");
+                columnaBorrar.setBackgroundResource(android.R.color.holo_red_dark);
+                columnaBorrar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaBorrar.setGravity(Gravity.CENTER);
+                columnaBorrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                columnaBorrar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        HashMap<String, Integer> obj = new HashMap<>();
+                        obj.put("funcion", 2);
+                        obj.put("id", (((TableRow) v.getParent()).getId()));
+                        alertDosBotones(IdentificacionBolsasActivity.this, new String[]{"Atención", "¿Quiere borrar este registro?"}, obj);
+                    }
+                });
+                fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+            }
+            tablaBolsas.addView(fila);
 
             final TableRow trSep = new TableRow(this);
             TableLayout.LayoutParams trParamsSep = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
@@ -245,131 +316,85 @@ public class IdentificacionBolsasActivity extends AppCompatActivity {
             TableRow.LayoutParams tvSepLay = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
             tvSepLay.span = 6;
             tvSep.setLayoutParams(tvSepLay);
-            tvSep.setBackgroundColor(Color.parseColor("#d9d9d9"));
-            tvSep.setHeight(1);
+            tvSep.setBackgroundColor(Color.rgb(243, 255, 189));
+            tvSep.setHeight(2);
             trSep.addView(tvSep);
             tablaBolsas.addView(trSep, trParamsSep);
         }
     }
 
-    private void descartarBolsa(int bolsaId) {
+    private void alertDescarte(int bolsaId, final int idBtn) {
         bolsa = getBolsaById(bolsaId);
-//        AlertDialog.Builder builder = new AlertDialog.Builder(IdentificacionBolsasActivity.this);
-//        builder.setTitle(R.string.app_name);
-//        builder.setMessage("¿Quiere descartar esta bolsa?");
-//        //builder.setIcon(R.drawable.ic_launcher_foreground);
-//        razonDescarte = new EditText(this);
-//        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int id) {
-//               bolsa.setRazonDescarte(razonDescarte.getText().toString());
-//                dialog.dismiss();
-//            }
-//        });
-//        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int id) {
-//                dialog.dismiss();
-//            }
-//        });
-//        AlertDialog alert = builder.create();
-//        alert.show();
+        final Button btnDescartar = findViewById(idBtn);
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Descarte Bolsa");
-        alert.setMessage("Deje un mensaje:");
-
-        // Set an EditText view to get user input
-        final EditText input = new EditText(this);
-        alert.setView(input);
-
+        alert.setTitle("Atención: Registrando Descarte");
+        alert.setIcon(R.drawable.ic_alert);
+        alert.setMessage("¿Porque se esta descartando la bolsa de sangre?:");
+        final EditText razonDescarte = new EditText(this);
+        android.widget.LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(100,60);
+        razonDescarte.setLayoutParams(lp);
+        alert.setView(razonDescarte);
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                String value = input.getText().toString();
+                String value = razonDescarte.getText().toString();
+                if(value.length() == 0)
+                    value = "No especificada.";
                 bolsa.setRazonDescarte(value);
+                btnDescartar.setBackgroundResource(android.R.color.holo_red_light);
+                btnDescartar.setText("DESCARTADA");
                 dialog.dismiss();
             }
         });
-
-        alert.setNegativeButton("Cancel",
+        alert.setNegativeButton("Cancelar",
                 new DialogInterface.OnClickListener() {
-
                     public void onClick(DialogInterface dialog, int which) {
                         // TODO Auto-generated method stub
                         return;
                     }
                 });
-        alert.show();
-    }
 
-    private void eliminarBolsa(int id) {
-        //investigar para crear el alert con un helperfunctino
-        bolsaId = id;
-        AlertDialog.Builder builder = new AlertDialog.Builder(IdentificacionBolsasActivity.this);
-        builder.setTitle(R.string.app_name);
-        builder.setMessage("¿Quiere borrar ese registro?");
-        //   builder.setIcon(R.drawable.ic_launcher_foreground);
-        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-                bolsas.remove(getBolsaById(bolsaId));
-                regenerarCodigos();
-                createRows();
-            }
-        });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog alert = builder.create();
+        if (bolsa.getRazonDescarte() != "") {
+            razonDescarte.setText(bolsa.getRazonDescarte());
+            alert.setNeutralButton("Cancelar Descarte", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    bolsa.setRazonDescarte("");
+                    Button btnDescarte = findViewById(idBtn);
+                    btnDescarte.setBackgroundResource(android.R.color.holo_blue_dark);
+                    btnDescarte.setText("DESCARTAR");
+                    dialog.dismiss();
+                }
+            });
+        }
         alert.show();
-        nroUltimaBolsa--;
-
     }
 
     private void modificarBolsa() {
         if (bolsa != null) {
-            int indexPartida = bolsas.indexOf(bolsa);
             bolsa.setPeso(Integer.parseInt(pesoGramos.getText().toString()));
             bolsa.setCondicion(condicion);
+            btnAgregar.setText(R.string.btnAgregar);
+            btnAgregar.setBackgroundResource(android.R.color.holo_green_dark);
             bolsa = null;
-            modoEdicion = false;
-            cleanFields();
-            createRows();
+            limpiarCampos();
+            crearTablasBolsas();
         }
-    }
-
-    private void cleanFields() {
-        pesoGramos.setText("");
     }
 
     private void enviarBolsas(boolean finalizar) {
-        JSONArray send = new JSONArray();
-        for (int i = 0; i < bolsas.size(); i++) {
-            send.put(bolsas.get(i).toJSONObject());
+        if (!bolsas.isEmpty()) {
+            if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar))) {
+                JSONArray jsonBolsas = new JSONArray();
+                for (int i = 0; i < bolsas.size(); i++) {
+                    jsonBolsas.put(bolsas.get(i).toJSONObject());
+                }
+                iniciarLoader();
+                new RegistroBolsasServerCall(this, jsonBolsas, idPartidaSeleccionada, finalizar);
+            } else {
+                Toast.makeText(IdentificacionBolsasActivity.this, "Atención: Debes terminar de modificar la bolsa.", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(IdentificacionBolsasActivity.this, "Atención: No tienes ninguna partida.", Toast.LENGTH_LONG).show();
         }
-        new RegistroBolsasServerCall(this, send, idPartida, finalizar);
-    }
-
-    private void questionEditBolsa(int bolsaId) {
-        bolsa = getBolsaById(bolsaId);
-        AlertDialog.Builder builder = new AlertDialog.Builder(IdentificacionBolsasActivity.this);
-        builder.setTitle(R.string.app_name);
-        builder.setMessage("¿Quiere editar ese registro?");
-        //builder.setIcon(R.drawable.ic_launcher_foreground);
-        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-                modoEdicion = true;
-                btnAgregar.setBackgroundColor(6);
-                setBolsa(bolsa);
-            }
-        });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
     }
 
     private Bolsa getBolsaById(int idPartida) {
@@ -382,15 +407,15 @@ public class IdentificacionBolsasActivity extends AppCompatActivity {
         return ret;
     }
 
-    private void setBolsa(Bolsa bolsa) {
+    private void setearBolsa(Bolsa bolsa) {
         pesoGramos.setText(bolsa.getPeso() + "");
         spinnerCondicion.setSelection(bolsa.getCondicion());
     }
 
-    private void regenerarCodigos(){
+    private void regenerarCodigos() {
         int num = nroUltimaBolsaRecibido + 1;
         for (int i = 0; i < bolsas.size(); i++) {
-            bolsas.get(i).generarCodigo(codigoBolsa,num++);
+            bolsas.get(i).generarCodigo(codigoBolsa, num++);
         }
     }
 

@@ -74,7 +74,6 @@ public abstract class ActivityMadre extends AppCompatActivity {
 
     public abstract void customAlertFunction(Object object);
 
-    //region Manejo loader
     public void iniciarLoader() {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         spinnerLoader.setVisibility(View.VISIBLE);
@@ -84,5 +83,4 @@ public abstract class ActivityMadre extends AppCompatActivity {
         spinnerLoader.setVisibility(View.INVISIBLE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
-    //endregion
 }

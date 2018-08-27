@@ -3,10 +3,7 @@ package ort.proyecto_final.mvdmart.server_calls;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.util.Log;
-import android.view.View;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -18,18 +15,16 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.IdentificacionBolsasActivity;
-import ort.proyecto_final.mvdmart.activities.SelectAreaActivity;
-import ort.proyecto_final.mvdmart.activities.SeparacionItemsActivity;
+import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.models.BotellaSuero;
 
 public class NuevaBotellaSueroServerCall {
-    private SeparacionItemsActivity activity;
+    private SeparacionSueroActivity activity;
     private Context context;
 
-    public NuevaBotellaSueroServerCall(final SeparacionItemsActivity activity) {
+    public NuevaBotellaSueroServerCall(final SeparacionSueroActivity activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/botelladesuero/nueva/" + Config.getNumeroOperario(activity);

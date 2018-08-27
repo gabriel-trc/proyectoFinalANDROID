@@ -4,12 +4,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,22 +34,20 @@ import ort.proyecto_final.mvdmart.R;
 import ort.proyecto_final.mvdmart.models.BotellaSuero;
 import ort.proyecto_final.mvdmart.models.ExtraccionSueroDeBolsa;
 import ort.proyecto_final.mvdmart.models.Item;
-import ort.proyecto_final.mvdmart.models.Partida;
 import ort.proyecto_final.mvdmart.server_calls.CambiarItemIdentificadoServerCall;
 import ort.proyecto_final.mvdmart.server_calls.NuevaBotellaSueroServerCall;
 import ort.proyecto_final.mvdmart.server_calls.ObtenerBotellasDeSueroServerCall;
 import ort.proyecto_final.mvdmart.server_calls.ObtenerItemsIdentificadosServerCall;
 import ort.proyecto_final.mvdmart.server_calls.SeleccionarItemServerCall;
 
+public class SeparacionSueroActivity extends ActivityMadre {
 
-public class SeparacionItemsActivity extends AppCompatActivity {
     private BotellaSuero botellaSueroSeleccionada;
     private Button btnSeleccionarItem, btnSeleccionarBotellaSuero, btnAgregarExtraaccionSuero;
     private ExpandableListView expandableListView;
     private ExpandableListAdapter expandableListAdapter;
     private List<String> expandableListTitle;
     private HashMap<String, List<Item>> expandableListDetail;
-    private ConstraintLayout spinnerLoader;
     private Item itemSeleccionado, nuevoItemSeleccionado;
     private TextView alertTitle, txtItemPreSeleccionado, txtBotellaSuero, txtDisponibleBotellaSuero;
     private HashMap<String, Integer> objetosEnVista = new HashMap<>();
@@ -60,12 +59,13 @@ public class SeparacionItemsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_separacion_items);
+        setContentView(R.layout.activity_separacion_suero);
         spinnerLoader = findViewById(R.id.spinner_loader);
-        iniciarVistas();
+        inicializarVistas();
     }
 
-    private void iniciarVistas() {
+    @Override
+    public void inicializarVistas() {
         txtCantidadExtracionSuero = findViewById(R.id.txtCantidadExtracionSuero);
         tablaExtraccionesSuero = findViewById(R.id.tablaExtraccionSuero);
         txtItemPreSeleccionado = findViewById(R.id.txtItemPreSeleccionado);
@@ -84,7 +84,7 @@ public class SeparacionItemsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 iniciarLoader();
-                new ObtenerBotellasDeSueroServerCall(SeparacionItemsActivity.this);
+                new ObtenerBotellasDeSueroServerCall(SeparacionSueroActivity.this);
             }
         });
 
@@ -92,15 +92,16 @@ public class SeparacionItemsActivity extends AppCompatActivity {
         btnAgregarExtraaccionSuero.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(botellaSueroSeleccionada != null && itemSeleccionado != null){
+                if (botellaSueroSeleccionada != null && itemSeleccionado != null) {
                     agregarNuevaExtraccion();
                 }
             }
         });
     }
 
+
     private void agregarNuevaExtraccion() {
-        extraccionSueroDeBolsas.add(new ExtraccionSueroDeBolsa(itemSeleccionado.getCodigo(),itemSeleccionado.getTipo(), botellaSueroSeleccionada.getCodigo(), Double.parseDouble(txtCantidadExtracionSuero.getText().toString())));
+        extraccionSueroDeBolsas.add(new ExtraccionSueroDeBolsa(itemSeleccionado.getCodigo(), itemSeleccionado.getTipo(), botellaSueroSeleccionada.getCodigo(), Double.parseDouble(txtCantidadExtracionSuero.getText().toString())));
         createRows();
         txtDisponibleBotellaSuero.setText("Disponible: " + (500 - Double.parseDouble(txtCantidadExtracionSuero.getText().toString())));
 
@@ -108,12 +109,12 @@ public class SeparacionItemsActivity extends AppCompatActivity {
 
     public void alertSeleccionItem(JSONObject itemsParaSeparar) {
         try {
-            expandableListDetail = Partida.partidasParaSeparar(itemsParaSeparar.getJSONArray("partidasConBolsas"));
+            expandableListDetail = Item.itemsParaSeparar(itemsParaSeparar);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        alertTitle = new TextView(SeparacionItemsActivity.this);
+        alertTitle = new TextView(SeparacionSueroActivity.this);
         alertTitle.setText("Selección de item");
         alertTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
         alertTitle.setGravity(Gravity.CENTER);
@@ -156,9 +157,9 @@ public class SeparacionItemsActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 if (nuevoItemSeleccionado != null) {
                     if (itemSeleccionado != null && objetosEnVista.containsKey(itemSeleccionado.getCodigo()) && objetosEnVista.get(itemSeleccionado.getCodigo()) == 1) {
-                        new CambiarItemIdentificadoServerCall(SeparacionItemsActivity.this, itemSeleccionado, nuevoItemSeleccionado);
+                        new CambiarItemIdentificadoServerCall(SeparacionSueroActivity.this, itemSeleccionado, nuevoItemSeleccionado);
                     } else {
-                        new SeleccionarItemServerCall(SeparacionItemsActivity.this, nuevoItemSeleccionado);
+                        new SeleccionarItemServerCall(SeparacionSueroActivity.this, nuevoItemSeleccionado);
                     }
                     dialog.dismiss();
                 } else
@@ -188,7 +189,7 @@ public class SeparacionItemsActivity extends AppCompatActivity {
 
     public void alertSeleccionarBotella(JSONArray botellas) {
         ArrayList<BotellaSuero> botellasSuero = new ArrayList<>();
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(SeparacionItemsActivity.this);
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(SeparacionSueroActivity.this);
         if (botellas.length() > 0) {
             for (int i = 0; i < botellas.length(); i++) {
                 try {
@@ -219,7 +220,7 @@ public class SeparacionItemsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     iniciarLoader();
-                    new NuevaBotellaSueroServerCall(SeparacionItemsActivity.this);
+                    new NuevaBotellaSueroServerCall(SeparacionSueroActivity.this);
                     dialog.dismiss();
                 }
             });
@@ -267,7 +268,7 @@ public class SeparacionItemsActivity extends AppCompatActivity {
             rowEditBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                   // questionEditPartida(((TableRow) v.getParent()).getId());
+                    // questionEditPartida(((TableRow) v.getParent()).getId());
                 }
             });
             row.addView(rowEditBtn);
@@ -298,17 +299,20 @@ public class SeparacionItemsActivity extends AppCompatActivity {
     }
 
 
-    //region Manejo loader
+    @Override
+    public void limpiarCampos() {
 
-    public void iniciarLoader() {
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        spinnerLoader.setVisibility(View.VISIBLE);
     }
 
-    public void finalizarLoader() {
-        spinnerLoader.setVisibility(View.INVISIBLE);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    @Override
+    public void customOnErrorResponseVolley(Object object) {
+
     }
 
-    //endregion
+    @Override
+    public void customAlertFunction(Object object) {
+
+    }
+
+
 }
