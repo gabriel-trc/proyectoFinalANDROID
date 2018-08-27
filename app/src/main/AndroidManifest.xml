@@ -53,7 +53,9 @@
         <activity
             android:name=".activities.SeparacionSueroActivity"
             android:label="@string/title_activity_separacion_suero"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustNothing" />
     </application>
 
 </manifest>

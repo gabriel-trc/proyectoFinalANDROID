@@ -75,7 +75,7 @@ public class SelectAreaActivity extends ActivityMadre {
         btnRegistroSeparacion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent goToNextActivity = new Intent(getApplicationContext(), SeparacionItemsActivity.class);
+                Intent goToNextActivity = new Intent(getApplicationContext(), SeparacionSueroActivity.class);
                 startActivity(goToNextActivity);
             }
         });

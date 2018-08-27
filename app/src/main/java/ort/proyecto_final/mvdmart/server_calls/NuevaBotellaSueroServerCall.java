@@ -28,7 +28,7 @@ public class NuevaBotellaSueroServerCall {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/botelladesuero/nueva/" + Config.getNumeroOperario(activity);
-
+        activity.iniciarLoader();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
@@ -36,8 +36,7 @@ public class NuevaBotellaSueroServerCall {
                         try {
                             activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
-
-                                activity.iniciarNuevaBotellaSuero(new BotellaSuero(response.getString("retorno"),0.0));
+                                activity.iniciarNuevaBotellaSuero(new BotellaSuero(response.getString("retorno"), 0));
                             } else {
                                 JSONArray errorArray = response.getJSONArray("mensajes");
                                 AlertDialog.Builder builder = new AlertDialog.Builder(activity);

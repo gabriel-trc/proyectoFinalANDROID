@@ -4,10 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -31,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import ort.proyecto_final.mvdmart.R;
+import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 import ort.proyecto_final.mvdmart.models.BotellaSuero;
 import ort.proyecto_final.mvdmart.models.ExtraccionSueroDeBolsa;
 import ort.proyecto_final.mvdmart.models.Item;
@@ -43,17 +40,18 @@ import ort.proyecto_final.mvdmart.server_calls.SeleccionarItemServerCall;
 public class SeparacionSueroActivity extends ActivityMadre {
 
     private BotellaSuero botellaSueroSeleccionada;
-    private Button btnSeleccionarItem, btnSeleccionarBotellaSuero, btnAgregarExtraaccionSuero;
+    private Button btnSeleccionarItem, btnFinalizarItem, btnSeleccionarBotellaSuero, btnAgregarExtraccionSuero;
     private ExpandableListView expandableListView;
     private ExpandableListAdapter expandableListAdapter;
     private List<String> expandableListTitle;
     private HashMap<String, List<Item>> expandableListDetail;
     private Item itemSeleccionado, nuevoItemSeleccionado;
-    private TextView alertTitle, txtItemPreSeleccionado, txtBotellaSuero, txtDisponibleBotellaSuero;
+    private TextView alertTitle, txtItemSeleccionado, txtBotellaSueroSeleccionada, txtDisponibleBotellaSuero;
     private HashMap<String, Integer> objetosEnVista = new HashMap<>();
     private TableLayout tablaExtraccionesSuero;
     ArrayList<ExtraccionSueroDeBolsa> extraccionSueroDeBolsas = new ArrayList<>();
-    private EditText txtCantidadExtracionSuero;
+    private EditText txtCantidadSueroExtraido;
+    private int disponibleBotellaSuero;
 
 
     @Override
@@ -66,17 +64,17 @@ public class SeparacionSueroActivity extends ActivityMadre {
 
     @Override
     public void inicializarVistas() {
-        txtCantidadExtracionSuero = findViewById(R.id.txtCantidadExtracionSuero);
-        tablaExtraccionesSuero = findViewById(R.id.tablaExtraccionSuero);
-        txtItemPreSeleccionado = findViewById(R.id.txtItemPreSeleccionado);
-        txtBotellaSuero = findViewById(R.id.txtBotellaSuero);
+        txtCantidadSueroExtraido = findViewById(R.id.txtCantidadSueroExtraido);
+        txtCantidadSueroExtraido.setTransformationMethod(null);
+        tablaExtraccionesSuero = findViewById(R.id.tablaExtraccionesSuero);
+        txtItemSeleccionado = findViewById(R.id.txtItemSeleccionado);
+        txtBotellaSueroSeleccionada = findViewById(R.id.txtBotellaSueroSeleccionada);
         txtDisponibleBotellaSuero = findViewById(R.id.txtDisponibleBotellaSuero);
         btnSeleccionarItem = findViewById(R.id.btnSeleccionarItem);
         btnSeleccionarItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iniciarLoader();
-                new ObtenerItemsIdentificadosServerCall(SeparacionItemsActivity.this);
+                new ObtenerItemsIdentificadosServerCall(SeparacionSueroActivity.this);
             }
         });
         btnSeleccionarBotellaSuero = findViewById(R.id.btnSeleccionarBotellaSuero);
@@ -88,8 +86,8 @@ public class SeparacionSueroActivity extends ActivityMadre {
             }
         });
 
-        btnAgregarExtraaccionSuero = findViewById(R.id.btnAgregarExtraaccionSuero);
-        btnAgregarExtraaccionSuero.setOnClickListener(new View.OnClickListener() {
+        btnAgregarExtraccionSuero = findViewById(R.id.btnAgregarExtraccionSuero);
+        btnAgregarExtraccionSuero.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (botellaSueroSeleccionada != null && itemSeleccionado != null) {
@@ -97,14 +95,6 @@ public class SeparacionSueroActivity extends ActivityMadre {
                 }
             }
         });
-    }
-
-
-    private void agregarNuevaExtraccion() {
-        extraccionSueroDeBolsas.add(new ExtraccionSueroDeBolsa(itemSeleccionado.getCodigo(), itemSeleccionado.getTipo(), botellaSueroSeleccionada.getCodigo(), Double.parseDouble(txtCantidadExtracionSuero.getText().toString())));
-        createRows();
-        txtDisponibleBotellaSuero.setText("Disponible: " + (500 - Double.parseDouble(txtCantidadExtracionSuero.getText().toString())));
-
     }
 
     public void alertSeleccionItem(JSONObject itemsParaSeparar) {
@@ -142,7 +132,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 nuevoItemSeleccionado = expandableListDetail.get(expandableListTitle.get(groupPosition)).get(childPosition);
                 alertTitle.setText("Ha seleccionado: " + nuevoItemSeleccionado.toString());
-                txtItemPreSeleccionado.setText(nuevoItemSeleccionado.toString());
+
                 return false;
             }
         });
@@ -156,6 +146,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (nuevoItemSeleccionado != null) {
+                    txtItemSeleccionado.setText(nuevoItemSeleccionado.toString());
                     if (itemSeleccionado != null && objetosEnVista.containsKey(itemSeleccionado.getCodigo()) && objetosEnVista.get(itemSeleccionado.getCodigo()) == 1) {
                         new CambiarItemIdentificadoServerCall(SeparacionSueroActivity.this, itemSeleccionado, nuevoItemSeleccionado);
                     } else {
@@ -170,7 +161,6 @@ public class SeparacionSueroActivity extends ActivityMadre {
         dialog.show();
     }
 
-
     public void itemSeleccionado() {
         int valor = 1;
         itemSeleccionado = nuevoItemSeleccionado;
@@ -178,8 +168,8 @@ public class SeparacionSueroActivity extends ActivityMadre {
         if (objetosEnVista.containsKey(itemSeleccionado.getCodigo()))
             valor += objetosEnVista.get(itemSeleccionado.getCodigo());
         objetosEnVista.put(itemSeleccionado.getCodigo(), valor);
-        btnSeleccionarItem.setText("Cambiar");
-        btnSeleccionarItem.setBackgroundColor(Color.MAGENTA);
+        btnSeleccionarItem.setText(R.string.btnCambiar);
+        btnSeleccionarItem.setBackgroundColor(getResources().getColor(R.color.colorBtnModificar));
     }
 
     public void cambiarItem() {//esta se engarga de cambiar el estado en el servidor
@@ -193,12 +183,12 @@ public class SeparacionSueroActivity extends ActivityMadre {
         if (botellas.length() > 0) {
             for (int i = 0; i < botellas.length(); i++) {
                 try {
-                    botellasSuero.add(new BotellaSuero(botellas.getJSONObject(i).getString("codigo"), botellas.getJSONObject(i).getDouble("cantidad")));
+                    botellasSuero.add(new BotellaSuero(botellas.getJSONObject(i).getString("codigo"), botellas.getJSONObject(i).getInt("cantidad")));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            mBuilder.setTitle("Seleccione una partida");
+            mBuilder.setTitle("Seleccione una botella de suero o inicie una nueva.");
             final ListAdapter adaptador = new ArrayAdapter<BotellaSuero>(this, android.R.layout.select_dialog_singlechoice, botellasSuero);
             mBuilder.setSingleChoiceItems(adaptador, -1, new DialogInterface.OnClickListener() {
                 @Override
@@ -208,8 +198,17 @@ public class SeparacionSueroActivity extends ActivityMadre {
             });
             mBuilder.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {//TODO override del listener del positive button para que no cierre el dialogo, si no escojio botella
-                    iniciarNuevaBotellaSuero(botellaSueroSeleccionada);
+                public void onClick(DialogInterface dialog, int which) {
+                    //TODO override del listener del positive button para que no cierre el dialogo, si no escojio botella
+                   if(botellaSueroSeleccionada != null)
+                        iniciarNuevaBotellaSuero(botellaSueroSeleccionada);
+                    dialog.dismiss();
+                }
+            });
+            mBuilder.setNeutralButton("Nueva botella", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    new NuevaBotellaSueroServerCall(SeparacionSueroActivity.this);
                     dialog.dismiss();
                 }
             });
@@ -219,7 +218,6 @@ public class SeparacionSueroActivity extends ActivityMadre {
             mBuilder.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    iniciarLoader();
                     new NuevaBotellaSueroServerCall(SeparacionSueroActivity.this);
                     dialog.dismiss();
                 }
@@ -237,8 +235,181 @@ public class SeparacionSueroActivity extends ActivityMadre {
 
     public void iniciarNuevaBotellaSuero(BotellaSuero botella) {
         botellaSueroSeleccionada = botella;
-        txtBotellaSuero.setText(botellaSueroSeleccionada.getCodigo().toString());
-        txtDisponibleBotellaSuero.setText("Disponible: " + (500 - botellaSueroSeleccionada.getCantidad()));
+        txtBotellaSueroSeleccionada.setText(botellaSueroSeleccionada.getCodigo().toString());
+        txtDisponibleBotellaSuero.setText("Disponible para llenar: " + (500 - botellaSueroSeleccionada.getCantidad()));
+        disponibleBotellaSuero = 500 - botellaSueroSeleccionada.getCantidad();
+    }
+
+    private boolean chequearCamposCompletosYTiposDatos() {
+        boolean camposCompletos = true;
+        String camposIncompletos = "Atención, debe completar los siguientes campos:";
+        int largoStringCampos = camposIncompletos.length();
+        if (itemSeleccionado == null)
+            camposIncompletos += " selección de itém,";
+        if (botellaSueroSeleccionada == null)
+            camposIncompletos += " botella de suero,";
+        if (!HelpersFunctions.isIntegerParseInt(txtCantidadSueroExtraido.getText().toString()))
+            camposIncompletos += " cantidad ml a extraer.";
+        if (camposIncompletos.length() != largoStringCampos) {
+            camposCompletos = false;
+            Toast.makeText(this.getApplicationContext(), camposIncompletos, Toast.LENGTH_LONG).show();
+        }
+        return camposCompletos;
+    }
+
+    private void agregarNuevaExtraccion() {
+        if (chequearCamposCompletosYTiposDatos()) {
+            int cantidadSueroExtraida = Integer.parseInt(txtCantidadSueroExtraido.getText().toString());
+            if (cantidadSueroExtraida <= disponibleBotellaSuero) {
+                extraccionSueroDeBolsas.add(new ExtraccionSueroDeBolsa(itemSeleccionado.getCodigo(), itemSeleccionado.getTipo(), botellaSueroSeleccionada.getCodigo(), Integer.parseInt(txtCantidadSueroExtraido.getText().toString())));
+                crearTablaExtraccionesSuero();
+                txtDisponibleBotellaSuero.setText("Disponible para llenar: " + (disponibleBotellaSuero - cantidadSueroExtraida));
+                limpiarCampos();
+            } else {
+                //TODO podria pasar?
+                alert(SeparacionSueroActivity.this, new String[]{"Atención", "La cantidad para extraer es mayor a la capacidad de la botella."}, null);
+            }
+        }
+    }
+
+    private void crearTablaExtraccionesSuero() {
+        tablaExtraccionesSuero.removeAllViews();
+        for (int i = -1; i < extraccionSueroDeBolsas.size(); i++) {
+            TableRow fila = new TableRow(this);
+            fila.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT, 15f));
+            if (i < 0)
+                fila.setBackgroundColor(Color.rgb(36, 123, 160));
+            else {
+                extraccionSueroDeBolsas.get(i).setLocalId(i);
+                fila.setId(i);
+                fila.setBackgroundColor((i % 2 == 0) ? Color.rgb(112, 193, 179) : Color.rgb(178, 219, 191));
+            }
+
+            TextView columnaCodigoItem = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaCodigoItem.setText("Código de itém");
+            else
+                columnaCodigoItem.setText(extraccionSueroDeBolsas.get(i).toString());
+            columnaCodigoItem.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaCodigoItem.setGravity(Gravity.CENTER);
+            columnaCodigoItem.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaCodigoItem, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
+
+            TextView columnaCantidadExtraida = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaCantidadExtraida.setText("Cantidad suero extraído");
+            else
+                columnaCantidadExtraida.setText(extraccionSueroDeBolsas.get(i).getCantidad());
+            columnaCantidadExtraida.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaCantidadExtraida.setGravity(Gravity.CENTER);
+            columnaCantidadExtraida.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaCantidadExtraida, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
+
+            TextView columnaCodigoBotellaSuero = new TextView(this.getApplicationContext());
+            if (i < 0)
+                columnaCodigoBotellaSuero.setText("Hora");
+            else
+                columnaCodigoBotellaSuero.setText(extraccionSueroDeBolsas.get(i).getCodigoBotellaDeSuero());
+            columnaCodigoBotellaSuero.setTextColor(getResources().getColor(R.color.colorBlanco));
+            columnaCodigoBotellaSuero.setGravity(Gravity.CENTER);
+            columnaCodigoBotellaSuero.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            fila.addView(columnaCodigoBotellaSuero, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
+
+            if (i < 0) {
+                TextView columnaModificar = new TextView(this.getApplicationContext());
+                columnaModificar.setText("Modificar");
+                columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaModificar.setGravity(Gravity.CENTER);
+                columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+            } else {
+                Button columnaModificar = new Button(this);
+                columnaModificar.setText(R.string.btnModificar);
+                columnaModificar.setBackgroundResource(android.R.color.holo_orange_dark);
+                columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaModificar.setGravity(Gravity.CENTER);
+                columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                columnaModificar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        HashMap<String, Integer> obj = new HashMap<>();
+                        obj.put("funcion", 1);
+                        obj.put("id", (((TableRow) v.getParent()).getId()));
+                        alertDosBotones(SeparacionSueroActivity.this, new String[]{"Atención", "¿Quiere editar este registro?"}, obj);
+                    }
+                });
+                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+            }
+
+            if (i < 0) {
+                TextView columnaBorrar = new TextView(this.getApplicationContext());
+                columnaBorrar.setText("Borrar");
+                columnaBorrar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaBorrar.setGravity(Gravity.CENTER);
+                columnaBorrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+            } else {
+                Button columnaBorrar = new Button(this);
+                columnaBorrar.setText("BORRAR");
+                columnaBorrar.setBackgroundResource(android.R.color.holo_red_dark);
+                columnaBorrar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaBorrar.setGravity(Gravity.CENTER);
+                columnaBorrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                columnaBorrar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // preguntaEliminarPartida(((TableRow) v.getParent()).getId());
+                        HashMap<String, Integer> obj = new HashMap<>();
+                        obj.put("funcion", 2);
+                        obj.put("id", (((TableRow) v.getParent()).getId()));
+                        alertDosBotones(SeparacionSueroActivity.this, new String[]{"Atención", "¿Quiere borrar este registro?"}, obj);
+                    }
+                });
+                fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+            }
+
+            if (i < 0) {
+                TextView columnaCerrar = new TextView(this.getApplicationContext());
+                columnaCerrar.setText("Cerrar");
+                columnaCerrar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaCerrar.setGravity(Gravity.CENTER);
+                columnaCerrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaCerrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+            } else {
+                Button columnaCerrar = new Button(this);
+                columnaCerrar.setText("CERRAR");
+                columnaCerrar.setBackgroundResource(android.R.color.holo_red_dark);
+                columnaCerrar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaCerrar.setGravity(Gravity.CENTER);
+                columnaCerrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                columnaCerrar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // preguntaEliminarPartida(((TableRow) v.getParent()).getId());
+                        HashMap<String, Integer> obj = new HashMap<>();
+                        obj.put("funcion", 2);
+                        obj.put("id", (((TableRow) v.getParent()).getId()));
+                        alertDosBotones(SeparacionSueroActivity.this, new String[]{"Atención", "¿Quiere cerrar este item?"}, obj);
+                    }
+                });
+                fila.addView(columnaCerrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+            }
+
+            tablaExtraccionesSuero.addView(fila);
+
+            final TableRow trSep = new TableRow(this);
+            TableLayout.LayoutParams trParamsSep = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
+            trParamsSep.setMargins(0, 0, 0, 0);
+            trSep.setLayoutParams(trParamsSep);
+            TextView tvSep = new TextView(this);
+            TableRow.LayoutParams tvSepLay = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+            tvSepLay.span = 6;
+            tvSep.setLayoutParams(tvSepLay);
+            tvSep.setBackgroundColor(Color.rgb(243, 255, 189));
+            tvSep.setHeight(4);
+            trSep.addView(tvSep);
+            tablaExtraccionesSuero.addView(trSep, trParamsSep);
+        }
     }
 
     private void createRows() {
@@ -301,7 +472,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
 
     @Override
     public void limpiarCampos() {
-
+        txtCantidadSueroExtraido.setText("");
     }
 
     @Override

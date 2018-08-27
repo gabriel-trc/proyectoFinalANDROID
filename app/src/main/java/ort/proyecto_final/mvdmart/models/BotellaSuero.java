@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 public class BotellaSuero {
     private String codigo;
-    private Double cantidad;
+    private int cantidad;
 
     public String getCodigo() {
         return codigo;
@@ -15,15 +15,15 @@ public class BotellaSuero {
         this.codigo = codigo;
     }
 
-    public Double getCantidad() {
+    public int getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(Double cantidad) {
+    public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
     }
 
-    public BotellaSuero(String codigo, Double cantidad) {
+    public BotellaSuero(String codigo, int cantidad) {
         this.codigo = codigo;
         this.cantidad = cantidad;
     }

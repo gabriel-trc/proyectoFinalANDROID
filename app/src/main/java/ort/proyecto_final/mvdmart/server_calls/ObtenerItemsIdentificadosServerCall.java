@@ -12,25 +12,26 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
+import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 
 public class ObtenerItemsIdentificadosServerCall {
-    private SeparacionItemsActivity activity;
+    private SeparacionSueroActivity activity;
     private Context context;
 
-    public ObtenerItemsIdentificadosServerCall(final SeparacionItemsActivity activity) {
+    public ObtenerItemsIdentificadosServerCall(final SeparacionSueroActivity activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/item/disponibles/" + Config.getNumeroOperario(activity);
-
+        activity.iniciarLoader();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                           // Config.setItemsPendientesSeparacion(activity, response.getString("retorno"));
+                            // Config.setItemsPendientesSeparacion(activity, response.getString("retorno"));
                             activity.finalizarLoader();
                             activity.alertSeleccionItem(response.getJSONObject("retorno"));
                         } catch (Throwable t) {

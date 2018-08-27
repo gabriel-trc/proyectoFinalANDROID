@@ -5,16 +5,8 @@ import ort.proyecto_final.mvdmart.models.Item;
 public class ExtraccionSueroDeBolsa extends Item {
 
     private String codigoBotellaDeSuero;
-    private Double cantidad;
-    private int localId;
+    private int cantidad;
 
-    public int getLocalId() {
-        return localId;
-    }
-
-    public void setLocalId(int localId) {
-        this.localId = localId;
-    }
 
     public String getCodigoBotellaDeSuero() {
         return codigoBotellaDeSuero;
@@ -24,15 +16,15 @@ public class ExtraccionSueroDeBolsa extends Item {
         this.codigoBotellaDeSuero = codigoBotellaDeSuero;
     }
 
-    public Double getCantidad() {
+    public int getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(Double cantidad) {
+    public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
     }
 
-    public ExtraccionSueroDeBolsa(String codigo, int tipo, String codigoBotellaDeSuero, Double cantidad) {
+    public ExtraccionSueroDeBolsa(String codigo, int tipo, String codigoBotellaDeSuero, int cantidad) {
         super(codigo, tipo);
         this.codigoBotellaDeSuero = codigoBotellaDeSuero;
         this.cantidad = cantidad;

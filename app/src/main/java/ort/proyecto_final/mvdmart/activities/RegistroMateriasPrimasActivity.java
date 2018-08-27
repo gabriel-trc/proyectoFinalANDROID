@@ -49,7 +49,6 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
     private TableLayout tablaRegistroPartidas;
     private ArrayAdapter<StringWithTag> frigorificosArray;
     private Spinner dropDownFrigorificos;
-
     private final Calendar calendar = Calendar.getInstance();
 
     @Override
@@ -58,7 +57,6 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
         setContentView(R.layout.activity_registro_materias_primas);
         inicializarVistas();
     }
-
     @Override
     public void inicializarVistas() {
         JSONArray obj = null;
@@ -223,7 +221,6 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
     }
 
     private boolean chequearCamposCompletosYTiposDatos() {
-        //TODO se podria refactoriar, y dejarlo en una sola funcion. Nno hay tiempo ahora mismo.
         boolean camposCompletos = true;
         String camposIncompletos = "Atención, debe completar los siguientes campos:";
         int largoStringCampos = camposIncompletos.length();
@@ -398,7 +395,6 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
     public void limpiarTabla() {
         tablaRegistroPartidas.removeAllViews();
     }
-
     @Override
     public void limpiarCampos() {
         txtCantConservadoras.setText("");
@@ -419,7 +415,6 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
         }
         return ret;
     }
-
     @Override
     public void customOnErrorResponseVolley(Object partidaId) {
         partidaParaModificar = getPartidaById((Integer) partidaId);
@@ -427,7 +422,6 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
         btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
         setearPartida(partidaParaModificar);
     }
-
     @Override
     public void customAlertFunction(Object object) {
         HashMap<String, Integer> hashMap = (HashMap<String, Integer>) object;
@@ -451,5 +445,4 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
         txtFecha.setText(partida.getFecha());
         txtHora.setText(partida.getHora());
     }
-
 }

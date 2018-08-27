@@ -11,6 +11,15 @@ import java.util.List;
 public class Item {
     private String codigo;
     private int tipo;
+    private int localId;
+
+    public int getLocalId() {
+        return localId;
+    }
+
+    public void setLocalId(int localId) {
+        this.localId = localId;
+    }
 
     public String getCodigo() {
         return codigo;
@@ -71,6 +80,6 @@ public class Item {
 
     @Override
     public String toString() {
-        return (this.tipo == 0) ? "Bolsa de sangre | " + this.codigo : "Botella de mezcla |" + this.codigo;
+        return (this.tipo == 0) ? "Bolsa de sangre | " + this.codigo : "Botella de mezcla | " + this.codigo;
     }
 }
