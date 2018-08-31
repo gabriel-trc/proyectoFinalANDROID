@@ -197,20 +197,19 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
             try {
                 String[] esValida = Partida.validar(Integer.parseInt(txtCantConservadoras.getText().toString()), Integer.parseInt(txtTemperatura.getText().toString()), Integer.parseInt(txtPeso.getText().toString()), txtNCote.getText().toString(), idFrigorifico);
                 if (esValida[1] == "Ok") {
-                    int indexPartida = partidas.indexOf(partidaParaModificar);
-                    partidas.get(indexPartida).setCantConservadoras(Integer.parseInt(txtCantConservadoras.getText().toString()));
-                    partidas.get(indexPartida).setPeso(Integer.parseInt(txtPeso.getText().toString()));
-                    partidas.get(indexPartida).setTemperatura(Integer.parseInt(txtTemperatura.getText().toString()));
-                    partidas.get(indexPartida).setNumCote(txtNCote.getText().toString());
-                    partidas.get(indexPartida).setIdFrigorifico(idFrigorifico);
-                    partidas.get(indexPartida).setPosFrigorifico(posFrigorifico);
-                    partidas.get(indexPartida).setFecha(txtFecha.getText().toString());
-                    partidas.get(indexPartida).setHora(txtHora.getText().toString());
-                    partidaParaModificar = null;
+                    partidaParaModificar.setCantConservadoras(Integer.parseInt(txtCantConservadoras.getText().toString()));
+                    partidaParaModificar.setPeso(Integer.parseInt(txtPeso.getText().toString()));
+                    partidaParaModificar.setTemperatura(Integer.parseInt(txtTemperatura.getText().toString()));
+                    partidaParaModificar.setNumCote(txtNCote.getText().toString());
+                    partidaParaModificar.setIdFrigorifico(idFrigorifico);
+                    partidaParaModificar.setPosFrigorifico(posFrigorifico);
+                    partidaParaModificar.setFecha(txtFecha.getText().toString());
+                    partidaParaModificar.setHora(txtHora.getText().toString());
+                    crearTablaRegistroPartidas();
                     limpiarCampos();
                     btnAgregar.setText(R.string.btnAgregar);
                     btnAgregar.setBackgroundResource(android.R.color.holo_green_dark);
-                    crearTablaRegistroPartidas();
+                    partidaParaModificar = null;
                 } else {
                     alert(RegistroMateriasPrimasActivity.this, esValida, null);
                 }
@@ -328,7 +327,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                 columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
                 columnaModificar.setGravity(Gravity.CENTER);
                 columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
             } else {
                 Button columnaModificar = new Button(this);
                 columnaModificar.setText(R.string.btnModificar);
@@ -345,7 +344,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                         alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"Atención", "¿Quiere editar este registro?"}, obj);
                     }
                 });
-                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
             }
 
             if (i < 0) {

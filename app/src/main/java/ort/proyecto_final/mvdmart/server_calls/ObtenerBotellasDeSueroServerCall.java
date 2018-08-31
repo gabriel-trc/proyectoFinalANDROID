@@ -24,6 +24,7 @@ public class ObtenerBotellasDeSueroServerCall {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/botelladesuero/disponibles/" + Config.getNumeroOperario(activity);
+        activity.iniciarLoader();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
@@ -31,7 +32,7 @@ public class ObtenerBotellasDeSueroServerCall {
                     public void onResponse(JSONObject response) {
                         try {
                             activity.finalizarLoader();
-                            activity.alertSeleccionarBotella(response.getJSONArray("retorno"));
+                            activity.alertSeleccionarBotellaSuero(response.getJSONArray("retorno"));
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
                         }

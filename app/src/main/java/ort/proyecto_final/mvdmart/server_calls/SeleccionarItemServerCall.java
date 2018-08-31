@@ -23,7 +23,6 @@ import ort.proyecto_final.mvdmart.models.Item;
 
 public class SeleccionarItemServerCall {
 
-
     private SeparacionSueroActivity activity;
     private Context context;
 
@@ -39,7 +38,7 @@ public class SeleccionarItemServerCall {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        activity.iniciarLoader();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.POST, url, sendObject, new Response.Listener<JSONObject>() {
                     @Override

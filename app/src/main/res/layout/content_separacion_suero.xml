@@ -118,15 +118,24 @@
             app:layout_constraintTop_toTopOf="@+id/txtBotellaSueroSeleccionada" />
 
         <TextView
-            android:id="@+id/txtDisponibleBotellaSuero"
+            android:id="@+id/textView18"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Disponible para llenar: "
+            android:text="Disponible en ml para rellenar: "
             android:textAppearance="@android:style/TextAppearance.Large"
             app:layout_constraintBottom_toBottomOf="@+id/btnSeleccionarBotellaSuero"
             app:layout_constraintStart_toEndOf="@+id/btnSeleccionarBotellaSuero"
             app:layout_constraintTop_toTopOf="@+id/btnSeleccionarBotellaSuero" />
+
+        <TextView
+            android:id="@+id/txtDisponibleParaLlenarSuero"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            app:layout_constraintBottom_toBottomOf="@+id/textView18"
+            app:layout_constraintStart_toEndOf="@+id/textView18"
+            app:layout_constraintTop_toTopOf="@+id/textView18" />
 
         <TextView
             android:id="@+id/textView14"
@@ -150,7 +159,7 @@
             app:layout_constraintTop_toTopOf="@+id/textView14" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/btnSeleccionarBotellaMezcla"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
@@ -169,9 +178,9 @@
             android:background="@color/colorBtnFinalizar"
             android:text="COMPLETA"
             android:textColor="@color/colorBlanco"
-            app:layout_constraintBottom_toBottomOf="@+id/button3"
-            app:layout_constraintStart_toEndOf="@+id/button3"
-            app:layout_constraintTop_toTopOf="@+id/button3" />
+            app:layout_constraintBottom_toBottomOf="@+id/btnSeleccionarBotellaMezcla"
+            app:layout_constraintStart_toEndOf="@+id/btnSeleccionarBotellaMezcla"
+            app:layout_constraintTop_toTopOf="@+id/btnSeleccionarBotellaMezcla" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline9"
@@ -265,11 +274,11 @@
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/nestedScrollView2"
             android:layout_width="0dp"
-            android:layout_height="165dp"
+            android:layout_height="350dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:fillViewport="true"
+            android:clipToPadding="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline10">
@@ -281,9 +290,59 @@
                 android:gravity="center"
                 android:isScrollContainer="true"
                 android:orientation="horizontal"
-                android:stretchColumns="*" />
+                android:stretchColumns="*"></TableLayout>
 
         </android.support.v4.widget.NestedScrollView>
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nestedScrollView2" />
+
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/nestedScrollView3"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:clipToPadding="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider2">
+
+            <TableLayout
+                android:id="@+id/tablaExtraccionesMezcla"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:isScrollContainer="true"
+                android:orientation="horizontal"
+                android:stretchColumns="*"></TableLayout>
+
+        </android.support.v4.widget.NestedScrollView>
+
+        <Button
+            android:id="@+id/btnFinalizar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/btnFinalizar"
+            android:textColor="@color/colorBlanco"
+            android:background="@color/colorBtnFinalizar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nestedScrollView3" />
 
     </android.support.constraint.ConstraintLayout>
 

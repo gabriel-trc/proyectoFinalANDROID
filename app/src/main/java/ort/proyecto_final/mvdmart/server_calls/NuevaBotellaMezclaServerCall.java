@@ -19,15 +19,17 @@ import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.models.BotellaSuero;
+import ort.proyecto_final.mvdmart.models.Item;
 
-public class NuevaBotellaSueroServerCall {
+public class NuevaBotellaMezclaServerCall {
+
     private SeparacionSueroActivity activity;
     private Context context;
 
-    public NuevaBotellaSueroServerCall(final SeparacionSueroActivity activity) {
+    public NuevaBotellaMezclaServerCall(final SeparacionSueroActivity activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
-        String url = Constants.DOMAIN + "/api/botelladesuero/nueva/" + Config.getNumeroOperario(activity);
+        String url = Constants.DOMAIN + "/api/botellademezcla/nueva/" + Config.getNumeroOperario(activity);
         activity.iniciarLoader();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -36,8 +38,8 @@ public class NuevaBotellaSueroServerCall {
                         try {
                             activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
-                                activity.setNuevaBotellaDeSueroSeleccionada (new BotellaSuero(response.getString("retorno"), 0));
-                                activity.botellaDeSueroSeleccionada();
+                                activity.setNuevaBotellaDeMezclaSeleccionada(new Item(response.getString("retorno"), 1));
+                                activity.botellaDeMezclaSeleccionada();
                             } else {
                                 JSONArray errorArray = response.getJSONArray("mensajes");
                                 AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -72,20 +74,7 @@ public class NuevaBotellaSueroServerCall {
                             Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
                         }
                     }
-                })
-//        {
-//            /**
-//             * Passing some request headers
-//             */
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                HashMap<String, String> headers = new HashMap<String, String>();
-//                //headers.put("Content-Type", "application/json");
-//                headers.put("idOperario", Config.getNumeroOperario(activity));
-//                return headers;
-//            }
-//        }
-                ;
+                });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }

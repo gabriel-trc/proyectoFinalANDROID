@@ -40,7 +40,7 @@ public class RegistroBolsasServerCall {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        activity.iniciarLoader();
         final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.POST, url, sendObject, new Response.Listener<JSONObject>() {
                     @Override
@@ -52,7 +52,7 @@ public class RegistroBolsasServerCall {
                                 if (finalizar)
                                     activity.finish();
                                 else
-                                    activity.vaciarArrayBolsas();
+                                    activity.limpiarTabla();
                             } else {
                                 String[] errores = HelpersFunctions.errores(response.getJSONArray("mensajes"));
                                 final int partidaId = response.getInt("retorno");

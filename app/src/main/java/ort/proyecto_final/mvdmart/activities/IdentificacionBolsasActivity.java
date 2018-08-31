@@ -179,10 +179,6 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
     }
 
     public void limpiarTabla() {
-        tablaBolsas.removeAllViews();
-    }
-
-    public void vaciarArrayBolsas() {
         bolsas = new ArrayList<>();
         tablaBolsas.removeAllViews();
     }
@@ -387,7 +383,6 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                 for (int i = 0; i < bolsas.size(); i++) {
                     jsonBolsas.put(bolsas.get(i).toJSONObject());
                 }
-                iniciarLoader();
                 new RegistroBolsasServerCall(this, jsonBolsas, idPartidaSeleccionada, finalizar);
             } else {
                 Toast.makeText(IdentificacionBolsasActivity.this, "Atención: Debes terminar de modificar la bolsa.", Toast.LENGTH_LONG).show();

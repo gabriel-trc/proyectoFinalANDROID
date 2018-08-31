@@ -12,6 +12,15 @@ public class Item {
     private String codigo;
     private int tipo;
     private int localId;
+    private boolean finalizado;
+
+    public boolean isFinalizado() {
+        return finalizado;
+    }
+
+    public void setFinalizado(boolean finalizado) {
+        this.finalizado = finalizado;
+    }
 
     public int getLocalId() {
         return localId;
@@ -40,6 +49,7 @@ public class Item {
     public Item(String codigo, int tipo) {
         this.codigo = codigo;
         this.tipo = tipo;
+        this.finalizado = false;
     }
 
 
@@ -65,7 +75,8 @@ public class Item {
             for (int j = 0; j < bolsas.length(); j++) {
                 bolsasDeSangre.add(new Item(bolsas.getJSONObject(j).getString("codigo"), 0));
             }
-            String llavePartida = partida.getJSONObject("frigorifico").getString("nombre") + " - " + partida.getString("fechaCompleta");
+            String[] fecha = partida.getString("fechaCompleta").substring(0, 10).split("-");
+            String llavePartida = partida.getJSONObject("frigorifico").getString("nombre") + " - " + fecha[2] + "-" + fecha[1] + "-" + fecha[0];
             itemsParaIdentificar.put(llavePartida, bolsasDeSangre);
         }
         ArrayList<Item> botellasDeMezcla = new ArrayList<>();
@@ -82,4 +93,17 @@ public class Item {
     public String toString() {
         return (this.tipo == 0) ? "Bolsa de sangre | " + this.codigo : "Botella de mezcla | " + this.codigo;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        else if (obj == null)
+            return false;
+        else if (getClass() != obj.getClass())
+            return false;
+        else
+            return this.codigo.equals(((Item) obj).getCodigo());
+    }
+
 }

@@ -5,7 +5,8 @@ import org.json.JSONObject;
 
 public class BotellaSuero {
     private String codigo;
-    private int cantidad;
+    private int cantidadOcupada;
+    private int cantidadDisponible;
 
     public String getCodigo() {
         return codigo;
@@ -15,17 +16,26 @@ public class BotellaSuero {
         this.codigo = codigo;
     }
 
-    public int getCantidad() {
-        return cantidad;
+    public int getCantidadOcupada() {
+        return cantidadOcupada;
     }
 
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
+    public void setCantidadOcupada(int cantidadOcupada) {
+        this.cantidadOcupada = cantidadOcupada;
     }
 
-    public BotellaSuero(String codigo, int cantidad) {
+    public int getCantidadDisponible() {
+        return cantidadDisponible;
+    }
+
+    public void setCantidadDisponible(int cantidadDisponible) {
+        this.cantidadDisponible = cantidadDisponible;
+    }
+
+    public BotellaSuero(String codigo, int cantidadOcupada) {
         this.codigo = codigo;
-        this.cantidad = cantidad;
+        this.cantidadOcupada = cantidadOcupada;
+        this.cantidadDisponible = 500 - cantidadOcupada;
     }
 
 
@@ -33,7 +43,7 @@ public class BotellaSuero {
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("Codigo", this.codigo);
-            jsonBody.put("Cantidad", this.cantidad);
+            jsonBody.put("Cantidad", this.cantidadOcupada);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -42,6 +52,6 @@ public class BotellaSuero {
 
     @Override
     public String toString() {
-        return this.codigo + " - " + this.cantidad + " ml";
+        return this.codigo + " - " + this.cantidadOcupada + " ml";
     }
 }

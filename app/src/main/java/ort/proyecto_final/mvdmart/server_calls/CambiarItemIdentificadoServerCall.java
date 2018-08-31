@@ -39,13 +39,12 @@ public class CambiarItemIdentificadoServerCall {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        activity.iniciarLoader();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.POST, url, sendObject, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-
                             if (response.getBoolean("suceso")) {
                                 activity.cambiarItem();
                                 activity.finalizarLoader();

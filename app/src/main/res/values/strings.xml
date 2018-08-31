@@ -20,5 +20,6 @@
     <string name="btnCancelar">CANCELAR</string>
     <string name="btnSeleccionar">SELECCIONAR</string>
     <string name="btnCerrar">CERRAR</string>
+    <string name="btnCerrada">CERRADA</string>
     <string name="btnCambiar">CAMBIAR</string>
 </resources>
