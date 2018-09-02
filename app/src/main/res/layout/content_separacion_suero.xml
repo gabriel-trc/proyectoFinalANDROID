@@ -14,6 +14,8 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context=".activities.SeparacionSueroActivity"
         tools:showIn="@layout/activity_separacion_suero">
@@ -22,8 +24,6 @@
             android:id="@+id/textView11"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:layout_marginTop="4dp"
             android:text="@string/title_activity_separacion_suero"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             app:layout_constraintBottom_toTopOf="@+id/guideline8"
@@ -37,34 +37,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="47dp" />
+            app:layout_constraintGuide_begin="50dp" />
 
         <TextView
             android:id="@+id/textView13"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="16dp"
-            android:text="Item seleccionado: "
-            android:textAppearance="@android:style/TextAppearance.Large"
+            android:text="ITEM:"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline8" />
 
         <TextView
             android:id="@+id/txtItemSeleccionado"
             android:layout_width="350dp"
-            android:layout_height="wrap_content"
+            android:layout_height="28dp"
             android:layout_marginStart="8dp"
+            android:gravity="center"
             android:textAppearance="@android:style/TextAppearance.Large"
+            android:textColor="@color/colorTexto"
             app:layout_constraintBottom_toBottomOf="@+id/textView13"
             app:layout_constraintStart_toEndOf="@+id/textView13"
             app:layout_constraintTop_toTopOf="@+id/textView13" />
 
         <Button
             android:id="@+id/btnSeleccionarItem"
-            android:layout_width="150dp"
-            android:layout_height="46dp"
-            android:layout_marginStart="12dp"
+            android:layout_width="152dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="190dp"
             android:background="@color/colorBtnSeleccionar"
             android:text="@string/btnSeleccionar"
             android:textColor="@color/colorBlanco"
@@ -76,10 +78,11 @@
             android:id="@+id/btnFinalizarItem"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:background="@color/colorBtnFinalizar"
-            android:text="@string/btnFinalizar"
+            android:layout_marginStart="8dp"
+            android:background="@android:color/holo_blue_light"
+            android:text="@string/btnCerrar"
             android:textColor="@color/colorBlanco"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@+id/btnSeleccionarItem"
             app:layout_constraintStart_toEndOf="@+id/btnSeleccionarItem"
             app:layout_constraintTop_toTopOf="@+id/btnSeleccionarItem" />
@@ -88,19 +91,20 @@
             android:id="@+id/textView12"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
-            android:text="Botella de suero seleccionada: "
-            android:textAppearance="@android:style/TextAppearance.Large"
+            android:text="BOTELLA DE SUERO:"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView13" />
 
         <TextView
             android:id="@+id/txtBotellaSueroSeleccionada"
-            android:layout_width="175dp"
+            android:layout_width="170dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:textAppearance="@android:style/TextAppearance.Large"
+            android:textColor="@color/colorTexto"
             app:layout_constraintBottom_toBottomOf="@+id/textView12"
             app:layout_constraintStart_toEndOf="@+id/textView12"
             app:layout_constraintTop_toTopOf="@+id/textView12" />
@@ -108,52 +112,55 @@
         <Button
             android:id="@+id/btnSeleccionarBotellaSuero"
             android:layout_width="150dp"
-            android:layout_height="46dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="37dp"
             android:background="@color/colorBtnSeleccionar"
             android:text="@string/btnSeleccionar"
             android:textColor="@color/colorBlanco"
+            app:layout_constraintBottom_toBottomOf="@+id/txtDisponibleParaLlenarSuero"
+            app:layout_constraintStart_toEndOf="@+id/txtDisponibleParaLlenarSuero"
+            app:layout_constraintTop_toTopOf="@+id/txtDisponibleParaLlenarSuero" />
+
+        <TextView
+            android:id="@+id/txtLabelDisponibleSuero"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Disponible: "
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="@+id/txtBotellaSueroSeleccionada"
             app:layout_constraintStart_toEndOf="@+id/txtBotellaSueroSeleccionada"
             app:layout_constraintTop_toTopOf="@+id/txtBotellaSueroSeleccionada" />
 
         <TextView
-            android:id="@+id/textView18"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="Disponible en ml para rellenar: "
-            android:textAppearance="@android:style/TextAppearance.Large"
-            app:layout_constraintBottom_toBottomOf="@+id/btnSeleccionarBotellaSuero"
-            app:layout_constraintStart_toEndOf="@+id/btnSeleccionarBotellaSuero"
-            app:layout_constraintTop_toTopOf="@+id/btnSeleccionarBotellaSuero" />
-
-        <TextView
             android:id="@+id/txtDisponibleParaLlenarSuero"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:textAppearance="@android:style/TextAppearance.Large"
-            app:layout_constraintBottom_toBottomOf="@+id/textView18"
-            app:layout_constraintStart_toEndOf="@+id/textView18"
-            app:layout_constraintTop_toTopOf="@+id/textView18" />
+            android:textColor="@color/colorTexto"
+            app:layout_constraintBottom_toBottomOf="@+id/txtLabelDisponibleSuero"
+            app:layout_constraintStart_toEndOf="@+id/txtLabelDisponibleSuero"
+            app:layout_constraintTop_toTopOf="@+id/txtLabelDisponibleSuero" />
 
         <TextView
             android:id="@+id/textView14"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
-            android:text="Botella de mezcla seleccionada: "
-            android:textAppearance="@android:style/TextAppearance.Large"
+            android:text="BOTELLA DE MEZCLA:"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView12" />
 
         <TextView
             android:id="@+id/txtBotellaMezclaSeleccionada"
-            android:layout_width="175dp"
+            android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:textAppearance="@android:style/TextAppearance.Large"
+            android:textColor="@color/colorTexto"
             app:layout_constraintBottom_toBottomOf="@+id/textView14"
             app:layout_constraintStart_toEndOf="@+id/textView14"
             app:layout_constraintTop_toTopOf="@+id/textView14" />
@@ -162,7 +169,7 @@
             android:id="@+id/btnSeleccionarBotellaMezcla"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="232dp"
             android:background="@color/colorBtnSeleccionar"
             android:text="@string/btnSeleccionar"
             android:textColor="@color/colorBlanco"
@@ -171,13 +178,14 @@
             app:layout_constraintTop_toTopOf="@+id/txtBotellaMezclaSeleccionada" />
 
         <Button
-            android:id="@+id/button4"
+            android:id="@+id/btnFinalizarBotellaMezcla"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:background="@color/colorBtnFinalizar"
-            android:text="COMPLETA"
+            android:layout_marginStart="8dp"
+            android:background="@android:color/holo_blue_light"
+            android:text="@string/btnCerrar"
             android:textColor="@color/colorBlanco"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@+id/btnSeleccionarBotellaMezcla"
             app:layout_constraintStart_toEndOf="@+id/btnSeleccionarBotellaMezcla"
             app:layout_constraintTop_toTopOf="@+id/btnSeleccionarBotellaMezcla" />
@@ -187,7 +195,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="220dp" />
+            app:layout_constraintGuide_begin="216dp" />
 
         <View
             android:id="@+id/divider"
@@ -201,19 +209,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline9" />
 
-
         <TextView
             android:id="@+id/textView15"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:text="Agregar extracción suero: "
-            android:textAppearance="@android:style/TextAppearance.Large"
+            android:layout_marginStart="180dp"
+            android:text="Cantidad de suero:"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
             app:layout_constraintBottom_toTopOf="@+id/guideline10"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline9" />
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
 
         <EditText
             android:id="@+id/txtCantidadSueroExtraido"
@@ -221,67 +226,102 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:ems="10"
-            android:hint="(ml)"
             android:inputType="numberPassword"
             app:layout_constraintBottom_toBottomOf="@+id/textView15"
             app:layout_constraintStart_toEndOf="@+id/textView15"
             app:layout_constraintTop_toTopOf="@+id/textView15" />
 
-        <Button
-            android:id="@+id/btnAgregarExtraccionSuero"
-            android:layout_width="150dp"
+        <TextView
+            android:id="@+id/textView19"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:background="@color/colorBtnAgregar"
-            android:text="@string/btnAgregar"
-            android:textColor="@color/colorBlanco"
+            android:text="mL"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
             app:layout_constraintBottom_toBottomOf="@+id/txtCantidadSueroExtraido"
             app:layout_constraintStart_toEndOf="@+id/txtCantidadSueroExtraido"
             app:layout_constraintTop_toTopOf="@+id/txtCantidadSueroExtraido" />
 
-        <TextView
-            android:id="@+id/textView17"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/btnAgregarExtraccionSuero"
+            android:layout_width="149dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="24dp"
-            android:text="Agregar sobrante de mezcla"
-            android:textAppearance="@android:style/TextAppearance.Large"
-            app:layout_constraintBottom_toTopOf="@+id/guideline10"
+            android:layout_marginEnd="16dp"
+            android:background="@color/colorBtnAgregar"
+            android:text="@string/btnAgregarSuero"
+            android:textColor="@color/colorBlanco"
+            app:layout_constraintBottom_toBottomOf="@+id/textView19"
             app:layout_constraintEnd_toStartOf="@+id/btnAgregarExtraccionMezcla"
-            app:layout_constraintTop_toTopOf="@+id/guideline9" />
+            app:layout_constraintTop_toTopOf="@+id/textView19" />
+
+        <!--<TextView-->
+        <!--android:id="@+id/textView17"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginTop="24dp"-->
+        <!--android:text="Agregar sobrante de mezcla"-->
+        <!--android:textAppearance="@android:style/TextAppearance.Large"-->
+        <!--app:layout_constraintBottom_toTopOf="@+id/guideline10"-->
+        <!--app:layout_constraintEnd_toStartOf="@+id/btnAgregarExtraccionMezcla"-->
+        <!--app:layout_constraintTop_toTopOf="@+id/guideline9" />-->
 
         <Button
             android:id="@+id/btnAgregarExtraccionMezcla"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="156dp"
             android:background="@color/colorBtnAgregar"
-            android:text="@string/btnAgregar"
+            android:text="@string/btnAgregarMezcla"
             android:textColor="@color/colorBlanco"
-            app:layout_constraintBottom_toBottomOf="@+id/textView17"
+            app:layout_constraintBottom_toBottomOf="@+id/btnAgregarExtraccionSuero"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textView17" />
+            app:layout_constraintTop_toTopOf="@+id/btnAgregarExtraccionSuero"
+            app:layout_constraintVertical_bias="0.0" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="291dp" />
+            app:layout_constraintGuide_begin="275dp" />
+
+        <TextView
+            android:id="@+id/txtTituloTablaExtraccionesSuero"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Extracciones de suero"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline10" />
+
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtTituloTablaExtraccionesSuero" />
 
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/nestedScrollView2"
             android:layout_width="0dp"
-            android:layout_height="350dp"
+            android:layout_height="320dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:clipToPadding="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline10">
+            app:layout_constraintTop_toBottomOf="@+id/divider3">
 
             <TableLayout
                 android:id="@+id/tablaExtraccionesSuero"
@@ -303,6 +343,18 @@
             android:layout_marginTop="8dp"
             android:background="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtTituloTablaExtraccionesMezcla" />
+
+        <TextView
+            android:id="@+id/txtTituloTablaExtraccionesMezcla"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Extracciones de mezcla"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/nestedScrollView2" />
 
@@ -330,16 +382,30 @@
         </android.support.v4.widget.NestedScrollView>
 
         <Button
-            android:id="@+id/btnFinalizar"
-            android:layout_width="wrap_content"
+            android:id="@+id/btnFinalizarSeparacion"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
+            android:background="@color/colorBtnFinalizar"
             android:text="@string/btnFinalizar"
             android:textColor="@color/colorBlanco"
-            android:background="@color/colorBtnFinalizar"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btnCancelarSeparacion"
+            app:layout_constraintTop_toBottomOf="@+id/nestedScrollView3" />
+
+        <Button
+            android:id="@+id/btnCancelarSeparacion"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:background="@color/colorBtnCancelar"
+            android:text="@string/btnCancelar"
+            android:textColor="@color/colorBlanco"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnFinalizarSeparacion"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/nestedScrollView3" />

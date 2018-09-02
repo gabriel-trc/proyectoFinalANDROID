@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
+import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 import ort.proyecto_final.mvdmart.models.BotellaSuero;
 
 public class NuevaBotellaSueroServerCall {
@@ -36,21 +37,15 @@ public class NuevaBotellaSueroServerCall {
                         try {
                             activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
-                                activity.setNuevaBotellaDeSueroSeleccionada (new BotellaSuero(response.getString("retorno"), 0));
-                                activity.botellaDeSueroSeleccionada();
+                                BotellaSuero nueva = new BotellaSuero(response.getString("retorno"), 0);
+                                activity.setNuevaBotellaDeSueroSeleccionada(nueva);
+                                if (activity.getBotellaSueroSeleccionada() != null && activity.getObjetosEnVista().containsKey(activity.getBotellaSueroSeleccionada().getCodigo()) && activity.getObjetosEnVista().get(activity.getBotellaSueroSeleccionada().getCodigo()) == 1)
+                                    new CambiarBotellaSueroSeleccionadaServerCall(activity, activity.getBotellaSueroSeleccionada(), nueva, true);
+                                else {
+                                    activity.botellaDeSueroSeleccionada();
+                                }
                             } else {
-                                JSONArray errorArray = response.getJSONArray("mensajes");
-                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                                builder.setTitle(errorArray.getString(0));
-                                builder.setMessage(errorArray.getString(1));
-                                //builder.setIcon(R.drawable.ic_launcher_foreground);
-                                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                AlertDialog alert = builder.create();
-                                alert.show();
+                                activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")),null);
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");

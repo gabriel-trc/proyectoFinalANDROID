@@ -1,5 +1,8 @@
 package ort.proyecto_final.mvdmart.models;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import ort.proyecto_final.mvdmart.models.Item;
 
 public class ExtraccionSueroDeBolsa extends Item {
@@ -28,5 +31,21 @@ public class ExtraccionSueroDeBolsa extends Item {
         super(codigo, tipo);
         this.codigoBotellaDeSuero = codigoBotellaDeSuero;
         this.cantidad = cantidad;
+    }
+
+    public JSONObject toJSON() {
+        JSONObject jsonBody = new JSONObject();
+        JSONObject item = new JSONObject();
+        try {
+            item.put("codigo", this.getCodigo());
+            item.put("tipo", this.getTipo());
+            jsonBody.put("item",item);
+            jsonBody.put("itemFinalizado",this.isFinalizado());
+            jsonBody.put("codigoBotellaDeSuero",this.codigoBotellaDeSuero);
+            jsonBody.put("cantidad",this.cantidad);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonBody;
     }
 }

@@ -36,11 +36,14 @@ import ort.proyecto_final.mvdmart.models.Item;
 import ort.proyecto_final.mvdmart.server_calls.CambiarBotellaDeMezclaSeleccionadaServerCall;
 import ort.proyecto_final.mvdmart.server_calls.CambiarBotellaSueroSeleccionadaServerCall;
 import ort.proyecto_final.mvdmart.server_calls.CambiarItemIdentificadoServerCall;
+import ort.proyecto_final.mvdmart.server_calls.CancelarSeparacionServerCall;
+import ort.proyecto_final.mvdmart.server_calls.FinalizarSeparacionServerCall;
 import ort.proyecto_final.mvdmart.server_calls.NuevaBotellaMezclaServerCall;
 import ort.proyecto_final.mvdmart.server_calls.NuevaBotellaSueroServerCall;
 import ort.proyecto_final.mvdmart.server_calls.ObtenerBotellasDeMezclaServerCall;
 import ort.proyecto_final.mvdmart.server_calls.ObtenerBotellasDeSueroServerCall;
 import ort.proyecto_final.mvdmart.server_calls.ObtenerItemsIdentificadosServerCall;
+import ort.proyecto_final.mvdmart.server_calls.RegistroMateriasPrimasServerCall;
 import ort.proyecto_final.mvdmart.server_calls.SeleccionarBotellaDeMezclaServerCall;
 import ort.proyecto_final.mvdmart.server_calls.SeleccionarBotellaDeSueroServerCall;
 import ort.proyecto_final.mvdmart.server_calls.SeleccionarItemServerCall;
@@ -48,19 +51,32 @@ import ort.proyecto_final.mvdmart.server_calls.SeleccionarItemServerCall;
 public class SeparacionSueroActivity extends ActivityMadre {
 
     private BotellaSuero botellaSueroSeleccionada, nuevaBotellaDeSueroSeleccionada;
-    private Button btnSeleccionarItem, btnFinalizarItem, btnSeleccionarBotellaSuero, btnSeleccionarBotellaMezcla, btnAgregarExtraccionSuero, btnAgregarExtraccionMezcla;
+    private Button btnSeleccionarItem, btnFinalizarItem, btnFinalizarBotellaMezcla, btnFinalizarSeparacion, btnSeleccionarBotellaSuero, btnSeleccionarBotellaMezcla, btnAgregarExtraccionSuero, btnAgregarExtraccionMezcla, btnCancelarSeparacion;
     private ExpandableListView expandableListView;
     private ExpandableListAdapter expandableListAdapter;
     private List<String> expandableListTitle;
     private HashMap<String, List<Item>> expandableListDetail;
     private Item itemSeleccionado, nuevoItemSeleccionado, botellaMezclaSeleccionada, nuevaBotellaDeMezclaSeleccionada;
-    private TextView alertTitle, txtItemSeleccionado, txtBotellaSueroSeleccionada, txtDisponibleParaLlenarSuero, txtBotellaMezclaSeleccionada;
+    private TextView alertTitle, txtItemSeleccionado, txtBotellaSueroSeleccionada, txtDisponibleParaLlenarSuero, txtBotellaMezclaSeleccionada, txtLabelDisponibleSuero;
     private HashMap<String, Integer> objetosEnVista = new HashMap<>();
     private TableLayout tablaExtraccionesSuero, tablaExtraccionesMezcla;
     ArrayList<ExtraccionSueroDeBolsa> extraccionesSueroDeBolsas = new ArrayList<>();
     ArrayList<ExtraccionMezclaDeBolsa> extraccionesMezclaDeBolsas = new ArrayList<>();
     private ExtraccionSueroDeBolsa extraccionSueroDeBolsaModificar;
     private EditText txtCantidadSueroExtraido;
+    private Integer cantidadDisponible;
+
+    public HashMap<String, Integer> getObjetosEnVista() {
+        return objetosEnVista;
+    }
+
+    public BotellaSuero getBotellaSueroSeleccionada() {
+        return botellaSueroSeleccionada;
+    }
+
+    public Item getBotellaMezclaSeleccionada() {
+        return botellaMezclaSeleccionada;
+    }
 
     public void setNuevaBotellaDeSueroSeleccionada(BotellaSuero nuevaBotellaDeSueroSeleccionada) {
         this.nuevaBotellaDeSueroSeleccionada = nuevaBotellaDeSueroSeleccionada;
@@ -80,6 +96,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
 
     @Override
     public void inicializarVistas() {
+        txtLabelDisponibleSuero = findViewById(R.id.txtLabelDisponibleSuero);
         txtCantidadSueroExtraido = findViewById(R.id.txtCantidadSueroExtraido);
         txtCantidadSueroExtraido.setTransformationMethod(null);
         tablaExtraccionesSuero = findViewById(R.id.tablaExtraccionesSuero);
@@ -88,6 +105,55 @@ public class SeparacionSueroActivity extends ActivityMadre {
         txtBotellaMezclaSeleccionada = findViewById(R.id.txtBotellaMezclaSeleccionada);
         txtBotellaSueroSeleccionada = findViewById(R.id.txtBotellaSueroSeleccionada);
         txtDisponibleParaLlenarSuero = findViewById(R.id.txtDisponibleParaLlenarSuero);
+        btnFinalizarItem = findViewById(R.id.btnFinalizarItem);
+        btnFinalizarItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO refactor. De cerrarce el item sin hacerle ninguna extraccion, ese caso puede pasar?
+                if (itemSeleccionado != null) {
+                    if (((AppCompatButton) v).getText().equals(getResources().getString(R.string.btnCerrar))) {
+                        finalizarItem(itemSeleccionado.getLocalId(), itemSeleccionado.getCodigo() + "CERRAR", true);
+                        btnFinalizarItem.setText(getResources().getString(R.string.btnCerrada));
+                        btnFinalizarItem.setBackgroundResource(android.R.color.holo_purple);
+                    } else {
+                        finalizarItem(itemSeleccionado.getLocalId(), itemSeleccionado.getCodigo() + "CERRAR", false);
+                        btnFinalizarItem.setText(getResources().getString(R.string.btnCerrar));
+                        btnFinalizarItem.setBackgroundResource(android.R.color.holo_green_light);
+                    }
+                } else {
+                    alert(SeparacionSueroActivity.this, new String[]{"Atención", "No hay tiene ningun itém seleccionado."}, null);
+                }
+            }
+        });
+        btnFinalizarBotellaMezcla = findViewById(R.id.btnFinalizarBotellaMezcla);
+        btnFinalizarBotellaMezcla.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (botellaMezclaSeleccionada != null) {
+                    HashMap<String, String> obj = new HashMap<>();
+                    obj.put("id", (((TableRow) v.getParent()).getId() + ""));
+                    obj.put("tagBtn", botellaMezclaSeleccionada.getCodigo() + "CERRAR");
+                    if (getExtraccionSueroDeBolsaById(Integer.parseInt(obj.get("id"))).isFinalizado()) {
+                        obj.put("funcion", "3");
+                        alertDosBotones(SeparacionSueroActivity.this, new String[]{"Atención", "¿Quiere abrir este item?"}, obj);
+                    } else {
+                        obj.put("funcion", "4");
+                        alertDosBotones(SeparacionSueroActivity.this, new String[]{"Atención", "¿Quiere cerrar este item?"}, obj);
+                    }
+//                    if (((AppCompatButton) v).getText().equals(getResources().getString(R.string.btnCerrar))) {
+//                        finalizarItem(itemSeleccionado.getLocalId(), itemSeleccionado.getCodigo() + "CERRAR", true);
+//                        btnFinalizarBotellaMezcla.setText(getResources().getString(R.string.btnCerrada));
+//                        btnFinalizarBotellaMezcla.setBackgroundResource(android.R.color.holo_purple);
+//                    } else {
+//                        finalizarItem(itemSeleccionado.getLocalId(), itemSeleccionado.getCodigo() + "CERRAR", false);
+//                        btnFinalizarBotellaMezcla.setText(getResources().getString(R.string.btnCerrar));
+//                        btnFinalizarBotellaMezcla.setBackgroundResource(android.R.color.holo_green_light);
+//                    }
+                } else {
+                    alert(SeparacionSueroActivity.this, new String[]{"Atención", "No hay tiene ninguna botella seleccionada."}, null);
+                }
+            }
+        });
         btnSeleccionarItem = findViewById(R.id.btnSeleccionarItem);
         btnSeleccionarItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,7 +168,6 @@ public class SeparacionSueroActivity extends ActivityMadre {
                 new ObtenerBotellasDeSueroServerCall(SeparacionSueroActivity.this);
             }
         });
-
         btnSeleccionarBotellaMezcla = findViewById(R.id.btnSeleccionarBotellaMezcla);
         btnSeleccionarBotellaMezcla.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,29 +175,77 @@ public class SeparacionSueroActivity extends ActivityMadre {
                 new ObtenerBotellasDeMezclaServerCall(SeparacionSueroActivity.this);
             }
         });
-
+        btnFinalizarSeparacion = findViewById(R.id.btnFinalizarSeparacion);
+        btnFinalizarSeparacion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finalizarSeparacion(false);
+            }
+        });
         btnAgregarExtraccionSuero = findViewById(R.id.btnAgregarExtraccionSuero);
         btnAgregarExtraccionSuero.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (((AppCompatButton) v).getText().equals(getResources().getString(R.string.btnAgregar)))
+                if (((AppCompatButton) v).getText().equals(getResources().getString(R.string.btnAgregarSuero)))
                     agregarNuevaExtraccionSuero();
                 else
                     modificarExtraccionSuero();
                 esconderTecado(SeparacionSueroActivity.this);
-
             }
         });
-
         btnAgregarExtraccionMezcla = findViewById(R.id.btnAgregarExtraccionMezcla);
         btnAgregarExtraccionMezcla.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (((AppCompatButton) v).getText().equals(getResources().getString(R.string.btnAgregar)))
+                if (((AppCompatButton) v).getText().equals(getResources().getString(R.string.btnAgregarMezcla)))
                     agregarNuevaExtraccionMezcla();
                 esconderTecado(SeparacionSueroActivity.this);
             }
         });
+
+        btnCancelarSeparacion = findViewById(R.id.btnCancelarSeparacion);
+        btnCancelarSeparacion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HashMap<String, String> obj = new HashMap<>();
+                obj.put("funcion", "8");
+                alertDosBotones(SeparacionSueroActivity.this, new String[]{"Atención", "¿Esta seguro que quiere cancelar todos los resgistros cargados?"}, obj);
+            }
+        });
+    }
+
+    private void finalizarSeparacion(Boolean cancelar) {
+        if (!extraccionesSueroDeBolsas.isEmpty()) {
+            if (btnAgregarExtraccionSuero.getText().equals(getResources().getString(R.string.btnAgregarSuero))) {
+                JSONArray extraccionesSuero = new JSONArray();
+                for (int i = 0; i < extraccionesSueroDeBolsas.size(); i++) {
+                    extraccionesSuero.put(extraccionesSueroDeBolsas.get(i).toJSON());
+                }
+                JSONArray extraccionesMezcla = new JSONArray();
+                if (!extraccionesMezclaDeBolsas.isEmpty()) {
+                    for (int i = 0; i < extraccionesMezclaDeBolsas.size(); i++) {
+                        extraccionesMezcla.put(extraccionesMezclaDeBolsas.get(i).toJSON());
+                    }
+                }
+                if (!cancelar) {
+                    Item itemParaLlamada = null;
+                    String codigoBotellaSueroLlamada = "";
+                    String codigoBotellaMezclaLlamada = "";
+                    if (itemSeleccionado != null && objetosEnVista.containsKey(itemSeleccionado.getCodigo()) && objetosEnVista.get(itemSeleccionado.getCodigo()) == 1)
+                        itemParaLlamada = itemSeleccionado;
+                    if (botellaSueroSeleccionada != null && objetosEnVista.containsKey(botellaSueroSeleccionada.getCodigo()) && objetosEnVista.get(botellaSueroSeleccionada.getCodigo()) == 1)
+                        codigoBotellaSueroLlamada = botellaSueroSeleccionada.getCodigo();
+                    if (botellaMezclaSeleccionada != null && objetosEnVista.containsKey(botellaMezclaSeleccionada.getCodigo()) && objetosEnVista.get(botellaMezclaSeleccionada.getCodigo()) == 1)
+                        codigoBotellaMezclaLlamada = botellaMezclaSeleccionada.getCodigo();
+                    new FinalizarSeparacionServerCall(this, extraccionesSuero, extraccionesMezcla, itemParaLlamada, codigoBotellaSueroLlamada, codigoBotellaMezclaLlamada);
+                } else
+                    new CancelarSeparacionServerCall(this, extraccionesSuero, extraccionesMezcla, itemSeleccionado, (botellaSueroSeleccionada != null) ? botellaSueroSeleccionada.getCodigo() : null, (botellaMezclaSeleccionada != null) ? botellaMezclaSeleccionada.getCodigo() : null);
+            } else {
+                Toast.makeText(SeparacionSueroActivity.this, "Atención: Debes terminar de modificar el registro.", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(SeparacionSueroActivity.this, "Atención: No tienes ningun registro de separación de suero.", Toast.LENGTH_LONG).show();
+        }
     }
 
     //region Manejo de Item para separar
@@ -241,7 +354,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
                     //TODO override del listener del positive button para que no cierre el dialogo, si no escojio botella
                     if (nuevaBotellaDeSueroSeleccionada != null) {
                         if (botellaSueroSeleccionada != null && objetosEnVista.containsKey(botellaSueroSeleccionada.getCodigo()) && objetosEnVista.get(botellaSueroSeleccionada.getCodigo()) == 1) {
-                            new CambiarBotellaSueroSeleccionadaServerCall(SeparacionSueroActivity.this, botellaSueroSeleccionada, nuevaBotellaDeSueroSeleccionada);
+                            new CambiarBotellaSueroSeleccionadaServerCall(SeparacionSueroActivity.this, botellaSueroSeleccionada, nuevaBotellaDeSueroSeleccionada, false);
                         } else {
                             new SeleccionarBotellaDeSueroServerCall(SeparacionSueroActivity.this, nuevaBotellaDeSueroSeleccionada);
                         }
@@ -282,8 +395,10 @@ public class SeparacionSueroActivity extends ActivityMadre {
         botellaSueroSeleccionada = nuevaBotellaDeSueroSeleccionada;
         nuevaBotellaDeSueroSeleccionada = null;
         agregarReferenciaDeObjetoEnVista(botellaSueroSeleccionada.getCodigo());
+        txtLabelDisponibleSuero.setVisibility(View.VISIBLE);
         txtBotellaSueroSeleccionada.setText(botellaSueroSeleccionada.getCodigo());
-        txtDisponibleParaLlenarSuero.setText((500 - botellaSueroSeleccionada.getCantidadOcupada()) + "");
+        txtDisponibleParaLlenarSuero.setText((500 - botellaSueroSeleccionada.getCantidadOcupada()) + " mL");
+        cantidadDisponible = 500 - botellaSueroSeleccionada.getCantidadDisponible();
         btnSeleccionarBotellaSuero.setText(R.string.btnCambiar);
         btnSeleccionarBotellaSuero.setBackgroundColor(getResources().getColor(R.color.colorBtnModificar));
     }
@@ -322,7 +437,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
                     //TODO override del listener del positive button para que no cierre el dialogo, si no escojio botella
                     if (nuevaBotellaDeMezclaSeleccionada != null) {
                         if (botellaMezclaSeleccionada != null && objetosEnVista.containsKey(botellaMezclaSeleccionada.getCodigo()) && objetosEnVista.get(botellaMezclaSeleccionada.getCodigo()) == 1) {
-                            new CambiarBotellaDeMezclaSeleccionadaServerCall(SeparacionSueroActivity.this, botellaMezclaSeleccionada, nuevaBotellaDeMezclaSeleccionada);
+                            new CambiarBotellaDeMezclaSeleccionadaServerCall(SeparacionSueroActivity.this, botellaMezclaSeleccionada, nuevaBotellaDeMezclaSeleccionada, false);
                         } else {
                             new SeleccionarBotellaDeMezclaServerCall(SeparacionSueroActivity.this, nuevaBotellaDeMezclaSeleccionada);
                         }
@@ -344,7 +459,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
             mBuilder.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    new NuevaBotellaSueroServerCall(SeparacionSueroActivity.this);
+                    new NuevaBotellaMezclaServerCall(SeparacionSueroActivity.this);
                     dialog.dismiss();
                 }
             });
@@ -412,7 +527,8 @@ public class SeparacionSueroActivity extends ActivityMadre {
                     agregarReferenciaDeObjetoEnVista(botellaSueroSeleccionada.getCodigo());
                     extraccionesSueroDeBolsas.add(new ExtraccionSueroDeBolsa(itemSeleccionado.getCodigo(), itemSeleccionado.getTipo(), botellaSueroSeleccionada.getCodigo(), Integer.parseInt(txtCantidadSueroExtraido.getText().toString())));
                     crearTablaExtraccionesSuero();
-                    txtDisponibleParaLlenarSuero.setText((botellaSueroSeleccionada.getCantidadDisponible() - cantidadSueroExtraida) + "");
+                    txtDisponibleParaLlenarSuero.setText((botellaSueroSeleccionada.getCantidadDisponible() - cantidadSueroExtraida) + " mL");
+                    cantidadDisponible = botellaSueroSeleccionada.getCantidadDisponible() - cantidadSueroExtraida;
                     botellaSueroSeleccionada.setCantidadDisponible(botellaSueroSeleccionada.getCantidadDisponible() - cantidadSueroExtraida);
                     limpiarCampos();
                 } else {
@@ -423,6 +539,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
         } else {
             alert(SeparacionSueroActivity.this, new String[]{"Atención", "No queda mas capacidad disponible en la botella de suero; debe de cambiarla."}, null);
         }
+        esconderTecado(SeparacionSueroActivity.this);
     }
 
     private void modificarExtraccionSuero() {
@@ -430,11 +547,12 @@ public class SeparacionSueroActivity extends ActivityMadre {
             int cantidadSueroExtraida = Integer.parseInt(txtCantidadSueroExtraido.getText().toString());
             if (cantidadSueroExtraida <= botellaSueroSeleccionada.getCantidadDisponible()) {
                 extraccionSueroDeBolsaModificar.setCantidad(cantidadSueroExtraida);
-                txtDisponibleParaLlenarSuero.setText((botellaSueroSeleccionada.getCantidadDisponible() - cantidadSueroExtraida) + "");
+                txtDisponibleParaLlenarSuero.setText((botellaSueroSeleccionada.getCantidadDisponible() - cantidadSueroExtraida) + " mL");
+                cantidadDisponible = botellaSueroSeleccionada.getCantidadDisponible() - cantidadSueroExtraida;
                 botellaSueroSeleccionada.setCantidadDisponible(botellaSueroSeleccionada.getCantidadDisponible() - cantidadSueroExtraida);
                 crearTablaExtraccionesSuero();
                 limpiarCampos();
-                btnAgregarExtraccionSuero.setText(R.string.btnAgregar);
+                btnAgregarExtraccionSuero.setText(R.string.btnAgregarSuero);
                 btnAgregarExtraccionSuero.setBackgroundResource(android.R.color.holo_green_dark);
                 extraccionSueroDeBolsaModificar = null;
             } else {
@@ -459,7 +577,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
 
             TextView columnaCodigoItem = new TextView(this.getApplicationContext());
             if (i < 0)
-                columnaCodigoItem.setText("Código de itém");
+                columnaCodigoItem.setText("Item");
             else
                 columnaCodigoItem.setText(extraccionesSueroDeBolsas.get(i).getCodigo());
             columnaCodigoItem.setTextColor(getResources().getColor(R.color.colorBlanco));
@@ -469,7 +587,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
 
             TextView columnaCantidadExtraida = new TextView(this.getApplicationContext());
             if (i < 0)
-                columnaCantidadExtraida.setText("Cantidad suero extraído");
+                columnaCantidadExtraida.setText("Cantidad de suero");
             else
                 columnaCantidadExtraida.setText(extraccionesSueroDeBolsas.get(i).getCantidad() + "");
             columnaCantidadExtraida.setTextColor(getResources().getColor(R.color.colorBlanco));
@@ -479,7 +597,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
 
             TextView columnaCodigoBotellaSuero = new TextView(this.getApplicationContext());
             if (i < 0)
-                columnaCodigoBotellaSuero.setText("Código botella de suero");
+                columnaCodigoBotellaSuero.setText("Botella de suero");
             else
                 columnaCodigoBotellaSuero.setText(extraccionesSueroDeBolsas.get(i).getCodigoBotellaDeSuero());
             columnaCodigoBotellaSuero.setTextColor(getResources().getColor(R.color.colorBlanco));
@@ -558,7 +676,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
                     @Override
                     public void onClick(View v) {
                         HashMap<String, String> obj = new HashMap<>();
-                        obj.put("id", (((TableRow) v.getParent()).getId()+""));
+                        obj.put("id", (((TableRow) v.getParent()).getId() + ""));
                         obj.put("tagBtn", (v.getTag().toString()));
                         if (getExtraccionSueroDeBolsaById(Integer.parseInt(obj.get("id"))).isFinalizado()) {
                             obj.put("funcion", "3");
@@ -591,10 +709,14 @@ public class SeparacionSueroActivity extends ActivityMadre {
 
     private void agregarNuevaExtraccionMezcla() {
         if (botellaMezclaSeleccionada != null && itemSeleccionado != null) {
-            agregarReferenciaDeObjetoEnVista(itemSeleccionado.getCodigo());
-            agregarReferenciaDeObjetoEnVista(botellaMezclaSeleccionada.getCodigo());
-            extraccionesMezclaDeBolsas.add(new ExtraccionMezclaDeBolsa(itemSeleccionado.getCodigo(), itemSeleccionado.getTipo(), botellaMezclaSeleccionada.getCodigo()));
-            crearTablaExtraccionesMezcla();
+            if (!extraccionesMezclaDeBolsas.contains(new ExtraccionMezclaDeBolsa(itemSeleccionado.getCodigo(), itemSeleccionado.getTipo(), botellaMezclaSeleccionada.getCodigo()))) {
+                agregarReferenciaDeObjetoEnVista(itemSeleccionado.getCodigo());
+                agregarReferenciaDeObjetoEnVista(botellaMezclaSeleccionada.getCodigo());
+                extraccionesMezclaDeBolsas.add(new ExtraccionMezclaDeBolsa(itemSeleccionado.getCodigo(), itemSeleccionado.getTipo(), botellaMezclaSeleccionada.getCodigo()));
+                crearTablaExtraccionesMezcla();
+            } else {
+                alert(SeparacionSueroActivity.this, new String[]{"Atención", "Ya ingreso un sobrante de mezcla de el item seleccionado a la botella de mezcla."}, null);
+            }
         } else {
             alert(SeparacionSueroActivity.this, new String[]{"Atención", "No hay seleccionado un item de donde extraer la mezcla o un recipiente donde depositarla."}, null);
         }
@@ -612,10 +734,9 @@ public class SeparacionSueroActivity extends ActivityMadre {
                 fila.setId(i);
                 fila.setBackgroundColor((i % 2 == 0) ? Color.rgb(112, 193, 179) : Color.rgb(178, 219, 191));
             }
-
             TextView columnaCodigoItem = new TextView(this.getApplicationContext());
             if (i < 0)
-                columnaCodigoItem.setText("Código de itém");
+                columnaCodigoItem.setText("Item");
             else
                 columnaCodigoItem.setText(extraccionesMezclaDeBolsas.get(i).getCodigo());
             columnaCodigoItem.setTextColor(getResources().getColor(R.color.colorBlanco));
@@ -625,7 +746,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
 
             TextView columnaCodigoBotellaMezcla = new TextView(this.getApplicationContext());
             if (i < 0)
-                columnaCodigoBotellaMezcla.setText("Código botella de mezcla");
+                columnaCodigoBotellaMezcla.setText("Botella de mezcla");
             else
                 columnaCodigoBotellaMezcla.setText(extraccionesMezclaDeBolsas.get(i).getCodigoBotellaMezcla());
             columnaCodigoBotellaMezcla.setTextColor(getResources().getColor(R.color.colorBlanco));
@@ -695,7 +816,8 @@ public class SeparacionSueroActivity extends ActivityMadre {
             } else {
                 Button columnaCerrar = new Button(this);
                 columnaCerrar.setText("CERRAR");
-                columnaCerrar.setBackgroundResource(android.R.color.holo_red_light);
+                columnaCerrar.setTag(extraccionesMezclaDeBolsas.get(i).getCodigoBotellaMezcla() + "CERRAR");
+                columnaCerrar.setBackgroundResource(android.R.color.holo_blue_light);
                 columnaCerrar.setTextColor(getResources().getColor(R.color.colorBlanco));
                 columnaCerrar.setGravity(Gravity.CENTER);
                 columnaCerrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
@@ -703,14 +825,19 @@ public class SeparacionSueroActivity extends ActivityMadre {
                     @Override
                     public void onClick(View v) {
                         HashMap<String, String> obj = new HashMap<>();
-                        obj.put("funcion", "6");
-                        obj.put("id", (((TableRow) v.getParent()).getId()) + "");
-                        alertDosBotones(SeparacionSueroActivity.this, new String[]{"Atención", "¿Quiere cerrar este item?"}, obj);
+                        obj.put("id", (((TableRow) v.getParent()).getId() + ""));
+                        obj.put("tagBtn", (v.getTag().toString()));
+                        if (getItemById(Integer.parseInt(obj.get("id"))).isFinalizado()) {
+                            obj.put("funcion", "6");
+                            alertDosBotones(SeparacionSueroActivity.this, new String[]{"Atención", "¿Quiere abrir este item?"}, obj);
+                        } else {
+                            obj.put("funcion", "7");
+                            alertDosBotones(SeparacionSueroActivity.this, new String[]{"Atención", "¿Quiere cerrar este item?"}, obj);
+                        }
                     }
                 });
                 fila.addView(columnaCerrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
             }
-
             tablaExtraccionesMezcla.addView(fila);
         }
 
@@ -752,12 +879,22 @@ public class SeparacionSueroActivity extends ActivityMadre {
             quitarReferenciaDeObjetoEnVista(ext.getCodigoBotellaDeSuero());
             quitarReferenciaDeObjetoEnVista(ext.getCodigo());
             crearTablaExtraccionesSuero();
-        } else if (hashMap.get("funcion") == "3") {//finaliza el item de la extracción de suero
+        } else if (hashMap.get("funcion") == "3") {//abre el item de la extracción de suero
             finalizarItem(Integer.parseInt(hashMap.get("id")), hashMap.get("tagBtn"), false);
-        } else if (hashMap.get("funcion") == "4") {//abre el item de la extracción de suero
+        } else if (hashMap.get("funcion") == "4") {//finaliza el item de la extracción de suero
             finalizarItem(Integer.parseInt(hashMap.get("id")), hashMap.get("tagBtn"), true);
-        } else if (hashMap.get("funcion") == "5") {
-
+        } else if (hashMap.get("funcion") == "5") {//borra extraccion de mezcla
+            ExtraccionMezclaDeBolsa ext = (ExtraccionMezclaDeBolsa) getItemById(Integer.parseInt(hashMap.get("id")));
+            extraccionesMezclaDeBolsas.remove(ext);
+            quitarReferenciaDeObjetoEnVista(ext.getCodigoBotellaMezcla());
+            quitarReferenciaDeObjetoEnVista(ext.getCodigo());
+            crearTablaExtraccionesMezcla();
+        } else if (hashMap.get("funcion") == "6") {//abre la botella que recolecta mezcla
+            finalizarBotellaJuntarMezcla(Integer.parseInt(hashMap.get("id")), hashMap.get("tagBtn"), false);
+        } else if (hashMap.get("funcion") == "7") {//finaliza la botella que recolecta mezcla
+            finalizarBotellaJuntarMezcla(Integer.parseInt(hashMap.get("id")), hashMap.get("tagBtn"), true);
+        } else if (hashMap.get("funcion") == "8") {//finaliza la botella que recolecta mezcla
+            finalizarSeparacion(true);
         }
     }
 
@@ -772,18 +909,40 @@ public class SeparacionSueroActivity extends ActivityMadre {
                 View view = tablaExtraccionesSuero.getChildAt(i);
                 if (view instanceof TableRow) {
                     TableRow row = (TableRow) view;
-                    if (row.getChildAt(5).getTag().equals(item.getCodigo()+"CERRAR")){
+                    if (row.getChildAt(5).getTag().equals(item.getCodigo() + "CERRAR")) {
                         Button btnCerrar = (Button) row.getChildAt(5);
-                        btnCerrar.setText((finalizado)?R.string.btnCerrada:R.string.btnCerrar);
-                        btnCerrar.setBackgroundResource((finalizado)?android.R.color.holo_purple:android.R.color.holo_green_light);
+                        btnCerrar.setText((finalizado) ? R.string.btnCerrada : R.string.btnCerrar);
+                        btnCerrar.setBackgroundResource((finalizado) ? android.R.color.holo_purple : android.R.color.holo_blue_light);
+                        if (itemSeleccionado.equals(item)) {
+                            btnFinalizarItem.setText((finalizado) ? R.string.btnCerrada : R.string.btnCerrar);
+                            btnFinalizarItem.setBackgroundResource((finalizado) ? android.R.color.holo_purple : android.R.color.holo_blue_light);
+                        }
                     }
                 }
             }
-
-
         }
+    }
 
-
+    private void finalizarBotellaJuntarMezcla(Integer itemId, String idBtn, boolean finalizado) {
+        ExtraccionMezclaDeBolsa ext = getItemById(itemId);
+        ext.setFinalizado(finalizado);
+        for (int i = 2; i < tablaExtraccionesMezcla.getChildCount(); i++) {
+            if (i % 2 == 0) {
+                View view = tablaExtraccionesMezcla.getChildAt(i);
+                if (view instanceof TableRow) {
+                    TableRow row = (TableRow) view;
+                    if (row.getChildAt(4).getTag().equals(ext.getCodigoBotellaMezcla() + "CERRAR")) {
+                        Button btnCerrar = (Button) row.getChildAt(5);
+                        btnCerrar.setText((finalizado) ? R.string.btnCerrada : R.string.btnCerrar);
+                        btnCerrar.setBackgroundResource((finalizado) ? android.R.color.holo_purple : android.R.color.holo_blue_light);
+                        if (botellaMezclaSeleccionada.getCodigo().equals(ext.getCodigoBotellaMezcla())) {
+                            btnFinalizarBotellaMezcla.setText((finalizado) ? R.string.btnCerrada : R.string.btnCerrar);
+                            btnFinalizarBotellaMezcla.setBackgroundResource((finalizado) ? android.R.color.holo_purple : android.R.color.holo_blue_light);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private ExtraccionSueroDeBolsa getExtraccionSueroDeBolsaById(int idEx) {
@@ -796,9 +955,23 @@ public class SeparacionSueroActivity extends ActivityMadre {
         return ret;
     }
 
-    private void setearExtraccion(ExtraccionSueroDeBolsa extraccion) {
-        txtDisponibleParaLlenarSuero.setText(Integer.parseInt(txtDisponibleParaLlenarSuero.getText().toString()) + extraccion.getCantidad() + "");
-        txtCantidadSueroExtraido.setText(extraccion.getCantidad() + "");
+    private ExtraccionMezclaDeBolsa getItemById(int id) {
+        ExtraccionMezclaDeBolsa ret = null;
+        for (ExtraccionMezclaDeBolsa extraccion : extraccionesMezclaDeBolsas) {
+            if (extraccion.getLocalId() == id) {
+                ret = extraccion;
+            }
+        }
+        return ret;
     }
+
+    private void setearExtraccion(ExtraccionSueroDeBolsa extraccion) {
+        txtDisponibleParaLlenarSuero.setText(cantidadDisponible + extraccion.getCantidad() + " mL");
+        cantidadDisponible = cantidadDisponible + extraccion.getCantidad();
+        botellaSueroSeleccionada.setCantidadDisponible(cantidadDisponible);
+        txtCantidadSueroExtraido.setText(extraccion.getCantidad() + "");
+        esconderTecado(SeparacionSueroActivity.this);
+    }
+
 
 }

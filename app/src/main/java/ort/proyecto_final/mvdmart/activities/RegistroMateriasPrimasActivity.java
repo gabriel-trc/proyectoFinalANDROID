@@ -43,7 +43,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
     private Partida partidaParaModificar = null;
     private TextView txtFecha, txtHora;
     private EditText txtCantConservadoras, txtPeso, txtTemperatura, txtNCote;
-    private Button btnAgregar, btnFinalizar;
+    private Button btnAgregar, btnFinalizar, btnCancelarRMP;
     private int idFrigorifico, posFrigorifico;
     private ArrayList<Partida> partidas = new ArrayList<>();
     private TableLayout tablaRegistroPartidas;
@@ -105,6 +105,14 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                 enviarRegistrosDePartidas();
             }
         });
+        btnCancelarRMP = findViewById(R.id.btnCancelarRMP);
+        btnCancelarRMP.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         txtHora = findViewById(R.id.hora);
         txtHora.setText(HelpersFunctions.horaEnFormato(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE)));
         txtHora.setOnClickListener(new View.OnClickListener() {
@@ -327,7 +335,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                 columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
                 columnaModificar.setGravity(Gravity.CENTER);
                 columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
             } else {
                 Button columnaModificar = new Button(this);
                 columnaModificar.setText(R.string.btnModificar);
@@ -344,7 +352,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                         alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"Atención", "¿Quiere editar este registro?"}, obj);
                     }
                 });
-                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
             }
 
             if (i < 0) {
@@ -353,7 +361,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                 columnaBorrar.setTextColor(getResources().getColor(R.color.colorBlanco));
                 columnaBorrar.setGravity(Gravity.CENTER);
                 columnaBorrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+                fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
             } else {
                 Button columnaBorrar = new Button(this);
                 columnaBorrar.setText("BORRAR");
@@ -371,7 +379,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                         alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"Atención", "¿Quiere borrar este registro?"}, obj);
                     }
                 });
-                fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+                fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
             }
 
             tablaRegistroPartidas.addView(fila);

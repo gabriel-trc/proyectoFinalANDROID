@@ -5,7 +5,7 @@
     <string name="title_activity_loading">LoadingActivity</string>
     <string name="title_activity_select_area"><u>SELECCIÓN DE ÁREA DE TARBAJO</u></string>
     <string name="title_activity_identificacion_bolsas"><u>IDENTIFICACIÓN DE BOLSAS DE SANGRE</u></string>
-    <string name="title_activity_separacion_suero"><u>SEPRACIÓN DE SUERO</u></string>
+    <string name="title_activity_separacion_suero"><u>REGISTROS DE SEPARACIÓN</u></string>
     <string-array name="condiciones_array">
         <item>ACEPTABLE</item>
         <item>DAÑO MENOR</item>
@@ -22,4 +22,6 @@
     <string name="btnCerrar">CERRAR</string>
     <string name="btnCerrada">CERRADA</string>
     <string name="btnCambiar">CAMBIAR</string>
+    <string name="btnAgregarSuero">AGREGAR SUERO</string>
+    <string name="btnAgregarMezcla">AGREGAR MEZCLA</string>
 </resources>

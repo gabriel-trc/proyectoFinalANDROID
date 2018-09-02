@@ -1,8 +1,6 @@
 package ort.proyecto_final.mvdmart.server_calls;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,71 +14,76 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+
+import ort.proyecto_final.mvdmart.activities.RegistroMateriasPrimasActivity;
 import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
+import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 import ort.proyecto_final.mvdmart.models.Item;
 
-public class CambiarItemIdentificadoServerCall {
-
+public class FinalizarSeparacionServerCall {
 
     private SeparacionSueroActivity activity;
     private Context context;
+    private HashMap<String, String> params;
 
-    public CambiarItemIdentificadoServerCall(final SeparacionSueroActivity activity, final Item itemAnterior, final Item itemNuevo) {
+    public FinalizarSeparacionServerCall(final SeparacionSueroActivity activity, final JSONArray extraccionesSuero, final JSONArray extraccionesMezcla, Item itemSeleccionado, String codigoBotellaDeSueroSeleccionada, String codigoBotellaDeMezclaSeleccionada) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
-        String url = Constants.DOMAIN + "/api/item/cambiar";
+
+        String url = Constants.DOMAIN + "/api/separacion/finalizar";
         JSONObject sendObject = new JSONObject();
         try {
-            sendObject.put("ItemAnterior", itemAnterior.toJSONObject());
-            sendObject.put("ItemNuevo", itemNuevo.toJSONObject());
-            sendObject.put("CodigoOperario", Config.getNumeroOperario(activity));
+            sendObject.put("extraccionesDeSuero", extraccionesSuero);
+            sendObject.put("extraccionesDeMezcla", extraccionesMezcla);
+            sendObject.put("codigoOperario", Config.getNumeroOperario(activity));
+            sendObject.put("itemSeleccionado", itemSeleccionado.toJSONObject());
+            sendObject.put("codigoBotellaDeMezclaSeleccionada", codigoBotellaDeMezclaSeleccionada);
+            sendObject.put("codigoBotellaDeSueroSeleccionada", codigoBotellaDeSueroSeleccionada);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         activity.iniciarLoader();
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.POST, url, sendObject, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
-                                activity.cambiarItem();
-                                activity.finalizarLoader();
+                                Toast.makeText(context, "Registros guardados", Toast.LENGTH_LONG).show();
+                                activity.recreate();
                             } else {
-                                JSONArray errorArray = response.getJSONArray("mensajes");
-                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                                builder.setTitle(errorArray.getString(0));
-                                builder.setMessage(errorArray.getString(1));
-                                //builder.setIcon(R.drawable.ic_launcher_foreground);
-                                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                AlertDialog alert = builder.create();
-                                alert.show();
+                                activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")), null);
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
+//TODO mostrar alert generico si entra al catch
                         }
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         activity.finalizarLoader();
+                        String errorMensaje[] = new String[2];
+                        errorMensaje[0] = "Error en el servidor";
                         if (error.getClass().equals(TimeoutError.class)) {
-                            Toast.makeText(context, "No se pudo conectar con el servidor", Toast.LENGTH_LONG).show();
+                            errorMensaje[1] = "No se pudo conectar con el servidor";
                         } else if (error.networkResponse != null) {
                             switch (error.networkResponse.statusCode) {
+                                case 500:
+                                    errorMensaje[1] = "Código 500 – Internal Server Error\n";
+                                    break;
                                 case 502:
-                                    Toast.makeText(context, "Error servidor 502", Toast.LENGTH_LONG).show();
+                                    errorMensaje[1] = "Código 502 – Bad Gateway\n";
                                     break;
                             }
                         } else {
-                            Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
+                            errorMensaje[1] = "Error en servidor\n";
                         }
+                        activity.alert(activity, errorMensaje, null);
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
