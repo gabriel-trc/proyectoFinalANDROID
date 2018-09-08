@@ -1,22 +1,23 @@
 package ort.proyecto_final.mvdmart.helpers;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.text.Html;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import ort.proyecto_final.mvdmart.R;
 
 public class HelpersFunctions {
 
     public static boolean isIntegerParseInt(String str) {
         try {
             Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException nfe) {
+
+        }
+        return false;
+    }
+
+    public static boolean isDoubleParseDouble(String str) {
+        try {
+            Double.parseDouble(str);
             return true;
         } catch (NumberFormatException nfe) {
 

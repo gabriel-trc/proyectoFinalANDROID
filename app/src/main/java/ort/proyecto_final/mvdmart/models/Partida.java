@@ -1,10 +1,5 @@
 package ort.proyecto_final.mvdmart.models;
 
-import android.provider.Telephony;
-import android.widget.Toast;
-
-import com.android.volley.toolbox.JsonObjectRequest;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,8 +7,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 
 public class Partida {
 
@@ -125,10 +118,10 @@ public class Partida {
 
     }
 
-    public Partida(int idFrigorifico, int posFrigorifico, int cantConservadoras, int peso, int temperatura, String fecha, String pHora, String numCote) {
+    public Partida(int idFrigorifico, int posFrigorifico, int cantConservadoras/*, int peso*/, int temperatura, String fecha, String pHora, String numCote) {
         this.idFrigorifico = idFrigorifico;
         this.cantConservadoras = cantConservadoras;
-        this.peso = peso;
+//        this.peso = peso;
         this.temperatura = temperatura;
         this.fecha = fecha;
         this.hora = pHora;
@@ -145,7 +138,7 @@ public class Partida {
         this.hora = pHora;
     }
 
-    public static String[] validar(int cantConservadoras, int temperatura, int pesoTotal, String numeroCote, int idFrigorifico) throws JSONException {
+    public static String[] validar(int cantConservadoras, int temperatura/*, int pesoTotal*/, String numeroCote, int idFrigorifico) throws JSONException {
         String camposIncorrectos = "Debe arreglar los siguientes campos:\n";
         int largoStringCampos = camposIncorrectos.length();
         if (idFrigorifico == -1)
@@ -156,8 +149,8 @@ public class Partida {
             camposIncorrectos += "La temperatura debe estar entre 0 y 40.\n";
         if (numeroCote.length() > 50)
             camposIncorrectos += "El número de cote, de tenerlo, debe tener un máximo de 50 caracteres.\n";
-        if (pesoTotal < 0 || pesoTotal > 100)
-            camposIncorrectos += "El peso debe estar entre 0 y 100.\n";
+//        if (pesoTotal < 0 || pesoTotal > 100)
+//            camposIncorrectos += "El peso debe estar entre 0 y 100.\n";
         if (camposIncorrectos.length() == largoStringCampos) {
             camposIncorrectos = "Ok";
         }
@@ -172,7 +165,7 @@ public class Partida {
             jsonBody.put("CodigoFrigorifico", this.idFrigorifico);
             jsonBody.put("NumeroDeCote", this.numCote);
             jsonBody.put("Temperatura", this.temperatura);
-            jsonBody.put("PesoTotal", this.peso);
+//            jsonBody.put("PesoTotal", this.peso);
             jsonBody.put("CantidadDeConservadoras", this.cantConservadoras);
         } catch (JSONException e) {
             e.printStackTrace();

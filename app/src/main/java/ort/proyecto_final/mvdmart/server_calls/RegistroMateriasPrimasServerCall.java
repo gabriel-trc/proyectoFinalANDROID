@@ -1,8 +1,6 @@
 package ort.proyecto_final.mvdmart.server_calls;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -41,7 +39,7 @@ public class RegistroMateriasPrimasServerCall  {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        activity.iniciarLoader();
         final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.POST, url, sendObject, new Response.Listener<JSONObject>() {
                     @Override
@@ -49,8 +47,7 @@ public class RegistroMateriasPrimasServerCall  {
                         try {
                             activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
-                                Toast.makeText(context, "Registros guardados", Toast.LENGTH_LONG).show();
-                                activity.limpiarTabla();
+                                activity.alertCheck(activity,null);
                             } else {
                                 Object partidaId = response.getInt("retorno");
                                 activity.alert(activity,HelpersFunctions.errores(response.getJSONArray("mensajes")),partidaId);

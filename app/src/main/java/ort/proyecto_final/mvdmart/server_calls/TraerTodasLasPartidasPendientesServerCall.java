@@ -23,15 +23,15 @@ public class TraerTodasLasPartidasPendientesServerCall {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/partida/pendientes/" + Config.getNumeroOperario(activity);
-
+        activity.iniciarLoader();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        activity.finalizarLoader();
                         try {
                             Config.setPartidasPendientes(activity, response.getString("retorno"));
-                            activity.finalizarLoader();
                             activity.alertSelectPartida();
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");

@@ -1,24 +1,25 @@
 package ort.proyecto_final.mvdmart.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.text.method.PasswordTransformationMethod;
+import android.support.v7.widget.AppCompatButton;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.HashMap;
+
 import ort.proyecto_final.mvdmart.R;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 import ort.proyecto_final.mvdmart.server_calls.LoginUsuarioServerCall;
+import ort.proyecto_final.mvdmart.server_calls.TraerTodasLasPartidasPendientesServerCall;
 
 public class MainActivity extends ActivityMadre {
 
@@ -40,6 +41,7 @@ public class MainActivity extends ActivityMadre {
     }
 
     public void inicializarVistas() {
+        final Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
         spinnerLoader = findViewById(R.id.spinner_loader);
         txtNumeroOperario = findViewById(R.id.txtNumeroOperario);
         txtNumeroOperario.setTransformationMethod(null);
@@ -56,7 +58,14 @@ public class MainActivity extends ActivityMadre {
         btnIngresar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ingresar();
+                final Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
+                v.startAnimation(scale);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        ingresar();
+                    }
+                }, 300);
             }
         });
     }
@@ -66,7 +75,6 @@ public class MainActivity extends ActivityMadre {
             Toast.makeText(this.getApplicationContext(), "Ingrese correctamente su número de operario", Toast.LENGTH_LONG).show();
             limpiarCampos();
         } else {
-            iniciarLoader();
             new LoginUsuarioServerCall(this, txtNumeroOperario.getText().toString());
         }
     }
@@ -77,12 +85,20 @@ public class MainActivity extends ActivityMadre {
     }
 
     @Override
-    public void customOnErrorResponseVolley(Object object) {
+    public void customServerModelError(Object object) {
 
     }
 
     @Override
     public void customAlertFunction(Object object) {
+        HashMap<String, String> hashMap = (HashMap<String, String>) object;
+        if (hashMap.get("funcion") == "-1") {
+            backButtonFunction();
+        }
+    }
 
+    @Override
+    public void backButtonFunction() {
+        finish();
     }
 }

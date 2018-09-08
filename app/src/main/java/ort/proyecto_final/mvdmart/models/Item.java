@@ -80,12 +80,14 @@ public class Item {
             itemsParaIdentificar.put(llavePartida, bolsasDeSangre);
         }
         ArrayList<Item> botellasDeMezcla = new ArrayList<>();
-        for (int i = 0; i < botellas.length(); i++) {
-            JSONObject botellaDeMezcla = botellas.getJSONObject(i);
-            botellasDeMezcla.add(new Item(botellaDeMezcla.getString("codigo"), 1));
+        if (botellas.length() > 0) {
+            for (int i = 0; i < botellas.length(); i++) {
+                JSONObject botellaDeMezcla = botellas.getJSONObject(i);
+                botellasDeMezcla.add(new Item(botellaDeMezcla.getString("codigo"), 1));
+            }
+            String llaveBotellas = "Botellas de mezcla";
+            itemsParaIdentificar.put(llaveBotellas, botellasDeMezcla);
         }
-        String llaveBotellas = "Botellas de mezcla";
-        itemsParaIdentificar.put(llaveBotellas, botellasDeMezcla);
         return itemsParaIdentificar;
     }
 
@@ -99,8 +101,6 @@ public class Item {
         if (this == obj)
             return true;
         else if (obj == null)
-            return false;
-        else if (getClass() != obj.getClass())
             return false;
         else
             return this.codigo.equals(((Item) obj).getCodigo());

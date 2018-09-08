@@ -3,7 +3,6 @@ package ort.proyecto_final.mvdmart.server_calls;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -11,7 +10,6 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import ort.proyecto_final.mvdmart.activities.MainActivity;
@@ -27,23 +25,21 @@ public class LoginUsuarioServerCall {
     public LoginUsuarioServerCall(final MainActivity activity, final String numeroOperario) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
-        String url = Constants.DOMAIN + "/api/operario/login/"+ numeroOperario;
-
+        String url = Constants.DOMAIN + "/api/operario/login/" + numeroOperario;
+        activity.iniciarLoader();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        activity.finalizarLoader();
                         try {
-                            activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
-                                activity.finalizarLoader();
                                 Config.setNumeroOperario(activity, numeroOperario + "");
                                 Intent goToNextActivity = new Intent(context, SelectAreaActivity.class);
                                 goToNextActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//TODO leer que hace este parche
                                 context.startActivity(goToNextActivity);
                             } else {
-                                JSONArray errorArray = response.getJSONArray("mensajes");
-                                activity.alert(activity, HelpersFunctions.errores(errorArray), null);
+                                activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")), null);
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
@@ -69,7 +65,7 @@ public class LoginUsuarioServerCall {
                         } else {
                             errorMensaje[1] = "Error en servidor\n";
                         }
-                        activity.alert(activity,errorMensaje,null);
+                        activity.alert(activity, errorMensaje, null);
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);

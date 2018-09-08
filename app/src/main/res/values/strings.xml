@@ -20,8 +20,10 @@
     <string name="btnCancelar">CANCELAR</string>
     <string name="btnSeleccionar">SELECCIONAR</string>
     <string name="btnCerrar">CERRAR</string>
-    <string name="btnCerrada">CERRADA</string>
+    <string name="btnCerrada">ABRIR</string>
     <string name="btnCambiar">CAMBIAR</string>
+    <string name="btnTirar">TIRAR</string>
+    <string name="btnTirada">RECUPERAR</string>
     <string name="btnAgregarSuero">AGREGAR SUERO</string>
     <string name="btnAgregarMezcla">AGREGAR MEZCLA</string>
 </resources>

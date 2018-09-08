@@ -10,7 +10,7 @@
     tools:showIn="@layout/activity_select_area">
 
     <Button
-        android:id="@+id/btnLogout"
+        android:id="@+id/btn_sa_Logout"
         android:layout_width="214dp"
         android:layout_height="59dp"
         android:layout_marginBottom="16dp"
@@ -21,7 +21,7 @@
 
 
     <Button
-        android:id="@+id/btnRegistroSeparacion"
+        android:id="@+id/btn_sa_RegistroSeparacion"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:background="@android:color/holo_orange_dark"
@@ -30,31 +30,31 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnIdentificacionBolsa"
+        app:layout_constraintStart_toEndOf="@+id/btn_sa_IdentificacionBolsa"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnIdentificacionBolsa"
+        android:id="@+id/btn_sa_IdentificacionBolsa"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:background="@android:color/holo_blue_dark"
         android:text="@string/title_activity_identificacion_bolsas"
         android:textColor="@color/colorBlanco"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnRegistroSeparacion"
+        app:layout_constraintEnd_toStartOf="@+id/btn_sa_RegistroSeparacion"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnRegistroMaterias"
+        app:layout_constraintStart_toEndOf="@+id/btn_sa_RegistroMaterias"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnRegistroMaterias"
+        android:id="@+id/btn_sa_RegistroMaterias"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:background="@android:color/holo_green_dark"
         android:text="@string/title_activity_registro_materias_primas"
         android:textColor="@color/colorBlanco"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnIdentificacionBolsa"
+        app:layout_constraintEnd_toStartOf="@+id/btn_sa_IdentificacionBolsa"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

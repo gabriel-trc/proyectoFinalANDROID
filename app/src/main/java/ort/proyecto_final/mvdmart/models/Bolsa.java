@@ -7,7 +7,8 @@ import org.json.JSONObject;
 
 public class Bolsa implements Comparable<Bolsa> {
 
-    private int localId, condicion, peso;
+    private int localId, condicion;
+    private Double peso;
     private String razonDescarte, codigoBolsa;
 
     //region Helper Getter's and Setter's
@@ -28,11 +29,11 @@ public class Bolsa implements Comparable<Bolsa> {
         this.condicion = condicion;
     }
 
-    public int getPeso() {
+    public Double getPeso() {
         return peso;
     }
 
-    public void setPeso(int peso) {
+    public void setPeso(Double peso) {
         this.peso = peso;
     }
 
@@ -57,13 +58,13 @@ public class Bolsa implements Comparable<Bolsa> {
         this.codigoBolsa = pCodigo;
     }
 
-    public Bolsa(int pPeso, int pCondicion) {
+    public Bolsa(Double pPeso, int pCondicion) {
         this.peso = pPeso;
         this.condicion = pCondicion;
         razonDescarte = "";
     }
 
-    public static boolean validar(int pPeso) {
+    public static boolean validar(Double pPeso) {
         if (pPeso >= 0 && pPeso <= 2000)
             return true;
         else

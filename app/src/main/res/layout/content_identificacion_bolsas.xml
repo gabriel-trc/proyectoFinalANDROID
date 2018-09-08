@@ -66,7 +66,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:inputType="numberPassword"
+        android:inputType="numberDecimal"
         app:layout_constraintBottom_toTopOf="@+id/guideline7"
         app:layout_constraintStart_toEndOf="@+id/textView8"
         app:layout_constraintTop_toTopOf="@+id/guideline6" />

@@ -8,15 +8,11 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
 import ort.proyecto_final.mvdmart.R;
-import ort.proyecto_final.mvdmart.models.Bolsa;
 import ort.proyecto_final.mvdmart.models.Item;
-import ort.proyecto_final.mvdmart.models.Partida;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 

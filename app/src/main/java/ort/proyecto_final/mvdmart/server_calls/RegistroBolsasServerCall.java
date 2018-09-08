@@ -1,8 +1,6 @@
 package ort.proyecto_final.mvdmart.server_calls;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -45,29 +43,17 @@ public class RegistroBolsasServerCall {
                 (Request.Method.POST, url, sendObject, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        activity.finalizarLoader();
                         try {
-                            activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
-                                Toast.makeText(context, "Registros guardados", Toast.LENGTH_LONG).show();
                                 if (finalizar)
-                                    activity.finish();
-                                else
+                                    activity.alertCheck(activity, null);
+                                else {
                                     activity.limpiarTabla();
+                                    Toast.makeText(context, "Registros guardados", Toast.LENGTH_LONG).show();
+                                }
                             } else {
-                                String[] errores = HelpersFunctions.errores(response.getJSONArray("mensajes"));
-                                final int partidaId = response.getInt("retorno");
-                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                                builder.setTitle(errores[0]);
-                                builder.setMessage(errores[1]);
-                                //builder.setIcon(R.drawable.ic_launcher_foreground);
-                                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.dismiss();
-                                        // activity.onResponseErrorPartida(partidaId);
-                                    }
-                                });
-                                AlertDialog alert = builder.create();
-                                alert.show();
+                                activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")), null);
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");

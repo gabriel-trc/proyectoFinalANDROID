@@ -2,7 +2,6 @@ package ort.proyecto_final.mvdmart.server_calls;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -25,13 +24,14 @@ public class TraerTodosLosFrigorificosServerCall {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/frigorifico/todos/" + Config.getNumeroOperario(activity);
+        activity.iniciarLoader();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        activity.finalizarLoader();
                         try {
-                            activity.finalizarLoader();
                             Config.setFrigorificos(activity, response.getString("retorno"));
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
@@ -57,7 +57,7 @@ public class TraerTodosLosFrigorificosServerCall {
                         } else {
                             errorMensaje[1] = "Error en servidor\n";
                         }
-                        activity.alert(activity,errorMensaje,null);
+                        activity.alert(activity, errorMensaje, null);
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);

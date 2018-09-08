@@ -3,8 +3,6 @@ package ort.proyecto_final.mvdmart.models;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.models.Item;
-
 public class ExtraccionSueroDeBolsa extends Item {
 
     private String codigoBotellaDeSuero;
@@ -48,4 +46,15 @@ public class ExtraccionSueroDeBolsa extends Item {
         }
         return jsonBody;
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        else if (obj == null)
+            return false;
+        else
+            return (this.getCodigo().equals(((ExtraccionSueroDeBolsa) obj).getCodigo()) && this.getCodigoBotellaDeSuero().equals(((ExtraccionSueroDeBolsa) obj).getCodigoBotellaDeSuero()));
+    }
+
+
 }

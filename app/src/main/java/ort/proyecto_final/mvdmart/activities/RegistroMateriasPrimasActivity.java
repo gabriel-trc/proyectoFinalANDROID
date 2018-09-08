@@ -10,6 +10,8 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -57,8 +59,10 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
         setContentView(R.layout.activity_registro_materias_primas);
         inicializarVistas();
     }
+
     @Override
     public void inicializarVistas() {
+        final Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
         JSONArray obj = null;
         List<StringWithTag> frigorificos = null;
         spinnerLoader = findViewById(R.id.spinner_loader);
@@ -109,7 +113,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
         btnCancelarRMP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onBackPressed();
             }
         });
 
@@ -143,8 +147,8 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
         });
         txtCantConservadoras = findViewById(R.id.cantConservadoras);
         txtCantConservadoras.setTransformationMethod(null);
-        txtPeso = findViewById(R.id.peso);
-        txtPeso.setTransformationMethod(null);
+//        txtPeso = findViewById(R.id.peso);
+//        txtPeso.setTransformationMethod(null);
         txtTemperatura = findViewById(R.id.temperatura);
         txtTemperatura.setTransformationMethod(null);
         txtNCote = findViewById(R.id.nroCote);
@@ -162,15 +166,15 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
     private void agregarPartida() {
         if (chequearCamposCompletosYTiposDatos()) {
             int cantConservadoras = Integer.parseInt(txtCantConservadoras.getText().toString());
-            int pesoTotal = Integer.parseInt(txtPeso.getText().toString());
+//            int pesoTotal = Integer.parseInt(txtPeso.getText().toString());
             int temperatura = Integer.parseInt(txtTemperatura.getText().toString());
             String numeroCote = txtNCote.getText().toString().replaceAll("\\s+", "");
             String fecha = txtFecha.getText().toString();
             String hora = txtHora.getText().toString();
             try {
-                String[] esValida = Partida.validar(cantConservadoras, temperatura, pesoTotal, numeroCote, idFrigorifico);
+                String[] esValida = Partida.validar(cantConservadoras, temperatura, /*pesoTotal,*/ numeroCote, idFrigorifico);
                 if (esValida[1] == "Ok") {
-                    Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, pesoTotal, temperatura, fecha, hora, numeroCote);
+                    Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, /*pesoTotal,*/ temperatura, fecha, hora, numeroCote);
                     partidas.add(partida);
                     limpiarCampos();
                     crearTablaRegistroPartidas();
@@ -190,7 +194,6 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                 for (int i = 0; i < partidas.size(); i++) {
                     jsonPartidas.put(partidas.get(i).toJSONObject());
                 }
-                iniciarLoader();
                 new RegistroMateriasPrimasServerCall(this, jsonPartidas);
             } else {
                 Toast.makeText(RegistroMateriasPrimasActivity.this, "Atención: Debes terminar de modificar la partida.", Toast.LENGTH_LONG).show();
@@ -203,10 +206,10 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
     private void modificarPartida() {
         if (partidaParaModificar != null && chequearCamposCompletosYTiposDatos()) {
             try {
-                String[] esValida = Partida.validar(Integer.parseInt(txtCantConservadoras.getText().toString()), Integer.parseInt(txtTemperatura.getText().toString()), Integer.parseInt(txtPeso.getText().toString()), txtNCote.getText().toString(), idFrigorifico);
+                String[] esValida = Partida.validar(Integer.parseInt(txtCantConservadoras.getText().toString()), Integer.parseInt(txtTemperatura.getText().toString()), /*Integer.parseInt(txtPeso.getText().toString()),*/ txtNCote.getText().toString(), idFrigorifico);
                 if (esValida[1] == "Ok") {
                     partidaParaModificar.setCantConservadoras(Integer.parseInt(txtCantConservadoras.getText().toString()));
-                    partidaParaModificar.setPeso(Integer.parseInt(txtPeso.getText().toString()));
+//                    partidaParaModificar.setPeso(Integer.parseInt(txtPeso.getText().toString()));
                     partidaParaModificar.setTemperatura(Integer.parseInt(txtTemperatura.getText().toString()));
                     partidaParaModificar.setNumCote(txtNCote.getText().toString());
                     partidaParaModificar.setIdFrigorifico(idFrigorifico);
@@ -235,8 +238,8 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
             camposIncompletos += " frigorífico,";
         if (!HelpersFunctions.isIntegerParseInt(txtCantConservadoras.getText().toString()))
             camposIncompletos += " cantidad de conservadoras,";
-        if (!HelpersFunctions.isIntegerParseInt(txtPeso.getText().toString()))
-            camposIncompletos += " peso,";
+//        if (!HelpersFunctions.isIntegerParseInt(txtPeso.getText().toString()))
+//            camposIncompletos += " peso,";
         if (!HelpersFunctions.isIntegerParseInt(txtTemperatura.getText().toString()))
             camposIncompletos += " temperatura.";
         if (camposIncompletos.length() != largoStringCampos) {
@@ -248,164 +251,166 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
 
     private void crearTablaRegistroPartidas() {
         tablaRegistroPartidas.removeAllViews();
-        for (int i = -1; i < partidas.size(); i++) {
-            TableRow fila = new TableRow(this);
-            fila.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT, 15f));
-            if (i < 0)
-                fila.setBackgroundColor(Color.rgb(36, 123, 160));
-            else {
-                partidas.get(i).setLocalId(i);
-                fila.setId(i/*partidas.get(i).getLocalId()*/);
-                fila.setBackgroundColor((i % 2 == 0) ? Color.rgb(112, 193, 179) : Color.rgb(178, 219, 191));
+        if (partidas.size() != 0) {
+            for (int i = -1; i < partidas.size(); i++) {
+                TableRow fila = new TableRow(this);
+                fila.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT, 14f));
+                if (i < 0)
+                    fila.setBackgroundColor(Color.rgb(36, 123, 160));
+                else {
+                    partidas.get(i).setLocalId(i);
+                    fila.setId(i/*partidas.get(i).getLocalId()*/);
+                    fila.setBackgroundColor((i % 2 == 0) ? Color.rgb(112, 193, 179) : Color.rgb(178, 219, 191));
+                }
+
+                TextView columnaFrigorifico = new TextView(this.getApplicationContext());
+                if (i < 0)
+                    columnaFrigorifico.setText("Frigorifico");
+                else
+                    columnaFrigorifico.setText(frigorificosArray.getItem(partidas.get(i).getPosFrigorifico()).string);
+                columnaFrigorifico.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaFrigorifico.setGravity(Gravity.CENTER);
+                columnaFrigorifico.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaFrigorifico, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2.5f));
+
+                TextView columnaFecha = new TextView(this.getApplicationContext());
+                if (i < 0)
+                    columnaFecha.setText("Fecha");
+                else
+                    columnaFecha.setText(partidas.get(i).getFecha());
+                columnaFecha.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaFecha.setGravity(Gravity.CENTER);
+                columnaFecha.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaFecha, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+
+                TextView columnaHora = new TextView(this.getApplicationContext());
+                if (i < 0)
+                    columnaHora.setText("Hora");
+                else
+                    columnaHora.setText(partidas.get(i).getHora());
+                columnaHora.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaHora.setGravity(Gravity.CENTER);
+                columnaHora.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaHora, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+
+                TextView columnaConservadoras = new TextView(this.getApplicationContext());
+                if (i < 0)
+                    columnaConservadoras.setText("Conservadoras");
+                else
+                    columnaConservadoras.setText(partidas.get(i).getCantConservadoras() + "");
+                columnaConservadoras.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaConservadoras.setGravity(Gravity.CENTER);
+                columnaConservadoras.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaConservadoras, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
+
+//            TextView columnaPeso = new TextView(this.getApplicationContext());
+//            if (i < 0)
+//                columnaPeso.setText("Peso");
+//            else
+//                columnaPeso.setText(partidas.get(i).getPeso() + "");
+//            columnaPeso.setTextColor(getResources().getColor(R.color.colorBlanco));
+//            columnaPeso.setGravity(Gravity.CENTER);
+//            columnaPeso.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+//            fila.addView(columnaPeso, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+
+                TextView columnaTemperatura = new TextView(this.getApplicationContext());
+                if (i < 0)
+                    columnaTemperatura.setText("Temperatura");
+                else
+                    columnaTemperatura.setText(partidas.get(i).getTemperatura() + "");
+                columnaTemperatura.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaTemperatura.setGravity(Gravity.CENTER);
+                columnaTemperatura.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaTemperatura, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
+
+                TextView columnaNumeroCote = new TextView(this.getApplicationContext());
+                if (i < 0)
+                    columnaNumeroCote.setText("Número de cote");
+                else
+                    columnaNumeroCote.setText(partidas.get(i).getNumCote() + "");
+                columnaNumeroCote.setTextColor(getResources().getColor(R.color.colorBlanco));
+                columnaNumeroCote.setGravity(Gravity.CENTER);
+                columnaNumeroCote.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                fila.addView(columnaNumeroCote, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
+
+                if (i < 0) {
+                    TextView columnaModificar = new TextView(this.getApplicationContext());
+                    columnaModificar.setText("Modificar");
+                    columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                    columnaModificar.setGravity(Gravity.CENTER);
+                    columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                    fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+                } else {
+                    Button columnaModificar = new Button(this);
+                    columnaModificar.setText(R.string.btnModificar);
+                    columnaModificar.setBackgroundResource(android.R.color.holo_orange_dark);
+                    columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                    columnaModificar.setGravity(Gravity.CENTER);
+                    columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                    columnaModificar.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            HashMap<String, String> obj = new HashMap<>();
+                            obj.put("funcion", "0");
+                            obj.put("id", (((TableRow) v.getParent()).getId()) + "");
+                            alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"Atención", "¿Quiere editar este registro?"}, obj);
+                        }
+                    });
+                    fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+                }
+
+                if (i < 0) {
+                    TextView columnaBorrar = new TextView(this.getApplicationContext());
+                    columnaBorrar.setText("Borrar");
+                    columnaBorrar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                    columnaBorrar.setGravity(Gravity.CENTER);
+                    columnaBorrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                    fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+                } else {
+                    Button columnaBorrar = new Button(this);
+                    columnaBorrar.setText("BORRAR");
+                    columnaBorrar.setBackgroundResource(android.R.color.holo_red_dark);
+                    columnaBorrar.setTextColor(getResources().getColor(R.color.colorBlanco));
+                    columnaBorrar.setGravity(Gravity.CENTER);
+                    columnaBorrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                    columnaBorrar.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            HashMap<String, String> obj = new HashMap<>();
+                            obj.put("funcion", "1");
+                            obj.put("id", (((TableRow) v.getParent()).getId()) + "");
+                            alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"Atención", "¿Quiere borrar este registro?"}, obj);
+                        }
+                    });
+                    fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+                }
+
+                tablaRegistroPartidas.addView(fila);
+
+                final TableRow trSep = new TableRow(this);
+                TableLayout.LayoutParams trParamsSep = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
+                trParamsSep.setMargins(0, 0, 0, 0);
+                trSep.setLayoutParams(trParamsSep);
+                TextView tvSep = new TextView(this);
+                TableRow.LayoutParams tvSepLay = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+                tvSepLay.span = 9;
+                tvSep.setLayoutParams(tvSepLay);
+                tvSep.setBackgroundColor(Color.rgb(243, 255, 189));
+                tvSep.setHeight(4);
+                trSep.addView(tvSep);
+                tablaRegistroPartidas.addView(trSep, trParamsSep);
             }
-
-            TextView columnaFrigorifico = new TextView(this.getApplicationContext());
-            if (i < 0)
-                columnaFrigorifico.setText("Frigorifico");
-            else
-                columnaFrigorifico.setText(frigorificosArray.getItem(partidas.get(i).getPosFrigorifico()).string);
-            columnaFrigorifico.setTextColor(getResources().getColor(R.color.colorBlanco));
-            columnaFrigorifico.setGravity(Gravity.CENTER);
-            columnaFrigorifico.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-            fila.addView(columnaFrigorifico, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2.5f));
-
-            TextView columnaFecha = new TextView(this.getApplicationContext());
-            if (i < 0)
-                columnaFecha.setText("Fecha");
-            else
-                columnaFecha.setText(partidas.get(i).getFecha());
-            columnaFecha.setTextColor(getResources().getColor(R.color.colorBlanco));
-            columnaFecha.setGravity(Gravity.CENTER);
-            columnaFecha.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-            fila.addView(columnaFecha, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
-
-            TextView columnaHora = new TextView(this.getApplicationContext());
-            if (i < 0)
-                columnaHora.setText("Hora");
-            else
-                columnaHora.setText(partidas.get(i).getHora());
-            columnaHora.setTextColor(getResources().getColor(R.color.colorBlanco));
-            columnaHora.setGravity(Gravity.CENTER);
-            columnaHora.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-            fila.addView(columnaHora, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
-
-            TextView columnaConservadoras = new TextView(this.getApplicationContext());
-            if (i < 0)
-                columnaConservadoras.setText("Conservadoras");
-            else
-                columnaConservadoras.setText(partidas.get(i).getCantConservadoras() + "");
-            columnaConservadoras.setTextColor(getResources().getColor(R.color.colorBlanco));
-            columnaConservadoras.setGravity(Gravity.CENTER);
-            columnaConservadoras.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-            fila.addView(columnaConservadoras, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
-
-            TextView columnaPeso = new TextView(this.getApplicationContext());
-            if (i < 0)
-                columnaPeso.setText("Peso");
-            else
-                columnaPeso.setText(partidas.get(i).getPeso() + "");
-            columnaPeso.setTextColor(getResources().getColor(R.color.colorBlanco));
-            columnaPeso.setGravity(Gravity.CENTER);
-            columnaPeso.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-            fila.addView(columnaPeso, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
-
-            TextView columnaTemperatura = new TextView(this.getApplicationContext());
-            if (i < 0)
-                columnaTemperatura.setText("Temperatura");
-            else
-                columnaTemperatura.setText(partidas.get(i).getTemperatura() + "");
-            columnaTemperatura.setTextColor(getResources().getColor(R.color.colorBlanco));
-            columnaTemperatura.setGravity(Gravity.CENTER);
-            columnaTemperatura.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-            fila.addView(columnaTemperatura, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
-
-            TextView columnaNumeroCote = new TextView(this.getApplicationContext());
-            if (i < 0)
-                columnaNumeroCote.setText("Número de cote");
-            else
-                columnaNumeroCote.setText(partidas.get(i).getNumCote() + "");
-            columnaNumeroCote.setTextColor(getResources().getColor(R.color.colorBlanco));
-            columnaNumeroCote.setGravity(Gravity.CENTER);
-            columnaNumeroCote.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-            fila.addView(columnaNumeroCote, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
-
-            if (i < 0) {
-                TextView columnaModificar = new TextView(this.getApplicationContext());
-                columnaModificar.setText("Modificar");
-                columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
-                columnaModificar.setGravity(Gravity.CENTER);
-                columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
-            } else {
-                Button columnaModificar = new Button(this);
-                columnaModificar.setText(R.string.btnModificar);
-                columnaModificar.setBackgroundResource(android.R.color.holo_orange_dark);
-                columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
-                columnaModificar.setGravity(Gravity.CENTER);
-                columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                columnaModificar.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        HashMap<String, Integer> obj = new HashMap<>();
-                        obj.put("funcion", 1);
-                        obj.put("id", (((TableRow) v.getParent()).getId()));
-                        alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"Atención", "¿Quiere editar este registro?"}, obj);
-                    }
-                });
-                fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
-            }
-
-            if (i < 0) {
-                TextView columnaBorrar = new TextView(this.getApplicationContext());
-                columnaBorrar.setText("Borrar");
-                columnaBorrar.setTextColor(getResources().getColor(R.color.colorBlanco));
-                columnaBorrar.setGravity(Gravity.CENTER);
-                columnaBorrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
-            } else {
-                Button columnaBorrar = new Button(this);
-                columnaBorrar.setText("BORRAR");
-                columnaBorrar.setBackgroundResource(android.R.color.holo_red_dark);
-                columnaBorrar.setTextColor(getResources().getColor(R.color.colorBlanco));
-                columnaBorrar.setGravity(Gravity.CENTER);
-                columnaBorrar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                columnaBorrar.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                       // preguntaEliminarPartida(((TableRow) v.getParent()).getId());
-                        HashMap<String, Integer> obj = new HashMap<>();
-                        obj.put("funcion", 2);
-                        obj.put("id", (((TableRow) v.getParent()).getId()));
-                        alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"Atención", "¿Quiere borrar este registro?"}, obj);
-                    }
-                });
-                fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
-            }
-
-            tablaRegistroPartidas.addView(fila);
-
-            final TableRow trSep = new TableRow(this);
-            TableLayout.LayoutParams trParamsSep = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
-            trParamsSep.setMargins(0, 0, 0, 0);
-            trSep.setLayoutParams(trParamsSep);
-            TextView tvSep = new TextView(this);
-            TableRow.LayoutParams tvSepLay = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
-            tvSepLay.span = 9;
-            tvSep.setLayoutParams(tvSepLay);
-            tvSep.setBackgroundColor(Color.rgb(243, 255, 189));
-            tvSep.setHeight(4);
-            trSep.addView(tvSep);
-            tablaRegistroPartidas.addView(trSep, trParamsSep);
         }
     }
 
     public void limpiarTabla() {
         tablaRegistroPartidas.removeAllViews();
     }
+
     @Override
     public void limpiarCampos() {
         txtCantConservadoras.setText("");
-        txtPeso.setText("");
+//        txtPeso.setText("");
         txtTemperatura.setText("");
         txtNCote.setText("");
         dropDownFrigorificos.setSelection(0);
@@ -422,30 +427,43 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
         }
         return ret;
     }
+
     @Override
-    public void customOnErrorResponseVolley(Object partidaId) {
+    public void customServerModelError(Object partidaId) {
         partidaParaModificar = getPartidaById((Integer) partidaId);
         btnAgregar.setText(R.string.btnModificar);
         btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
         setearPartida(partidaParaModificar);
     }
+
     @Override
     public void customAlertFunction(Object object) {
-        HashMap<String, Integer> hashMap = (HashMap<String, Integer>) object;
-        if (hashMap.get("funcion") == 1) {
-            partidaParaModificar = getPartidaById(hashMap.get("id"));
-            btnAgregar.setText(R.string.btnModificar);
-            btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
-            setearPartida(partidaParaModificar);
-        } else {
-            partidas.remove(getPartidaById(hashMap.get("id")));
-            crearTablaRegistroPartidas();
+        HashMap<String, String> hashMap = (HashMap<String, String>) object;
+        switch (hashMap.get("funcion")){
+            case "-1":
+                backButtonFunction();
+                break;
+            case "0":
+                partidaParaModificar = getPartidaById(Integer.parseInt(hashMap.get("id")));
+                btnAgregar.setText(R.string.btnModificar);
+                btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
+                setearPartida(partidaParaModificar);
+                break;
+            case "1":
+                partidas.remove(getPartidaById(Integer.parseInt(hashMap.get("id"))));
+                crearTablaRegistroPartidas();
+                break;
         }
+    }
+
+    @Override
+    public void backButtonFunction() {
+        finish();
     }
 
     private void setearPartida(Partida partida) {
         txtCantConservadoras.setText(partida.getCantConservadoras() + "");
-        txtPeso.setText(partida.getPeso() + "");
+//        txtPeso.setText(partida.getPeso() + "");
         txtTemperatura.setText(partida.getTemperatura() + "");
         txtNCote.setText(partida.getNumCote() + "");
         dropDownFrigorificos.setSelection(partida.getPosFrigorifico());

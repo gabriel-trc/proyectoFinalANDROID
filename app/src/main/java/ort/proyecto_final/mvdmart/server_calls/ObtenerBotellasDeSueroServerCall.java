@@ -30,9 +30,9 @@ public class ObtenerBotellasDeSueroServerCall {
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        activity.finalizarLoader();
                         try {
-                            activity.finalizarLoader();
-                            activity.alertSeleccionarBotellaSuero(response.getJSONArray("retorno"));
+                                                        activity.alertSeleccionarBotellaSuero(response.getJSONArray("retorno"));
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
                         }

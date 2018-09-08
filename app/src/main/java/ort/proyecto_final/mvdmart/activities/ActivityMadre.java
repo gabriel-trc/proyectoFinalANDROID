@@ -3,17 +3,23 @@ package ort.proyecto_final.mvdmart.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
+
+import java.util.HashMap;
 
 import ort.proyecto_final.mvdmart.R;
 
 public abstract class ActivityMadre extends AppCompatActivity {
     public ConstraintLayout spinnerLoader;
+    public Handler handler = new Handler();
 
     public ActivityMadre() {
     }
@@ -41,8 +47,25 @@ public abstract class ActivityMadre extends AppCompatActivity {
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 if (object != null)
-                    customOnErrorResponseVolley(object);
+                    customServerModelError(object);
                 dialog.dismiss();
+            }
+        });
+        android.app.AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    public void alertCheck(Context contexto, String[] mensaje) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(contexto);
+//        builder.setTitle(Html.fromHtml("<font color='#00FF00'>" + mensaje[0].toUpperCase() + "</font>"));
+//        builder.setMessage(mensaje[1]);
+        builder.setTitle(Html.fromHtml("<font color='#00FF00'>ATENCION: Registros guardados</font>"));
+        builder.setMessage("Se han guardado todos los registros correctamente.");
+        builder.setIcon(R.drawable.ic_check);
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+                finish();
             }
         });
         android.app.AlertDialog alert = builder.create();
@@ -70,7 +93,7 @@ public abstract class ActivityMadre extends AppCompatActivity {
         alert.show();
     }
 
-    public abstract void customOnErrorResponseVolley(Object object);
+    public abstract void customServerModelError(Object object);
 
     public abstract void customAlertFunction(Object object);
 
@@ -82,5 +105,14 @@ public abstract class ActivityMadre extends AppCompatActivity {
     public void finalizarLoader() {
         spinnerLoader.setVisibility(View.INVISIBLE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+
+    public abstract void backButtonFunction();
+
+    @Override
+    public void onBackPressed() {
+        HashMap<String, String> obj = new HashMap<>();
+        obj.put("funcion", "-1");
+        alertDosBotones(ActivityMadre.this, new String[]{"Atención: esta saliendo de la actividad.", "¡Perderá los cambios que no haya finalizado!"}, obj);
     }
 }

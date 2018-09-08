@@ -30,9 +30,8 @@ public class ObtenerItemsIdentificadosServerCall {
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        activity.finalizarLoader();
                         try {
-                            // Config.setItemsPendientesSeparacion(activity, response.getString("retorno"));
-                            activity.finalizarLoader();
                             activity.alertSeleccionItem(response.getJSONObject("retorno"));
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");

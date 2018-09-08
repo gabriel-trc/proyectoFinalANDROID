@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
@@ -14,27 +16,28 @@ import android.widget.TextView;
 
 import org.json.JSONArray;
 
+import java.util.HashMap;
 import java.util.List;
 
 import ort.proyecto_final.mvdmart.R;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.helpers.StringWithTag;
 import ort.proyecto_final.mvdmart.server_calls.ComenzarIdentificacionPartidaServerCall;
-import ort.proyecto_final.mvdmart.server_calls.TraerTodosLosFrigorificosServerCall;
 import ort.proyecto_final.mvdmart.server_calls.TraerTodasLasPartidasPendientesServerCall;
+import ort.proyecto_final.mvdmart.server_calls.TraerTodosLosFrigorificosServerCall;
 
-public class SelectAreaActivity extends ActivityMadre {
+public class SelectAreaActivity extends ActivityMadre implements View.OnClickListener {
 
-    private Button btnLogout,  btnRegistroSeparacion, btnIdentificacionBolsa, btnRegistroMaterias;
+    private Button btnLogout, btnRegistroSeparacion, btnIdentificacionBolsa, btnRegistroMaterias;
     private TextView txtOperario;
     private int idPartidaSelecionada = -1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_area);
         spinnerLoader = findViewById(R.id.spinner_loader);
-        iniciarLoader();
         new TraerTodosLosFrigorificosServerCall(this);
         inicializarVistas();
     }
@@ -44,41 +47,14 @@ public class SelectAreaActivity extends ActivityMadre {
         txtOperario.setText("Número de operario: " + Config.getNumeroOperario(SelectAreaActivity.this));
         txtOperario.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 36);
 
-        btnLogout = findViewById(R.id.btnLogout);
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent goToNextActivity = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(goToNextActivity);
-                finish();
-            }
-        });
-        btnRegistroMaterias = findViewById(R.id.btnRegistroMaterias);
-        btnRegistroMaterias.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent goToNextActivity = new Intent(getApplicationContext(), RegistroMateriasPrimasActivity.class);
-                startActivity(goToNextActivity);
-            }
-        });
-
-        btnIdentificacionBolsa = findViewById(R.id.btnIdentificacionBolsa);
-        btnIdentificacionBolsa.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                iniciarLoader();
-                new TraerTodasLasPartidasPendientesServerCall(SelectAreaActivity.this);
-            }
-        });
-
-        btnRegistroSeparacion= findViewById(R.id.btnRegistroSeparacion);
-        btnRegistroSeparacion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent goToNextActivity = new Intent(getApplicationContext(), SeparacionSueroActivity.class);
-                startActivity(goToNextActivity);
-            }
-        });
+        btnLogout = findViewById(R.id.btn_sa_Logout);
+        btnLogout.setOnClickListener(this);
+        btnRegistroMaterias = findViewById(R.id.btn_sa_RegistroMaterias);
+        btnRegistroMaterias.setOnClickListener(this);
+        btnIdentificacionBolsa = findViewById(R.id.btn_sa_IdentificacionBolsa);
+        btnIdentificacionBolsa.setOnClickListener(this);
+        btnRegistroSeparacion = findViewById(R.id.btn_sa_RegistroSeparacion);
+        btnRegistroSeparacion.setOnClickListener(this);
     }
 
     //TODO en caso de reusar el sialogo con single chice, refactoring del metodo para poder rutilizarlo
@@ -93,7 +69,7 @@ public class SelectAreaActivity extends ActivityMadre {
         final ListAdapter adaptador = new ArrayAdapter<StringWithTag>(this, android.R.layout.select_dialog_singlechoice, partidas);
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(SelectAreaActivity.this);
         mBuilder.setTitle("Seleccione una partida");
-        if(adaptador.getCount() > 0){
+        if (adaptador.getCount() > 0) {
             mBuilder.setSingleChoiceItems(adaptador, -1, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -101,7 +77,7 @@ public class SelectAreaActivity extends ActivityMadre {
                     idPartidaSelecionada = partidaSeleccionada.tag;
                 }
             });
-        }else{
+        } else {
             mBuilder.setMessage("No hay partidas pendientes para identificar.");
         }
         mBuilder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -123,6 +99,20 @@ public class SelectAreaActivity extends ActivityMadre {
         mDialog.show();
     }
 
+    @Override
+    public void customAlertFunction(Object object) {
+        HashMap<String, String> hashMap = (HashMap<String, String>) object;
+        if (hashMap.get("funcion") == "-1") {
+            backButtonFunction();
+        }
+    }
+
+    @Override
+    public void backButtonFunction() {
+        Intent goToNextActivity = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(goToNextActivity);
+        finish();
+    }
 
     @Override
     public void limpiarCampos() {
@@ -130,13 +120,32 @@ public class SelectAreaActivity extends ActivityMadre {
     }
 
     @Override
-    public void customOnErrorResponseVolley(Object object) {
+    public void customServerModelError(Object object) {
 
     }
 
     @Override
-    public void customAlertFunction(Object object) {
-
+    public void onClick(final View v) {
+        final Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
+        v.startAnimation(scale);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                switch (v.getId()) {
+                    case R.id.btn_sa_Logout:
+                        onBackPressed();
+                        break;
+                    case R.id.btn_sa_RegistroMaterias:
+                        startActivity(new Intent(getApplicationContext(), RegistroMateriasPrimasActivity.class));
+                        break;
+                    case R.id.btn_sa_IdentificacionBolsa:
+                        new TraerTodasLasPartidasPendientesServerCall(SelectAreaActivity.this);
+                        break;
+                    case R.id.btn_sa_RegistroSeparacion:
+                        startActivity(new Intent(getApplicationContext(), SeparacionSueroActivity.class));
+                        break;
+                }
+            }
+        }, 300);
     }
-
 }
