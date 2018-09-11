@@ -31,6 +31,7 @@ public class MainActivity extends ActivityMadre {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Config.setNumeroOperario(this, null);
+        Config.setNombreOperario(this, null);
         inicializarVistas();
     }
 
@@ -100,5 +101,10 @@ public class MainActivity extends ActivityMadre {
     @Override
     public void backButtonFunction() {
         finish();
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 }

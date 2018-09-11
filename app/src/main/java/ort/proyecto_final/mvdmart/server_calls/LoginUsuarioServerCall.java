@@ -35,6 +35,7 @@ public class LoginUsuarioServerCall {
                         try {
                             if (response.getBoolean("suceso")) {
                                 Config.setNumeroOperario(activity, numeroOperario + "");
+                                Config.setNombreOperario(activity, response.getString("retorno"));
                                 Intent goToNextActivity = new Intent(context, SelectAreaActivity.class);
                                 goToNextActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//TODO leer que hace este parche
                                 context.startActivity(goToNextActivity);

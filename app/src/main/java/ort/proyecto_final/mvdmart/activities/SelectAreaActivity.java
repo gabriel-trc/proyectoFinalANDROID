@@ -26,7 +26,7 @@ import ort.proyecto_final.mvdmart.server_calls.ComenzarIdentificacionPartidaServ
 import ort.proyecto_final.mvdmart.server_calls.TraerTodasLasPartidasPendientesServerCall;
 import ort.proyecto_final.mvdmart.server_calls.TraerTodosLosFrigorificosServerCall;
 
-public class SelectAreaActivity extends ActivityMadre implements View.OnClickListener {
+public class SelectAreaActivity extends ActivityMadre {
 
     private Button btnLogout, btnRegistroSeparacion, btnIdentificacionBolsa, btnRegistroMaterias;
     private TextView txtOperario;
@@ -44,7 +44,7 @@ public class SelectAreaActivity extends ActivityMadre implements View.OnClickLis
 
     public void inicializarVistas() {
         txtOperario = findViewById(R.id.txtOperario);
-        txtOperario.setText("Número de operario: " + Config.getNumeroOperario(SelectAreaActivity.this));
+        txtOperario.setText(Config.getNombreOperario(SelectAreaActivity.this) + " (" + Config.getNumeroOperario(SelectAreaActivity.this) + ")");
         txtOperario.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 36);
 
         btnLogout = findViewById(R.id.btn_sa_Logout);

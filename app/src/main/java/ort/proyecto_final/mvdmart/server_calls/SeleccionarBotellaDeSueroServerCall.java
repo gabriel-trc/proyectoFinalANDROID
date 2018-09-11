@@ -24,14 +24,14 @@ public class SeleccionarBotellaDeSueroServerCall {
     private SeparacionSueroActivity activity;
     private Context context;
 
-    public SeleccionarBotellaDeSueroServerCall(final SeparacionSueroActivity activity, final BotellaSuero botella) {
+    public SeleccionarBotellaDeSueroServerCall(final SeparacionSueroActivity activity, final String codigoBotella) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/botelladesuero/seleccionar";
 
         JSONObject sendObject = new JSONObject();
         try {
-            sendObject.put("CodigoNueva", botella.getCodigo());
+            sendObject.put("CodigoNueva", codigoBotella);
             sendObject.put("CodigoOperario", Config.getNumeroOperario(activity));
         } catch (JSONException e) {
             e.printStackTrace();

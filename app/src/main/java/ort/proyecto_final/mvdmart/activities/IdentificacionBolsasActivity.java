@@ -96,42 +96,14 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
         });
         //TODO refactor de nombres de id. poner diminutivo de que actividad pertenecen, al cerrar la aplicacio liberar parida
         pesoGramos = findViewById(R.id.pesoGramos);
-        btnAgregar = findViewById(R.id.btnAgregarBolsa);
-        btnAgregar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.startAnimation(scale);
-                if (((AppCompatButton) v).getText().equals(getResources().getString(R.string.btnAgregar)))
-                    agregarBolsa();
-                else
-                    modificarBolsa();
-                esconderTecado(IdentificacionBolsasActivity.this);
-            }
-        });
-        btnEnviarBolsas = findViewById(R.id.btnAgregarBolsas);
-        btnEnviarBolsas.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.startAnimation(scale);
-                enviarBolsas(false);
-            }
-        });
-        btnFinalizar = findViewById(R.id.btnFinalizarIdentificacion);
-        btnFinalizar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.startAnimation(scale);
-                enviarBolsas(true);
-            }
-        });
-        btnCancelar = findViewById(R.id.btnCancelarIdentificacion);
-        btnCancelar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.startAnimation(scale);
-                activity.onBackPressed();
-            }
-        });
+        btnAgregar = findViewById(R.id.btn_ib_AgregarBolsa);
+        btnAgregar.setOnClickListener(this);
+        btnEnviarBolsas = findViewById(R.id.btn_ib_AgregarBolsas);
+        btnEnviarBolsas.setOnClickListener(this);
+        btnFinalizar = findViewById(R.id.btn_ib_Finalizar);
+        btnFinalizar.setOnClickListener(this);
+        btnCancelar = findViewById(R.id.btn_ib_Cancelar);
+        btnCancelar.setOnClickListener(this);
         tablaBolsas = findViewById(R.id.tablaBolsas);
     }
 
@@ -430,5 +402,34 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
     @Override
     public void backButtonFunction() {
         new CancelarIdentificacionPartidaServerCall(activity, idPartidaSeleccionada);
+    }
+
+    @Override
+    public void onClick(final View v) {
+        final Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
+        v.startAnimation(scale);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                switch (v.getId()) {
+                    case R.id.btn_ib_AgregarBolsa:
+                        esconderTecado(IdentificacionBolsasActivity.this);
+                        if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar)))
+                            agregarBolsa();
+                        else
+                            modificarBolsa();
+                        break;
+                    case R.id.btn_ib_AgregarBolsas:
+                        enviarBolsas(false);
+                        break;
+                    case R.id.btn_ib_Cancelar:
+                        onBackPressed();
+                        break;
+                    case R.id.btn_ib_Finalizar:
+                        enviarBolsas(true);
+                        break;
+                }
+            }
+        }, 300);
     }
 }

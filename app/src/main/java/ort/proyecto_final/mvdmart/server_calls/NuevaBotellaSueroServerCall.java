@@ -31,18 +31,18 @@ public class NuevaBotellaSueroServerCall {
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        activity.finalizarLoader();
                         try {
-                            activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
                                 BotellaSuero nueva = new BotellaSuero(response.getString("retorno"), 0);
                                 activity.setNuevaBotellaDeSueroSeleccionada(nueva);
-                                if (activity.getBotellaSueroSeleccionada() != null && activity.getObjetosEnVista().containsKey(activity.getBotellaSueroSeleccionada().getCodigo()) && activity.getObjetosEnVista().get(activity.getBotellaSueroSeleccionada().getCodigo()) == 1)
-                                    new CambiarBotellaSueroSeleccionadaServerCall(activity, activity.getBotellaSueroSeleccionada(), nueva, true);
+                                if (activity.getBotellaSueroSeleccionada() != null && activity.getReferenciasEnVista().containsKey(activity.getBotellaSueroSeleccionada().getCodigo()) && activity.getReferenciasEnVista().get(activity.getBotellaSueroSeleccionada().getCodigo()) == 1)
+                                    new CambiarBotellaSueroSeleccionadaServerCall(activity, activity.getBotellaSueroSeleccionada().getCodigo(), nueva.getCodigo());
                                 else {
                                     activity.botellaDeSueroSeleccionada();
                                 }
                             } else {
-                                activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")),null);
+                                activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")), null);
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");

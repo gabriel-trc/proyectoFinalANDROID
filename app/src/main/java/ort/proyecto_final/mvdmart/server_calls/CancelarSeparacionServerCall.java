@@ -26,33 +26,19 @@ public class CancelarSeparacionServerCall {
 
     private SeparacionSueroActivity activity;
     private Context context;
-    private HashMap<String, String> params;
 
-    public CancelarSeparacionServerCall(final SeparacionSueroActivity activity, final JSONArray extraccionesSuero, final JSONArray extraccionesMezcla, Item itemSeleccionado, String codigoBotellaDeSueroSeleccionada, String codigoBotellaDeMezclaSeleccionada) {
+    public CancelarSeparacionServerCall(final SeparacionSueroActivity activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
-
-        String url = Constants.DOMAIN + "/api/separacion/cancelar";
-        JSONObject sendObject = new JSONObject();
-        try {
-            sendObject.put("extraccionesDeSuero", extraccionesSuero);
-            sendObject.put("extraccionesDeMezcla", extraccionesMezcla);
-            sendObject.put("codigoOperario", Config.getNumeroOperario(activity));
-            sendObject.put("itemSeleccionado", itemSeleccionado.toJSONObject());
-            sendObject.put("codigoBotellaDeMezclaSeleccionada", codigoBotellaDeMezclaSeleccionada);
-            sendObject.put("codigoBotellaDeSueroSeleccionada", codigoBotellaDeSueroSeleccionada);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        String url = Constants.DOMAIN + "/api/separacion/cancelar/" + Config.getNumeroOperario(activity);
         activity.iniciarLoader();
         final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, url, sendObject, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
                             activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
-                                Toast.makeText(context, "Registros cancelados", Toast.LENGTH_LONG).show();
                                 activity.finish();
                             } else {
                                 activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")), null);

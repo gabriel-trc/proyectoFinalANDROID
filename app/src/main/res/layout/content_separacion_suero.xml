@@ -383,7 +383,7 @@
         </android.support.v4.widget.NestedScrollView>
 
         <Button
-            android:id="@+id/btn_rs_FinalizarSeparacion"
+            android:id="@+id/btn_rs_Finalizar"
             android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -394,11 +394,11 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/btn_rs_CancelarSeparacion"
+            app:layout_constraintStart_toEndOf="@+id/btn_rs_Cancelar"
             app:layout_constraintTop_toBottomOf="@+id/nestedScrollView3" />
 
         <Button
-            android:id="@+id/btn_rs_CancelarSeparacion"
+            android:id="@+id/btn_rs_Cancelar"
             android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:background="@color/colorBtnCancelar"
@@ -406,7 +406,7 @@
             android:textColor="@color/colorBlanco"
 
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_rs_FinalizarSeparacion"
+            app:layout_constraintEnd_toStartOf="@+id/btn_rs_Finalizar"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/nestedScrollView3" />

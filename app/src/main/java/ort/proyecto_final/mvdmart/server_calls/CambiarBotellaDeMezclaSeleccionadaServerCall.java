@@ -23,7 +23,7 @@ public class CambiarBotellaDeMezclaSeleccionadaServerCall {
     private SeparacionSueroActivity activity;
     private Context context;
 
-    public CambiarBotellaDeMezclaSeleccionadaServerCall(final SeparacionSueroActivity activity, final Item botellaAnterior, final Item botellaNueva, boolean nueva) {
+    public CambiarBotellaDeMezclaSeleccionadaServerCall(final SeparacionSueroActivity activity, final Item botellaAnterior, final Item botellaNueva) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/botellademezcla/cambiar";
@@ -32,7 +32,6 @@ public class CambiarBotellaDeMezclaSeleccionadaServerCall {
             sendObject.put("CodigoAnterior", botellaAnterior.getCodigo());
             sendObject.put("CodigoNueva", botellaNueva.getCodigo());
             sendObject.put("CodigoOperario", Config.getNumeroOperario(activity));
-            sendObject.put("Nueva",nueva);
         } catch (JSONException e) {
             e.printStackTrace();
         }

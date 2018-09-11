@@ -32,18 +32,18 @@ public class NuevaBotellaMezclaServerCall {
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        activity.finalizarLoader();
                         try {
-                            activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
                                 Item nuevaBotellaMezcla = new Item(response.getString("retorno"), 1);
                                 activity.setNuevaBotellaDeMezclaSeleccionada(nuevaBotellaMezcla);
-                                if (activity.getBotellaMezclaSeleccionada() != null && activity.getObjetosEnVista().containsKey(activity.getBotellaMezclaSeleccionada().getCodigo()) && activity.getObjetosEnVista().get(activity.getBotellaMezclaSeleccionada().getCodigo()) == 1)
-                                    new CambiarBotellaDeMezclaSeleccionadaServerCall(activity, activity.getBotellaMezclaSeleccionada(), nuevaBotellaMezcla, true);
+                                if (activity.getBotellaMezclaSeleccionada() != null && activity.getReferenciasEnVista().containsKey(activity.getBotellaMezclaSeleccionada().getCodigo()) && activity.getReferenciasEnVista().get(activity.getBotellaMezclaSeleccionada().getCodigo()) == 1)
+                                    new CambiarBotellaDeMezclaSeleccionadaServerCall(activity, activity.getBotellaMezclaSeleccionada(), nuevaBotellaMezcla);
                                 else {
                                     activity.botellaDeMezclaSeleccionada();
                                 }
                             } else {
-                                activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")),null);
+                                activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")), null);
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");

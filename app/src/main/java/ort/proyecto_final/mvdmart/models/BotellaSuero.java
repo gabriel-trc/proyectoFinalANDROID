@@ -6,7 +6,15 @@ import org.json.JSONObject;
 public class BotellaSuero {
     private String codigo;
     private int cantidadOcupada;
-    private int cantidadDisponible;
+    private boolean usando;
+
+    public boolean isUsando() {
+        return usando;
+    }
+
+    public void setUsando(boolean usando) {
+        this.usando = usando;
+    }
 
     public String getCodigo() {
         return codigo;
@@ -24,18 +32,10 @@ public class BotellaSuero {
         this.cantidadOcupada = cantidadOcupada;
     }
 
-    public int getCantidadDisponible() {
-        return cantidadDisponible;
-    }
-
-    public void setCantidadDisponible(int cantidadDisponible) {
-        this.cantidadDisponible = cantidadDisponible;
-    }
 
     public BotellaSuero(String codigo, int cantidadOcupada) {
         this.codigo = codigo;
         this.cantidadOcupada = cantidadOcupada;
-        this.cantidadDisponible = 500 - cantidadOcupada;
     }
 
 
@@ -52,6 +52,6 @@ public class BotellaSuero {
 
     @Override
     public String toString() {
-        return this.codigo + " - " + this.cantidadOcupada + " ml";
+        return this.codigo + " - " + (500 - this.cantidadOcupada) + " mL disponibles.";
     }
 }

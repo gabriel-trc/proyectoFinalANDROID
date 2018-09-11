@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
+import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 import ort.proyecto_final.mvdmart.models.Item;
 
 public class SeleccionarItemServerCall {
@@ -43,23 +44,13 @@ public class SeleccionarItemServerCall {
                 (Request.Method.POST, url, sendObject, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        activity.finalizarLoader();
                         try {
                             if (response.getBoolean("suceso")) {
                                 activity.itemSeleccionado();
-                                activity.finalizarLoader();
                             } else {
                                 JSONArray errorArray = response.getJSONArray("mensajes");
-                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                                builder.setTitle(errorArray.getString(0));
-                                builder.setMessage(errorArray.getString(1));
-                                //builder.setIcon(R.drawable.ic_launcher_foreground);
-                                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                AlertDialog alert = builder.create();
-                                alert.show();
+                                activity.alert(context, HelpersFunctions.errores(errorArray), null);
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");

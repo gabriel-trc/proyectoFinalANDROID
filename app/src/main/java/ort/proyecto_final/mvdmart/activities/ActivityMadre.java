@@ -17,7 +17,7 @@ import java.util.HashMap;
 
 import ort.proyecto_final.mvdmart.R;
 
-public abstract class ActivityMadre extends AppCompatActivity {
+public abstract class ActivityMadre extends AppCompatActivity implements View.OnClickListener {
     public ConstraintLayout spinnerLoader;
     public Handler handler = new Handler();
 

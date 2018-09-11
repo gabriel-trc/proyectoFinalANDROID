@@ -91,31 +91,12 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
 
             }
         });
-        btnAgregar = findViewById(R.id.btnAgregar);
-        btnAgregar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (((AppCompatButton) v).getText().equals(getResources().getString(R.string.btnAgregar)))
-                    agregarPartida();
-                else
-                    modificarPartida();
-                esconderTecado(RegistroMateriasPrimasActivity.this);
-            }
-        });
-        btnFinalizar = findViewById(R.id.btnFinalizar);
-        btnFinalizar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                enviarRegistrosDePartidas();
-            }
-        });
-        btnCancelarRMP = findViewById(R.id.btnCancelarRMP);
-        btnCancelarRMP.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        btnAgregar = findViewById(R.id.btn_rmp_AgregarPartida);
+        btnAgregar.setOnClickListener(this);
+        btnFinalizar = findViewById(R.id.btn_rmp_Finalizar);
+        btnFinalizar.setOnClickListener(this);
+        btnCancelarRMP = findViewById(R.id.btn_rmp_Cancelar);
+        btnCancelarRMP.setOnClickListener(this);
 
         txtHora = findViewById(R.id.hora);
         txtHora.setText(HelpersFunctions.horaEnFormato(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE)));
@@ -164,7 +145,8 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
     }
 
     private void agregarPartida() {
-        if (chequearCamposCompletosYTiposDatos()) {
+//        if (chequearCamposCompletosYTiposDatos()) {
+            if (true) {
             int cantConservadoras = Integer.parseInt(txtCantConservadoras.getText().toString());
 //            int pesoTotal = Integer.parseInt(txtPeso.getText().toString());
             int temperatura = Integer.parseInt(txtTemperatura.getText().toString());
@@ -173,7 +155,8 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
             String hora = txtHora.getText().toString();
             try {
                 String[] esValida = Partida.validar(cantConservadoras, temperatura, /*pesoTotal,*/ numeroCote, idFrigorifico);
-                if (esValida[1] == "Ok") {
+//                if (esValida[1] == "Ok") {
+                    if (true) {
                     Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, /*pesoTotal,*/ temperatura, fecha, hora, numeroCote);
                     partidas.add(partida);
                     limpiarCampos();
@@ -232,7 +215,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
 
     private boolean chequearCamposCompletosYTiposDatos() {
         boolean camposCompletos = true;
-        String camposIncompletos = "Atención, debe completar los siguientes campos:";
+        String camposIncompletos = "Debe completar los siguientes campos:";
         int largoStringCampos = camposIncompletos.length();
         if (idFrigorifico == -1)
             camposIncompletos += " frigorífico,";
@@ -244,7 +227,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
             camposIncompletos += " temperatura.";
         if (camposIncompletos.length() != largoStringCampos) {
             camposCompletos = false;
-            Toast.makeText(this.getApplicationContext(), camposIncompletos, Toast.LENGTH_LONG).show();
+            alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", camposIncompletos},null);
         }
         return camposCompletos;
     }
@@ -439,7 +422,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
     @Override
     public void customAlertFunction(Object object) {
         HashMap<String, String> hashMap = (HashMap<String, String>) object;
-        switch (hashMap.get("funcion")){
+        switch (hashMap.get("funcion")) {
             case "-1":
                 backButtonFunction();
                 break;
@@ -469,5 +452,31 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
         dropDownFrigorificos.setSelection(partida.getPosFrigorifico());
         txtFecha.setText(partida.getFecha());
         txtHora.setText(partida.getHora());
+    }
+
+    @Override
+    public void onClick(final View v) {
+        final Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
+        v.startAnimation(scale);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                switch (v.getId()) {
+                    case R.id.btn_rmp_AgregarPartida:
+                        if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar)))
+                            agregarPartida();
+                        else
+                            modificarPartida();
+                        esconderTecado(RegistroMateriasPrimasActivity.this);
+                        break;
+                    case R.id.btn_rmp_Cancelar:
+                        onBackPressed();
+                        break;
+                    case R.id.btn_rmp_Finalizar:
+                        enviarRegistrosDePartidas();
+                        break;
+                }
+            }
+        }, 300);
     }
 }

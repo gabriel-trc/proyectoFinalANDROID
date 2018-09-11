@@ -32,6 +32,14 @@ public class Config {
         return activity.getSharedPreferences(Constants.MyPREFERENCES, Context.MODE_PRIVATE).getString("numeroOperario","");
     }
 
+    public static void setNombreOperario (Activity activity, String pNombreOperario){
+        assignSharedPreferences(activity,"nombreOperario", pNombreOperario);
+    }
+
+    public static String getNombreOperario (Activity activity){
+        return activity.getSharedPreferences(Constants.MyPREFERENCES, Context.MODE_PRIVATE).getString("nombreOperario","");
+    }
+
     public static void setFrigorificos (Activity activity, String pFrigorificos){
         assignSharedPreferences(activity,"frigorificos", pFrigorificos);
     }

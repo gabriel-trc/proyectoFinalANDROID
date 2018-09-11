@@ -28,7 +28,7 @@ public class FinalizarSeparacionServerCall {
     private Context context;
     private HashMap<String, String> params;
 
-    public FinalizarSeparacionServerCall(final SeparacionSueroActivity activity, final JSONArray extraccionesSuero, final JSONArray extraccionesMezcla, Item itemSeleccionado, String codigoBotellaDeSueroSeleccionada, String codigoBotellaDeMezclaSeleccionada) {
+    public FinalizarSeparacionServerCall(final SeparacionSueroActivity activity, final JSONArray extraccionesSuero, final JSONArray extraccionesMezcla) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
 
@@ -38,9 +38,6 @@ public class FinalizarSeparacionServerCall {
             sendObject.put("extraccionesDeSuero", extraccionesSuero);
             sendObject.put("extraccionesDeMezcla", extraccionesMezcla);
             sendObject.put("codigoOperario", Config.getNumeroOperario(activity));
-            sendObject.put("itemSeleccionado", itemSeleccionado.toJSONObject());
-            sendObject.put("codigoBotellaDeMezclaSeleccionada", codigoBotellaDeMezclaSeleccionada);
-            sendObject.put("codigoBotellaDeSueroSeleccionada", codigoBotellaDeSueroSeleccionada);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -52,8 +49,7 @@ public class FinalizarSeparacionServerCall {
                         try {
                             activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
-                                Toast.makeText(context, "Registros guardados", Toast.LENGTH_LONG).show();
-                                activity.recreate();
+                                activity.alertCheck(activity,null);
                             } else {
                                 activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")), null);
                             }
