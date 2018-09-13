@@ -173,7 +173,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
 
     public void alertSeleccionItem(JSONObject itemsParaSeparar) {
         try {
-            expandableListDetail = Item.itemsParaSeparar(itemsParaSeparar);
+            expandableListDetail = Item.itemsParaSepararLinkedHashMap(itemsParaSeparar);
         } catch (JSONException e) {
             e.printStackTrace();
         }

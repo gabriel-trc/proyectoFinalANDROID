@@ -1,21 +1,34 @@
 package ort.proyecto_final.mvdmart.models;
 
+import android.provider.Telephony;
+import android.support.annotation.NonNull;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-public class Partida {
+public class Partida implements Comparable<Partida> {
 
     private int localId, idFrigorifico, cantConservadoras, temperatura, peso, posFrigorifico, id;
     private String fecha, hora, numCote, nombreFrigorifico;
     private ArrayList<Bolsa> bolsas;
+    private ArrayList<Item> items;
 
     //region Helper Getter's and Setter's
 
+
+    public ArrayList<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(ArrayList<Item> items) {
+        this.items = items;
+    }
 
     public String getHora() {
         return hora;
@@ -129,10 +142,10 @@ public class Partida {
         this.posFrigorifico = posFrigorifico;
     }
 
-    public Partida(int pId, String pNombreFrigorifico, String pNumeroCote, String pFecha, String pHora, ArrayList<Bolsa> pBolsas) {
+    public Partida(int pId, String pNombreFrigorifico, String pNumeroCote, String pFecha, String pHora, ArrayList<Item> pBolsas) {
         this.id = pId;
         this.nombreFrigorifico = pNombreFrigorifico;
-        this.bolsas = pBolsas;
+        this.items = pBolsas;
         this.numCote = pNumeroCote;
         this.fecha = pFecha;
         this.hora = pHora;
@@ -205,5 +218,20 @@ public class Partida {
     @Override
     public String toString() {
         return this.nombreFrigorifico + " - " + this.fecha;
+    }
+
+    @Override
+    public int compareTo(@NonNull Partida p) {
+        if (this.nombreFrigorifico.compareTo(p.nombreFrigorifico) != 0) {
+            return this.nombreFrigorifico.compareTo(p.nombreFrigorifico);
+        } else if (this.fecha.compareTo(p.fecha) != 0) {
+            return this.fecha.compareTo(p.fecha);
+        } else {
+            return this.hora.compareTo(p.hora);
+        }
+
+        //return Comparator.comparing(Partida::getNombreFrigorifico).thenComparing(Partida::getFecha).thenComparing(Partida::getHora).compare(this,p);
+//        return this.nombreFrigorifico.compareTo(p.nombreFrigorifico);
+
     }
 }
