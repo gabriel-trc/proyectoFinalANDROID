@@ -68,6 +68,7 @@ public class Item {
         HashMap<String, List<Item>> itemsParaIdentificar = new HashMap<>();
         JSONArray partidasConBolsas = itemsIdentificados.getJSONArray("partidasConBolsas");
         JSONArray botellas = itemsIdentificados.getJSONArray("botellasDeMezcla");
+        int num = 1;
         for (int i = 0; i < partidasConBolsas.length(); i++) {
             JSONObject partida = partidasConBolsas.getJSONObject(i);
             JSONArray bolsas = partida.getJSONArray("bolsaDeSangre");
@@ -76,8 +77,9 @@ public class Item {
                 bolsasDeSangre.add(new Item(bolsas.getJSONObject(j).getString("codigo"), 0));
             }
             String[] fecha = partida.getString("fechaCompleta").substring(0, 10).split("-");
-            String llavePartida = partida.getJSONObject("frigorifico").getString("nombre") + " - " + fecha[2] + "-" + fecha[1] + "-" + fecha[0];
+            String llavePartida = num + " - " + partida.getJSONObject("frigorifico").getString("nombre") + " - " + fecha[2] + "-" + fecha[1] + "-" + fecha[0];
             itemsParaIdentificar.put(llavePartida, bolsasDeSangre);
+            num++;
         }
         ArrayList<Item> botellasDeMezcla = new ArrayList<>();
         if (botellas.length() > 0) {
@@ -85,7 +87,7 @@ public class Item {
                 JSONObject botellaDeMezcla = botellas.getJSONObject(i);
                 botellasDeMezcla.add(new Item(botellaDeMezcla.getString("codigo"), 1));
             }
-            String llaveBotellas = "Botellas de mezcla";
+            String llaveBotellas = num + " - " + "Botellas de mezcla";
             itemsParaIdentificar.put(llaveBotellas, botellasDeMezcla);
         }
         return itemsParaIdentificar;

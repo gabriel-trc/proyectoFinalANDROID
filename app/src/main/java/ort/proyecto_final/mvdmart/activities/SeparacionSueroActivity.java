@@ -147,7 +147,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
     }
 
     private void finalizarSeparacion() {
-        if (!extraccionesSueroDeBolsas.isEmpty()) {
+        if (extraccionesSueroDeBolsas.size() > 0 || extraccionesMezclaDeBolsas.size() > 0) {
             if (btnAgregarExtraccionSuero.getText().equals(getResources().getString(R.string.btnAgregarSuero))) {
                 JSONArray extraccionesSuero = new JSONArray();
                 for (int i = 0; i < extraccionesSueroDeBolsas.size(); i++) {
@@ -1094,7 +1094,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
                         break;
                     case R.id.btn_rs_TirarItem:
                         if (itemSeleccionado != null) {
-                            if (referenciasEnVista.get(itemSeleccionado.getCodigo()) > 1) {
+                            if (referenciasEnVista.get(itemSeleccionado.getCodigo()) >= 1) {
                                 hashMapCustomAlertFunction.put("id", itemSeleccionado.getCodigo());
                                 hashMapCustomAlertFunction.put("funcion", "3");
                                 String msg = (itemSeleccionado.isFinalizado()) ? "¿Quiere recuperar este item?" : "¿Quiere tirar este item?";
@@ -1108,7 +1108,7 @@ public class SeparacionSueroActivity extends ActivityMadre {
                         break;
                     case R.id.btn_rs_CerrarBotellaMezcla:
                         if (botellaMezclaSeleccionada != null) {
-                            if (referenciasEnVista.get(itemSeleccionado.getCodigo()) > 1) {
+                            if (referenciasEnVista.get(itemSeleccionado.getCodigo()) >= 1) {
                                 hashMapCustomAlertFunction.put("id", botellaMezclaSeleccionada.getCodigo());
                                 hashMapCustomAlertFunction.put("funcion", "4");
                                 String msg = (botellaMezclaSeleccionada.isFinalizado()) ? "¿Quiere abrir esta botella de mezcla?" : "¿Quiere cerrar esta botella de mezcla?";

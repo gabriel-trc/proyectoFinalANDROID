@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -20,7 +19,6 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,7 +47,8 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
     private TableLayout tablaBolsas;
     private Spinner spinnerCondicion;
     private Bolsa bolsa;
-    private IdentificacionBolsasActivity activity = this;
+    private HashMap<String, String> hashMapCustomAlertFunction = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +121,7 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                 alert(IdentificacionBolsasActivity.this, new String[]{"DATOS INVÁLIDOS", "El peso debe de estar entre 0 y 2000."}, null);
             }
         } else {
-            Toast.makeText(this.getApplicationContext(), "Atención: Debe completar todos los campos.", Toast.LENGTH_LONG).show();
+            alert(IdentificacionBolsasActivity.this, new String[]{"ATENCIÓN", "No se ha ingresado el peso de la bolsa."}, null);
         }
     }
 
@@ -149,7 +148,7 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
             Collections.sort(bolsas);
             for (int i = -1; i < bolsas.size(); i++) {
                 TableRow fila = new TableRow(this);
-                fila.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT, 8f));
+                fila.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT, 15.5f));
                 if (i < 0)
                     fila.setBackgroundColor(Color.rgb(36, 123, 160));
                 else {
@@ -166,7 +165,7 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                 columnaCodigo.setTextColor(getResources().getColor(R.color.colorBlanco));
                 columnaCodigo.setGravity(Gravity.CENTER);
                 columnaCodigo.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                fila.addView(columnaCodigo, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2));
+                fila.addView(columnaCodigo, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 3.5f));
 
                 TextView columnaPeso = new TextView(this.getApplicationContext());
                 if (i < 0)
@@ -176,7 +175,7 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                 columnaPeso.setTextColor(getResources().getColor(R.color.colorBlanco));
                 columnaPeso.setGravity(Gravity.CENTER);
                 columnaPeso.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                fila.addView(columnaPeso, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1));
+                fila.addView(columnaPeso, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2));
 
                 TextView columnaCondicion = new TextView(this.getApplicationContext());
                 if (i < 0)
@@ -186,7 +185,7 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                 columnaCondicion.setTextColor(getResources().getColor(R.color.colorBlanco));
                 columnaCondicion.setGravity(Gravity.CENTER);
                 columnaCondicion.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                fila.addView(columnaCondicion, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+                fila.addView(columnaCondicion, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 4f));
 
                 if (i < 0) {
                     TextView columnaDescartar = new TextView(this.getApplicationContext());
@@ -194,23 +193,31 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                     columnaDescartar.setTextColor(getResources().getColor(R.color.colorBlanco));
                     columnaDescartar.setGravity(Gravity.CENTER);
                     columnaDescartar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                    fila.addView(columnaDescartar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+                    fila.addView(columnaDescartar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 2.5f));
                 } else {
                     Button columnaDescartar = new Button(this);
-                    columnaDescartar.setText("DESCARTAR");
+                    columnaDescartar.setText((bolsas.get(i).getRazonDescarte().equals("")) ? "DESCARTAR" : "DESCARTADA");
                     columnaDescartar.setId(Integer.parseInt((bolsas.get(i).getCodigoBolsa()).substring(6)));
-                    columnaDescartar.setBackgroundResource(android.R.color.holo_blue_dark);
+                    columnaDescartar.setBackgroundResource((bolsas.get(i).getRazonDescarte().equals("")) ? android.R.color.holo_blue_dark : android.R.color.holo_red_light);
                     columnaDescartar.setTextColor(getResources().getColor(R.color.colorBlanco));
                     columnaDescartar.setGravity(Gravity.CENTER);
                     columnaDescartar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
                     columnaDescartar.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(View v) {
+                        public void onClick(final View v) {
                             v.startAnimation(scale);
-                            alertDescarte(((TableRow) v.getParent()).getId(), v.getId());
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar))) {
+                                        alertDescarte(((TableRow) v.getParent()).getId(), v.getId());
+                                    } else
+                                        alert(IdentificacionBolsasActivity.this, new String[]{"ATENCIÓN", "Para continuar primero debes terminar de modificar el registro."}, null);
+                                }
+                            }, 300);
                         }
                     });
-                    fila.addView(columnaDescartar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
+                    fila.addView(columnaDescartar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 2.5f));
                 }
 
                 if (i < 0) {
@@ -219,7 +226,7 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                     columnaModificar.setTextColor(getResources().getColor(R.color.colorBlanco));
                     columnaModificar.setGravity(Gravity.CENTER);
                     columnaModificar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                    fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+                    fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
                 } else {
                     Button columnaModificar = new Button(this);
                     columnaModificar.setText(R.string.btnModificar);
@@ -231,13 +238,18 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                         @Override
                         public void onClick(View v) {
                             v.startAnimation(scale);
-                            HashMap<String, String> obj = new HashMap<>();
-                            obj.put("funcion", "0");
-                            obj.put("id", (((TableRow) v.getParent()).getId()) + "");
-                            alertDosBotones(IdentificacionBolsasActivity.this, new String[]{"Atención", "¿Quiere editar este registro?"}, obj);
+                            hashMapCustomAlertFunction.put("id", (((TableRow) v.getParent()).getId()) + "");
+                            hashMapCustomAlertFunction.put("funcion", "0");
+                            v.startAnimation(scale);
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    alertDosBotones(IdentificacionBolsasActivity.this, new String[]{"Atención", "¿Quiere editar este registro?"}, hashMapCustomAlertFunction);
+                                }
+                            }, 300);
                         }
                     });
-                    fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
+                    fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f));
                 }
 
                 if (i < 0) {
@@ -258,10 +270,15 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                         @Override
                         public void onClick(View v) {
                             v.startAnimation(scale);
-                            HashMap<String, String> obj = new HashMap<>();
-                            obj.put("funcion", "1");
-                            obj.put("id", (((TableRow) v.getParent()).getId()) + "");
-                            alertDosBotones(IdentificacionBolsasActivity.this, new String[]{"Atención", "¿Quiere borrar este registro?"}, obj);
+                            hashMapCustomAlertFunction.put("id", (((TableRow) v.getParent()).getId()) + "");
+                            hashMapCustomAlertFunction.put("funcion", "1");
+                            v.startAnimation(scale);
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    alertDosBotones(IdentificacionBolsasActivity.this, new String[]{"Atención", "¿Quiere borrar este registro?"}, hashMapCustomAlertFunction);
+                                }
+                            }, 300);
                         }
                     });
                     fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1.5f));
@@ -350,10 +367,10 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                 }
                 new RegistroBolsasServerCall(this, jsonBolsas, idPartidaSeleccionada, finalizar);
             } else {
-                Toast.makeText(IdentificacionBolsasActivity.this, "Atención: Debes terminar de modificar la bolsa.", Toast.LENGTH_LONG).show();
+                alert(IdentificacionBolsasActivity.this, new String[]{"ATENCIÓN", "Para continuar debes terminar de modificar el regitro."}, null);
             }
         } else {
-            Toast.makeText(IdentificacionBolsasActivity.this, "Atención: No tienes ninguna partida.", Toast.LENGTH_LONG).show();
+            alert(IdentificacionBolsasActivity.this, new String[]{"ATENCIÓN", "No tienes ninguna bolsa identificada."}, null);
         }
     }
 
@@ -387,21 +404,31 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                 backButtonFunction();
                 break;
             case "0":
-                bolsa = getBolsaById(Integer.parseInt(hashMap.get("id")));
-                btnAgregar.setText(R.string.btnModificar);
-                btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
-                setearBolsa(bolsa);
+                if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar))) {
+                    bolsa = getBolsaById(Integer.parseInt(hashMap.get("id")));
+                    btnAgregar.setText(R.string.btnModificar);
+                    btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
+                    setearBolsa(bolsa);
+                } else
+                    alert(IdentificacionBolsasActivity.this, new String[]{"ATENCIÓN", "Ya estas modificando un registro, primero debes terminarlo."}, null);
                 break;
             case "1":
-                bolsas.remove(getBolsaById(Integer.parseInt(hashMap.get("id"))));
-                crearTablasBolsas();
+                if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar))) {
+                    bolsa = getBolsaById(Integer.parseInt(hashMap.get("id")));
+                    btnAgregar.setText(R.string.btnModificar);
+                    btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
+                    setearBolsa(bolsa);
+                    bolsas.remove(getBolsaById(Integer.parseInt(hashMap.get("id"))));
+                    crearTablasBolsas();
+                } else
+                    alert(IdentificacionBolsasActivity.this, new String[]{"ATENCIÓN", "Para continuar primero debes terminar de modificar el registro."}, null);
                 break;
         }
     }
 
     @Override
     public void backButtonFunction() {
-        new CancelarIdentificacionPartidaServerCall(activity, idPartidaSeleccionada);
+        new CancelarIdentificacionPartidaServerCall(IdentificacionBolsasActivity.this, idPartidaSeleccionada);
     }
 
     @Override

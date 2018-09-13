@@ -9,16 +9,15 @@
     tools:layout_editor_absoluteY="25dp"
     tools:showIn="@layout/activity_select_area">
 
-    <Button
-        android:id="@+id/btn_sa_Logout"
-        android:layout_width="214dp"
-        android:layout_height="59dp"
-        android:layout_marginBottom="16dp"
+    <TextView
+        android:id="@+id/txtOperario"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:text="Finalizar Turno"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
+        android:layout_marginTop="16dp"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btn_sa_RegistroSeparacion"
@@ -66,14 +65,17 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="263dp" />
 
-    <TextView
-        android:id="@+id/txtOperario"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <Button
+        android:id="@+id/btn_sa_Logout"
+        android:layout_width="180dp"
+        android:layout_height="45dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:background="@color/colorBtnCancelar"
+        android:text="Finalizar Turno"
+        android:textColor="@color/colorBlanco"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 
 </android.support.constraint.ConstraintLayout>

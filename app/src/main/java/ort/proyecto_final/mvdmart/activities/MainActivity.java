@@ -1,8 +1,6 @@
 package ort.proyecto_final.mvdmart.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -11,7 +9,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.HashMap;
 
@@ -19,7 +16,6 @@ import ort.proyecto_final.mvdmart.R;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 import ort.proyecto_final.mvdmart.server_calls.LoginUsuarioServerCall;
-import ort.proyecto_final.mvdmart.server_calls.TraerTodasLasPartidasPendientesServerCall;
 
 public class MainActivity extends ActivityMadre {
 
@@ -42,7 +38,6 @@ public class MainActivity extends ActivityMadre {
     }
 
     public void inicializarVistas() {
-        final Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
         spinnerLoader = findViewById(R.id.spinner_loader);
         txtNumeroOperario = findViewById(R.id.txtNumeroOperario);
         txtNumeroOperario.setTransformationMethod(null);
@@ -56,24 +51,12 @@ public class MainActivity extends ActivityMadre {
             }
         });
         btnIngresar = findViewById(R.id.btnIngresar);
-        btnIngresar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
-                v.startAnimation(scale);
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        ingresar();
-                    }
-                }, 300);
-            }
-        });
+        btnIngresar.setOnClickListener(this);
     }
 
     public void ingresar() {
         if (!HelpersFunctions.isIntegerParseInt(txtNumeroOperario.getText().toString())) {
-            Toast.makeText(this.getApplicationContext(), "Ingrese correctamente su número de operario", Toast.LENGTH_LONG).show();
+            alert(MainActivity.this, new String[]{"ATENCION", "Ingrese correctamente su número de operario.\nEs necesario para poder loguearce en el sistema."}, null);
             limpiarCampos();
         } else {
             new LoginUsuarioServerCall(this, txtNumeroOperario.getText().toString());
@@ -104,7 +87,19 @@ public class MainActivity extends ActivityMadre {
     }
 
     @Override
-    public void onClick(View v) {
-
+    public void onClick(final View v) {
+        final Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
+        v.startAnimation(scale);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                switch (v.getId()) {
+                    case R.id.btnIngresar:
+                        ingresar();
+                        esconderTecado(MainActivity.this);
+                        break;
+                }
+            }
+        }, 300);
     }
 }

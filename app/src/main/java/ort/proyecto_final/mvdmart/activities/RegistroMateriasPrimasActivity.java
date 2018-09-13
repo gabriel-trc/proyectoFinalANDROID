@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -52,6 +51,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
     private ArrayAdapter<StringWithTag> frigorificosArray;
     private Spinner dropDownFrigorificos;
     private final Calendar calendar = Calendar.getInstance();
+    private HashMap<String, String> hashMapCustomAlertFunction = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +62,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
 
     @Override
     public void inicializarVistas() {
-        final Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
-        JSONArray obj = null;
+        JSONArray obj;
         List<StringWithTag> frigorificos = null;
         spinnerLoader = findViewById(R.id.spinner_loader);
         tablaRegistroPartidas = findViewById(R.id.tablaPartidas);
@@ -145,8 +144,8 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
     }
 
     private void agregarPartida() {
-//        if (chequearCamposCompletosYTiposDatos()) {
-            if (true) {
+        if (chequearCamposCompletosYTiposDatos()) {
+//            if (true) {
             int cantConservadoras = Integer.parseInt(txtCantConservadoras.getText().toString());
 //            int pesoTotal = Integer.parseInt(txtPeso.getText().toString());
             int temperatura = Integer.parseInt(txtTemperatura.getText().toString());
@@ -155,8 +154,8 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
             String hora = txtHora.getText().toString();
             try {
                 String[] esValida = Partida.validar(cantConservadoras, temperatura, /*pesoTotal,*/ numeroCote, idFrigorifico);
-//                if (esValida[1] == "Ok") {
-                    if (true) {
+                if (esValida[1] == "Ok") {
+//                    if (true) {
                     Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, /*pesoTotal,*/ temperatura, fecha, hora, numeroCote);
                     partidas.add(partida);
                     limpiarCampos();
@@ -165,7 +164,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                     alert(RegistroMateriasPrimasActivity.this, esValida, null);
                 }
             } catch (JSONException e) {
-                Toast.makeText(RegistroMateriasPrimasActivity.this, "Atención: Campos mal formateados. Si perciste, comunicarlo.", Toast.LENGTH_LONG).show();
+                alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", "Campos mal formateados. Si perciste comunicarlo."}, null);
             }
         }
     }
@@ -179,10 +178,10 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                 }
                 new RegistroMateriasPrimasServerCall(this, jsonPartidas);
             } else {
-                Toast.makeText(RegistroMateriasPrimasActivity.this, "Atención: Debes terminar de modificar la partida.", Toast.LENGTH_LONG).show();
+                alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", "Debes terminar de modificar la partida."}, null);
             }
         } else {
-            Toast.makeText(RegistroMateriasPrimasActivity.this, "Atención: No tienes ninguna partida.", Toast.LENGTH_LONG).show();
+            alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", "No tienes ningun registro cargado."}, null);
         }
     }
 
@@ -208,7 +207,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                     alert(RegistroMateriasPrimasActivity.this, esValida, null);
                 }
             } catch (JSONException e) {
-                Toast.makeText(this.getApplicationContext(), "Atención: Campos mal formateados. Si perciste, comunicarlo.", Toast.LENGTH_LONG).show();
+                alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", "Campos mal formateados. Si perciste comunicarlo."}, null);
             }
         }
     }
@@ -227,12 +226,13 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
             camposIncompletos += " temperatura.";
         if (camposIncompletos.length() != largoStringCampos) {
             camposCompletos = false;
-            alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", camposIncompletos},null);
+            alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", camposIncompletos}, null);
         }
         return camposCompletos;
     }
 
     private void crearTablaRegistroPartidas() {
+        final Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
         tablaRegistroPartidas.removeAllViews();
         if (partidas.size() != 0) {
             for (int i = -1; i < partidas.size(); i++) {
@@ -333,10 +333,16 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                     columnaModificar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            HashMap<String, String> obj = new HashMap<>();
-                            obj.put("funcion", "0");
-                            obj.put("id", (((TableRow) v.getParent()).getId()) + "");
-                            alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"Atención", "¿Quiere editar este registro?"}, obj);
+                            v.startAnimation(scale);
+                            hashMapCustomAlertFunction.put("id", (((TableRow) v.getParent()).getId()) + "");
+                            hashMapCustomAlertFunction.put("funcion", "0");
+                            v.startAnimation(scale);
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"ATENCIÓN", "¿Quiere editar este registro?"}, hashMapCustomAlertFunction);
+                                }
+                            }, 300);
                         }
                     });
                     fila.addView(columnaModificar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
@@ -359,10 +365,16 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                     columnaBorrar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            HashMap<String, String> obj = new HashMap<>();
-                            obj.put("funcion", "1");
-                            obj.put("id", (((TableRow) v.getParent()).getId()) + "");
-                            alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"Atención", "¿Quiere borrar este registro?"}, obj);
+                            v.startAnimation(scale);
+                            hashMapCustomAlertFunction.put("id", (((TableRow) v.getParent()).getId()) + "");
+                            hashMapCustomAlertFunction.put("funcion", "1");
+                            v.startAnimation(scale);
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"ATENCIÓN", "¿Quiere editar este registro?"}, hashMapCustomAlertFunction);
+                                }
+                            }, 300);
                         }
                     });
                     fila.addView(columnaBorrar, new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.5f));
@@ -427,14 +439,22 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                 backButtonFunction();
                 break;
             case "0":
-                partidaParaModificar = getPartidaById(Integer.parseInt(hashMap.get("id")));
-                btnAgregar.setText(R.string.btnModificar);
-                btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
-                setearPartida(partidaParaModificar);
+                if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar))) {
+                    partidaParaModificar = getPartidaById(Integer.parseInt(hashMap.get("id")));
+                    btnAgregar.setText(R.string.btnModificar);
+                    btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
+                    setearPartida(partidaParaModificar);
+                } else {
+                    alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", "Ya se encuentra modificando un registro, termine con ese para poder continuar."}, null);
+                }
                 break;
             case "1":
-                partidas.remove(getPartidaById(Integer.parseInt(hashMap.get("id"))));
-                crearTablaRegistroPartidas();
+                if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar))) {
+                    partidas.remove(getPartidaById(Integer.parseInt(hashMap.get("id"))));
+                    crearTablaRegistroPartidas();
+                } else {
+                    alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", "Se encuentra modificando un registro, debe termianr para poder usar esta funcionalidad."}, null);
+                }
                 break;
         }
     }

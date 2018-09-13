@@ -65,9 +65,9 @@
 
         <Button
             android:id="@+id/btn_rs_SeleccionarItem"
-            android:layout_width="152dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="190dp"
+            android:layout_width="150dp"
+            android:layout_height="49dp"
+            android:layout_marginStart="196dp"
             android:background="@color/colorBtnSeleccionar"
             android:text="@string/btnSeleccionar"
             android:textColor="@color/colorBlanco"
