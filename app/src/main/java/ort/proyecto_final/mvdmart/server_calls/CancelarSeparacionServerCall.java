@@ -45,7 +45,6 @@ public class CancelarSeparacionServerCall {
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
-//TODO mostrar alert generico si entra al catch
                         }
                     }
                 }, new Response.ErrorListener() {

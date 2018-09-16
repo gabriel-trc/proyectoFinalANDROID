@@ -39,7 +39,7 @@ public class LoadingActivity extends AppCompatActivity {
 //
 //
 //        protected String doInBackground(Void... urls){
-//            TraerTodosLosFrigorificosServerCall serverCall = new TraerTodosLosFrigorificosServerCall(activity);
+//            ObtenerLosFrigorificosServerCall serverCall = new ObtenerLosFrigorificosServerCall(activity);
 //
 //        }
 //

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">MVDMART</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_registro_materias_primas"><u>REGISTROS DE MATERIAS PRIMAS</u></string>
+    <string name="title_activity_registro_materias_primas"><u>REGISTROS DE MATERIA PRIMA</u></string>
     <string name="title_activity_loading">LoadingActivity</string>
     <string name="title_activity_select_area"><u>SELECCIÓN DE ÁREA DE TARBAJO</u></string>
     <string name="title_activity_identificacion_bolsas"><u>IDENTIFICACIÓN DE BOLSAS DE SANGRE</u></string>

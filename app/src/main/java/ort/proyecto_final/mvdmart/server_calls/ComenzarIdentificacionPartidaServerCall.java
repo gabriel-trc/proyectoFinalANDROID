@@ -38,7 +38,7 @@ public class ComenzarIdentificacionPartidaServerCall {
                             if (response.getBoolean("suceso")) {
                                 Intent goToNextActivity = new Intent(context, IdentificacionBolsasActivity.class);
                                 goToNextActivity.putExtra("idPartida", idPartida);
-                                goToNextActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//TODO leer que hace este parche
+                                goToNextActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 context.startActivity(goToNextActivity);
                             } else {
                                 JSONArray errorArray = response.getJSONArray("mensajes");

@@ -222,14 +222,14 @@ public class Partida implements Comparable<Partida> {
 
     @Override
     public int compareTo(@NonNull Partida p) {
-        if (this.nombreFrigorifico.compareTo(p.nombreFrigorifico) != 0) {
-            return this.nombreFrigorifico.compareTo(p.nombreFrigorifico);
-        } else if (this.fecha.compareTo(p.fecha) != 0) {
-            return this.fecha.compareTo(p.fecha);
-        } else {
-            return this.hora.compareTo(p.hora);
-        }
 
+        if (this.fecha.compareTo(p.fecha) != 0) {
+            return this.fecha.compareTo(p.fecha);
+        } else if (this.nombreFrigorifico.compareTo(p.nombreFrigorifico) != 0) {
+            return this.hora.compareTo(p.hora);
+        } else {
+            return this.nombreFrigorifico.compareTo(p.nombreFrigorifico);
+        }
         //return Comparator.comparing(Partida::getNombreFrigorifico).thenComparing(Partida::getFecha).thenComparing(Partida::getHora).compare(this,p);
 //        return this.nombreFrigorifico.compareTo(p.nombreFrigorifico);
 

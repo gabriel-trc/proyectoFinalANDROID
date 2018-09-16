@@ -15,11 +15,11 @@ import ort.proyecto_final.mvdmart.activities.SelectAreaActivity;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 
-public class TraerTodasLasPartidasPendientesServerCall {
+public class ObtenerLasPartidasPendientesParaIdentificarServerCall {
     private SelectAreaActivity activity;
     private Context context;
 
-    public TraerTodasLasPartidasPendientesServerCall(final SelectAreaActivity activity) {
+    public ObtenerLasPartidasPendientesParaIdentificarServerCall(final SelectAreaActivity activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/partida/pendientes/" + Config.getNumeroOperario(activity);
@@ -42,7 +42,7 @@ public class TraerTodasLasPartidasPendientesServerCall {
                     public void onErrorResponse(VolleyError error) {
                         activity.finalizarLoader();
                         String errorMensaje[] = new String[2];
-                        errorMensaje[0] = "Error en el servidor";
+                        errorMensaje[0] = "Error de conexión";
                         if (error.getClass().equals(TimeoutError.class)) {
                             errorMensaje[1] = "No se pudo conectar con el servidor";
                         } else if (error.networkResponse != null) {
@@ -53,9 +53,12 @@ public class TraerTodasLasPartidasPendientesServerCall {
                                 case 502:
                                     errorMensaje[1] = "Código 502 – Bad Gateway\n";
                                     break;
+                                default:
+                                    errorMensaje[1] = "Error en el servidor";
+                                    break;
                             }
                         } else {
-                            errorMensaje[1] = "Error en servidor\n";
+                            errorMensaje[1] = "Verifique su conexion a internet.\n";
                         }
                         activity.alert(activity, errorMensaje, null);
                     }

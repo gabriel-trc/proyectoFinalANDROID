@@ -23,8 +23,8 @@ import ort.proyecto_final.mvdmart.R;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.helpers.StringWithTag;
 import ort.proyecto_final.mvdmart.server_calls.ComenzarIdentificacionPartidaServerCall;
-import ort.proyecto_final.mvdmart.server_calls.TraerTodasLasPartidasPendientesServerCall;
-import ort.proyecto_final.mvdmart.server_calls.TraerTodosLosFrigorificosServerCall;
+import ort.proyecto_final.mvdmart.server_calls.ObtenerLasPartidasPendientesParaIdentificarServerCall;
+import ort.proyecto_final.mvdmart.server_calls.ObtenerLosFrigorificosServerCall;
 
 public class SelectAreaActivity extends ActivityMadre {
 
@@ -38,7 +38,7 @@ public class SelectAreaActivity extends ActivityMadre {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_area);
         spinnerLoader = findViewById(R.id.spinner_loader);
-        new TraerTodosLosFrigorificosServerCall(this);
+        new ObtenerLosFrigorificosServerCall(this);
         inicializarVistas();
     }
 
@@ -139,7 +139,7 @@ public class SelectAreaActivity extends ActivityMadre {
                         startActivity(new Intent(getApplicationContext(), RegistroMateriasPrimasActivity.class));
                         break;
                     case R.id.btn_sa_IdentificacionBolsa:
-                        new TraerTodasLasPartidasPendientesServerCall(SelectAreaActivity.this);
+                        new ObtenerLasPartidasPendientesParaIdentificarServerCall(SelectAreaActivity.this);
                         break;
                     case R.id.btn_sa_RegistroSeparacion:
                         startActivity(new Intent(getApplicationContext(), SeparacionSueroActivity.class));

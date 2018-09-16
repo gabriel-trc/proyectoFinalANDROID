@@ -51,7 +51,7 @@ public class LoginUsuarioServerCall {
                     public void onErrorResponse(VolleyError error) {
                         activity.finalizarLoader();
                         String errorMensaje[] = new String[2];
-                        errorMensaje[0] = "Error en el servidor";
+                        errorMensaje[0] = "Error de conexión";
                         if (error.getClass().equals(TimeoutError.class)) {
                             errorMensaje[1] = "No se pudo conectar con el servidor";
                         } else if (error.networkResponse != null) {
@@ -62,9 +62,12 @@ public class LoginUsuarioServerCall {
                                 case 502:
                                     errorMensaje[1] = "Código 502 – Bad Gateway\n";
                                     break;
+                                default:
+                                    errorMensaje[1] = "Error en el servidor";
+                                    break;
                             }
                         } else {
-                            errorMensaje[1] = "Error en servidor\n";
+                            errorMensaje[1] = "Verifique su conexion a internet.\n";
                         }
                         activity.alert(activity, errorMensaje, null);
                     }
