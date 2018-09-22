@@ -18,7 +18,7 @@
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context=".activities.SeparacionSueroActivity"
+        tools:context=".activities.Separacion"
         tools:showIn="@layout/activity_separacion_suero">
 
         <TextView

@@ -12,17 +12,17 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.MainActivity;
-import ort.proyecto_final.mvdmart.activities.SelectAreaActivity;
+import ort.proyecto_final.mvdmart.activities.Login;
+import ort.proyecto_final.mvdmart.activities.SeleccionArea;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 
 public class LoginUsuarioServerCall {
-    private MainActivity activity;
+    private Login activity;
     private Context context;
 
-    public LoginUsuarioServerCall(final MainActivity activity, final String numeroOperario) {
+    public LoginUsuarioServerCall(final Login activity, final String numeroOperario) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/operario/login/" + numeroOperario;
@@ -36,7 +36,7 @@ public class LoginUsuarioServerCall {
                             if (response.getBoolean("suceso")) {
                                 Config.setNumeroOperario(activity, numeroOperario + "");
                                 Config.setNombreOperario(activity, response.getString("retorno"));
-                                Intent goToNextActivity = new Intent(context, SelectAreaActivity.class);
+                                Intent goToNextActivity = new Intent(context, SeleccionArea.class);
                                 goToNextActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//TODO leer que hace este parche
                                 context.startActivity(goToNextActivity);
                             } else {
@@ -51,28 +51,25 @@ public class LoginUsuarioServerCall {
                     public void onErrorResponse(VolleyError error) {
                         activity.finalizarLoader();
                         String errorMensaje[] = new String[2];
-                        errorMensaje[0] = "Error de conexión";
+                        errorMensaje[0] = "Ups!!";
                         if (error.getClass().equals(TimeoutError.class)) {
-                            errorMensaje[1] = "No se pudo conectar con el servidor";
+                            errorMensaje[1] = "No se pudo conectar con el servidor, time out error";
                         } else if (error.networkResponse != null) {
-                            switch (error.networkResponse.statusCode) {
-                                case 500:
-                                    errorMensaje[1] = "Código 500 – Internal Server Error\n";
-                                    break;
-                                case 502:
-                                    errorMensaje[1] = "Código 502 – Bad Gateway\n";
-                                    break;
-                                default:
-                                    errorMensaje[1] = "Error en el servidor";
-                                    break;
+                            int codigoError = error.networkResponse.statusCode;
+                            if(codigoError >= 500){
+                                errorMensaje[1] = "Error en el lado del servidor, código " + codigoError + "\nPor favor comuníquelo a su superior.";
+                            }else if(codigoError >= 400){
+                                errorMensaje[1] = "Error en el lado del cliente, código " + codigoError + "\nPor favor comuníquelo a su superior.";
+                            }else{
+                                errorMensaje[1] = "Error, código " + codigoError + "\nPor favor comuníquelo  a su superior.";
                             }
                         } else {
-                            errorMensaje[1] = "Verifique su conexion a internet.\n";
+                            errorMensaje[1] = "No hay conexión a internet, compruebe que el dispositivo esté conectado a una red.";
                         }
                         activity.alert(activity, errorMensaje, null);
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        VolleyRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

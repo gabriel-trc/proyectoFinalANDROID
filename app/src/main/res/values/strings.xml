@@ -6,7 +6,7 @@
     <string name="title_activity_select_area"><u>SELECCIÓN DE ÁREA DE TARBAJO</u></string>
     <string name="title_activity_identificacion_bolsas"><u>IDENTIFICACIÓN DE BOLSAS DE SANGRE</u></string>
     <string name="title_activity_separacion_suero"><u>REGISTROS DE SEPARACIÓN</u></string>
-    <string name="title_activity_main"><u>LOGIN DEL SISTEMA</u></string>
+    <string name="title_activity_main"><u>INGRESO A LA APLICACIÓN</u></string>
     <string-array name="condiciones_array">
         <item>ACEPTABLE</item>
         <item>DAÑO MENOR</item>

@@ -1,8 +1,6 @@
 package ort.proyecto_final.mvdmart.server_calls;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,7 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
+import ort.proyecto_final.mvdmart.activities.Separacion;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
@@ -25,10 +23,10 @@ import ort.proyecto_final.mvdmart.models.Item;
 public class CambiarItemIdentificadoServerCall {
 
 
-    private SeparacionSueroActivity activity;
+    private Separacion activity;
     private Context context;
 
-    public CambiarItemIdentificadoServerCall(final SeparacionSueroActivity activity, final Item itemAnterior, final Item itemNuevo) {
+    public CambiarItemIdentificadoServerCall(final Separacion activity, final Item itemAnterior, final Item itemNuevo) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/item/cambiar";
@@ -75,6 +73,6 @@ public class CambiarItemIdentificadoServerCall {
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        VolleyRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

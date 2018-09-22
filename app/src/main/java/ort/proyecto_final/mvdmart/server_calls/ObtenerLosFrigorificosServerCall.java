@@ -11,16 +11,16 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.SelectAreaActivity;
+import ort.proyecto_final.mvdmart.activities.SeleccionArea;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 
 public class ObtenerLosFrigorificosServerCall {
 
-    private SelectAreaActivity activity;
+    private SeleccionArea activity;
     private Context context;
 
-    public ObtenerLosFrigorificosServerCall(final SelectAreaActivity activity) {
+    public ObtenerLosFrigorificosServerCall(final SeleccionArea activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/frigorifico/todos/" + Config.getNumeroOperario(activity);
@@ -64,6 +64,6 @@ public class ObtenerLosFrigorificosServerCall {
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        VolleyRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

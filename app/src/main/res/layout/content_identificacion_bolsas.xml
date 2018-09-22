@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activities.IdentificacionBolsasActivity"
+    tools:context=".activities.Identificacion"
     tools:layout_editor_absoluteY="25dp"
     tools:showIn="@layout/activity_identificacion_bolsas">
 
@@ -151,7 +151,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:background="@android:color/holo_green_light"
-        android:text="@string/btnAgregar"
+        android:text="Agregar Bolsas"
         android:textColor="@color/colorBlanco"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_ib_Finalizar"

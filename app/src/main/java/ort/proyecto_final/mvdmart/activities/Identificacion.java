@@ -34,7 +34,7 @@ import ort.proyecto_final.mvdmart.models.Bolsa;
 import ort.proyecto_final.mvdmart.server_calls.CancelarIdentificacionPartidaServerCall;
 import ort.proyecto_final.mvdmart.server_calls.RegistroBolsasServerCall;
 
-public class IdentificacionBolsasActivity extends ActivityMadre {
+public class Identificacion extends ActivityMadre {
 
     private JSONObject partida;
     private TextView txtNombrePartida;
@@ -61,7 +61,6 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
 
     @Override
     public void inicializarVistas() {
-        final Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
         spinnerLoader = findViewById(R.id.spinner_loader);
         txtNombrePartida = findViewById(R.id.txtNombrePartida);
         try {
@@ -118,10 +117,10 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                 limpiarCampos();
                 crearTablasBolsas();
             } else {
-                alert(IdentificacionBolsasActivity.this, new String[]{"DATOS INVÁLIDOS", "El peso debe de estar entre 0 y 2000."}, null);
+                alert(Identificacion.this, new String[]{"DATOS INVÁLIDOS", "El peso debe de estar entre 1 y 2000."}, null);
             }
         } else {
-            alert(IdentificacionBolsasActivity.this, new String[]{"ATENCIÓN", "No se ha ingresado el peso de la bolsa."}, null);
+            alert(Identificacion.this, new String[]{"ATENCIÓN", "No se ha ingresado el peso de la bolsa."}, null);
         }
     }
 
@@ -212,7 +211,7 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                                     if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar))) {
                                         alertDescarte(((TableRow) v.getParent()).getId(), v.getId());
                                     } else
-                                        alert(IdentificacionBolsasActivity.this, new String[]{"ATENCIÓN", "Para continuar primero debes terminar de modificar el registro."}, null);
+                                        alert(Identificacion.this, new String[]{"ATENCIÓN", "Para continuar primero debes terminar de modificar el registro."}, null);
                                 }
                             }, 300);
                         }
@@ -237,14 +236,13 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                     columnaModificar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            v.startAnimation(scale);
                             hashMapCustomAlertFunction.put("id", (((TableRow) v.getParent()).getId()) + "");
                             hashMapCustomAlertFunction.put("funcion", "0");
                             v.startAnimation(scale);
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    alertDosBotones(IdentificacionBolsasActivity.this, new String[]{"Atención", "¿Quiere editar este registro?"}, hashMapCustomAlertFunction);
+                                    alertDosBotones(Identificacion.this, new String[]{"Atención", "¿Quiere editar este registro?"}, hashMapCustomAlertFunction);
                                 }
                             }, 300);
                         }
@@ -269,14 +267,13 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                     columnaBorrar.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            v.startAnimation(scale);
                             hashMapCustomAlertFunction.put("id", (((TableRow) v.getParent()).getId()) + "");
                             hashMapCustomAlertFunction.put("funcion", "1");
                             v.startAnimation(scale);
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    alertDosBotones(IdentificacionBolsasActivity.this, new String[]{"Atención", "¿Quiere borrar este registro?"}, hashMapCustomAlertFunction);
+                                    alertDosBotones(Identificacion.this, new String[]{"Atención", "¿Quiere borrar este registro?"}, hashMapCustomAlertFunction);
                                 }
                             }, 300);
                         }
@@ -307,7 +304,7 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Atención: Registrando Descarte");
         alert.setIcon(R.drawable.ic_alert);
-        alert.setMessage("¿Porque se esta descartando la bolsa de sangre?:");
+        alert.setMessage("¿Porque se esta descartando la bolsa de sangre?");
         final EditText razonDescarte = new EditText(this);
         android.widget.LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(100, 60);
         razonDescarte.setLayoutParams(lp);
@@ -315,11 +312,15 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String value = razonDescarte.getText().toString();
-                if (value.length() == 0)
-                    value = "No especificada.";
-                bolsa.setRazonDescarte(value);
-                btnDescartar.setBackgroundResource(android.R.color.holo_red_light);
-                btnDescartar.setText("DESCARTADA");
+                if (value.length() > 500) {
+                    alert(Identificacion.this, new String[]{"ATENCIÓN", "El informe de descarte supero el largo permitido de 500 caracteres."}, null);
+                } else {
+                    if (value.length() == 0)
+                        value = "No especificada.";
+                    bolsa.setRazonDescarte(value);
+                    btnDescartar.setBackgroundResource(android.R.color.holo_red_light);
+                    btnDescartar.setText("DESCARTADA");
+                }
                 dialog.dismiss();
             }
         });
@@ -358,18 +359,22 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
     }
 
     private void enviarBolsas(boolean finalizar) {
-        if (!bolsas.isEmpty()) {
-            if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar))) {
-                JSONArray jsonBolsas = new JSONArray();
-                for (int i = 0; i < bolsas.size(); i++) {
-                    jsonBolsas.put(bolsas.get(i).toJSONObject());
-                }
+        if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar))) {
+            JSONArray jsonBolsas = new JSONArray();
+            for (int i = 0; i < bolsas.size(); i++) {
+                jsonBolsas.put(bolsas.get(i).toJSONObject());
+            }
+            if (finalizar)
                 new RegistroBolsasServerCall(this, jsonBolsas, idPartidaSeleccionada, finalizar);
-            } else {
-                alert(IdentificacionBolsasActivity.this, new String[]{"ATENCIÓN", "Para continuar debes terminar de modificar el regitro."}, null);
+            else {
+                if (!bolsas.isEmpty()) {
+                    new RegistroBolsasServerCall(this, jsonBolsas, idPartidaSeleccionada, finalizar);
+                } else {
+                    alert(Identificacion.this, new String[]{"ATENCIÓN", "No tienes ninguna bolsa identificada."}, null);
+                }
             }
         } else {
-            alert(IdentificacionBolsasActivity.this, new String[]{"ATENCIÓN", "No tienes ninguna bolsa identificada."}, null);
+            alert(Identificacion.this, new String[]{"ATENCIÓN", "Para continuar debes terminar de modificar el regitro."}, null);
         }
     }
 
@@ -409,7 +414,7 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                     btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
                     setearBolsa(bolsa);
                 } else
-                    alert(IdentificacionBolsasActivity.this, new String[]{"ATENCIÓN", "Ya estas modificando un registro, primero debes terminarlo."}, null);
+                    alert(Identificacion.this, new String[]{"ATENCIÓN", "Ya estas modificando un registro, primero debes terminarlo."}, null);
                 break;
             case "1":
                 if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar))) {
@@ -420,14 +425,14 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
                     bolsas.remove(getBolsaById(Integer.parseInt(hashMap.get("id"))));
                     crearTablasBolsas();
                 } else
-                    alert(IdentificacionBolsasActivity.this, new String[]{"ATENCIÓN", "Para continuar primero debes terminar de modificar el registro."}, null);
+                    alert(Identificacion.this, new String[]{"ATENCIÓN", "Para continuar primero debes terminar de modificar el registro."}, null);
                 break;
         }
     }
 
     @Override
     public void backButtonFunction() {
-        new CancelarIdentificacionPartidaServerCall(IdentificacionBolsasActivity.this, idPartidaSeleccionada);
+        new CancelarIdentificacionPartidaServerCall(Identificacion.this, idPartidaSeleccionada);
     }
 
     @Override
@@ -439,7 +444,7 @@ public class IdentificacionBolsasActivity extends ActivityMadre {
             public void run() {
                 switch (v.getId()) {
                     case R.id.btn_ib_AgregarBolsa:
-                        esconderTecado(IdentificacionBolsasActivity.this);
+                        esconderTecado(Identificacion.this);
                         if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar)))
                             agregarBolsa();
                         else

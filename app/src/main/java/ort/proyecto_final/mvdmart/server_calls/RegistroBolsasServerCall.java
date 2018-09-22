@@ -2,7 +2,6 @@ package ort.proyecto_final.mvdmart.server_calls;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -14,17 +13,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.IdentificacionBolsasActivity;
+import ort.proyecto_final.mvdmart.activities.Identificacion;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 
 public class RegistroBolsasServerCall {
 
-    private IdentificacionBolsasActivity activity;
+    private Identificacion activity;
     private Context context;
 
-    public RegistroBolsasServerCall(final IdentificacionBolsasActivity activity, final JSONArray bolsas, final int idPartida, final boolean finalizar) {
+    public RegistroBolsasServerCall(final Identificacion activity, final JSONArray bolsas, final int idPartida, final boolean finalizar) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
 
@@ -46,11 +45,12 @@ public class RegistroBolsasServerCall {
                         activity.finalizarLoader();
                         try {
                             if (response.getBoolean("suceso")) {
-                                if (finalizar)
-                                    activity.alertCheck(activity, null);
+                                if (finalizar) {
+                                    activity.alertCheck(activity, null, finalizar);
+                                }
                                 else {
                                     activity.limpiarTabla();
-                                    Toast.makeText(context, "Registros guardados", Toast.LENGTH_LONG).show();
+                                    activity.alertCheck(activity, null, finalizar);
                                 }
                             } else {
                                 activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")), null);
@@ -63,20 +63,29 @@ public class RegistroBolsasServerCall {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         activity.finalizarLoader();
+                        String errorMensaje[] = new String[2];
+                        errorMensaje[0] = "Error de conexión";
                         if (error.getClass().equals(TimeoutError.class)) {
-                            Toast.makeText(context, "No se pudo conectar con el servidor", Toast.LENGTH_LONG).show();
+                            errorMensaje[1] = "No se pudo conectar con el servidor";
                         } else if (error.networkResponse != null) {
                             switch (error.networkResponse.statusCode) {
+                                case 500:
+                                    errorMensaje[1] = "Código 500 – Internal Server Error\n";
+                                    break;
                                 case 502:
-                                    Toast.makeText(context, "Error servidor 502", Toast.LENGTH_LONG).show();
+                                    errorMensaje[1] = "Código 502 – Bad Gateway\n";
+                                    break;
+                                default:
+                                    errorMensaje[1] = "Error en el servidor";
                                     break;
                             }
                         } else {
-                            Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
+                            errorMensaje[1] = "Verifique su conexion a internet.\n";
                         }
+                        activity.alert(activity, errorMensaje, null);
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        VolleyRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

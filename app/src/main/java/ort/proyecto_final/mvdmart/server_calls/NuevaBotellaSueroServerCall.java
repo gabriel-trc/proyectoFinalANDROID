@@ -12,17 +12,17 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
+import ort.proyecto_final.mvdmart.activities.Separacion;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 import ort.proyecto_final.mvdmart.models.BotellaSuero;
 
 public class NuevaBotellaSueroServerCall {
-    private SeparacionSueroActivity activity;
+    private Separacion activity;
     private Context context;
 
-    public NuevaBotellaSueroServerCall(final SeparacionSueroActivity activity) {
+    public NuevaBotellaSueroServerCall(final Separacion activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/botelladesuero/nueva/" + Config.getNumeroOperario(activity);
@@ -36,7 +36,7 @@ public class NuevaBotellaSueroServerCall {
                             if (response.getBoolean("suceso")) {
                                 BotellaSuero nueva = new BotellaSuero(response.getString("retorno"), 0);
                                 activity.setNuevaBotellaDeSueroSeleccionada(nueva);
-                                if (activity.getBotellaSueroSeleccionada() != null && activity.getReferenciasEnVista().containsKey(activity.getBotellaSueroSeleccionada().getCodigo()) && activity.getReferenciasEnVista().get(activity.getBotellaSueroSeleccionada().getCodigo()) == 1)
+                                if (activity.getBotellaSueroSeleccionada() != null && activity.getHashMapReferenciasEnVista().containsKey(activity.getBotellaSueroSeleccionada().getCodigo()) && activity.getHashMapReferenciasEnVista().get(activity.getBotellaSueroSeleccionada().getCodigo()) == 1)
                                     new CambiarBotellaSueroSeleccionadaServerCall(activity, activity.getBotellaSueroSeleccionada().getCodigo(), nueva.getCodigo());
                                 else {
                                     activity.botellaDeSueroSeleccionada();
@@ -79,6 +79,6 @@ public class NuevaBotellaSueroServerCall {
 //        }
                 ;
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        VolleyRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

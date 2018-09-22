@@ -17,7 +17,7 @@ import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 import ort.proyecto_final.mvdmart.server_calls.LoginUsuarioServerCall;
 
-public class MainActivity extends ActivityMadre {
+public class Login extends ActivityMadre {
 
     private Button btnIngresar;
     private EditText txtNumeroOperario;
@@ -45,7 +45,7 @@ public class MainActivity extends ActivityMadre {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    esconderTecado(MainActivity.this);
+                    esconderTecado(Login.this);
                 }
                 return false;
             }
@@ -56,11 +56,11 @@ public class MainActivity extends ActivityMadre {
 
     public void ingresar() {
         if (!HelpersFunctions.isIntegerParseInt(txtNumeroOperario.getText().toString())) {
-            alert(MainActivity.this, new String[]{"ATENCION", "Ingrese correctamente su número de operario.\nEs necesario para poder loguearce en el sistema."}, null);
-            limpiarCampos();
+            alert(Login.this, new String[]{"ATENCION", "Ingrese correctamente su número de operario."}, null);
         } else {
             new LoginUsuarioServerCall(this, txtNumeroOperario.getText().toString());
         }
+        limpiarCampos();
     }
 
     @Override
@@ -96,7 +96,7 @@ public class MainActivity extends ActivityMadre {
                 switch (v.getId()) {
                     case R.id.btnIngresar:
                         ingresar();
-                        esconderTecado(MainActivity.this);
+                        esconderTecado(Login.this);
                         break;
                 }
             }

@@ -3,7 +3,7 @@ package ort.proyecto_final.mvdmart.models;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ExtraccionMezclaDeBolsa extends Item {
+public class ExtraccionMezcla extends Item {
 
     private String codigoBotellaMezcla;
 
@@ -15,7 +15,7 @@ public class ExtraccionMezclaDeBolsa extends Item {
         this.codigoBotellaMezcla = codigoBotellaMezcla;
     }
 
-    public ExtraccionMezclaDeBolsa(String codigo, int tipo, String codigoBotellaMezcla) {
+    public ExtraccionMezcla(String codigo, int tipo, String codigoBotellaMezcla) {
         super(codigo, tipo);
         this.codigoBotellaMezcla = codigoBotellaMezcla;
     }
@@ -44,6 +44,6 @@ public class ExtraccionMezclaDeBolsa extends Item {
         else if (getClass() != obj.getClass())
             return false;
         else
-            return (this.getCodigoBotellaMezcla().equals(((ExtraccionMezclaDeBolsa) obj).getCodigoBotellaMezcla()) && this.getCodigo().equals(((ExtraccionMezclaDeBolsa) obj).getCodigo()));
+            return (this.getCodigoBotellaMezcla().equals(((ExtraccionMezcla) obj).getCodigoBotellaMezcla()) && this.getCodigo().equals(((ExtraccionMezcla) obj).getCodigo()));
     }
 }

@@ -2,7 +2,6 @@ package ort.proyecto_final.mvdmart.server_calls;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -10,45 +9,34 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.Separacion;
+import ort.proyecto_final.mvdmart.activities.SeleccionArea;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
-import ort.proyecto_final.mvdmart.models.Item;
 
-public class SeleccionarItemServerCall {
-
-    private Separacion activity;
+public class LogoutUsuarioServerCall {
+    private SeleccionArea activity;
     private Context context;
 
-    public SeleccionarItemServerCall(final Separacion activity, final Item item) {
+    public LogoutUsuarioServerCall(final SeleccionArea activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
-        String url = Constants.DOMAIN + "/api/item/seleccionar";
-
-        JSONObject sendObject = new JSONObject();
-        try {
-            sendObject.put("Item", item.toJSONObject());
-            sendObject.put("CodigoOperario", Config.getNumeroOperario(activity));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        String url = Constants.DOMAIN + "/api/operario/logout/" + Config.getNumeroOperario(activity);
         activity.iniciarLoader();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, url, sendObject, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         activity.finalizarLoader();
                         try {
                             if (response.getBoolean("suceso")) {
-                                activity.itemSeleccionado();
+                                Config.setNumeroOperario(activity,"");
+                                Config.setNombreOperario(activity, "");
+                                activity.finish();
                             } else {
-                                JSONArray errorArray = response.getJSONArray("mensajes");
-                                activity.alert(context, HelpersFunctions.errores(errorArray), null);
+                                activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")), null);
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
@@ -58,17 +46,23 @@ public class SeleccionarItemServerCall {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         activity.finalizarLoader();
+                        String errorMensaje[] = new String[2];
+                        errorMensaje[0] = "Ups!!";
                         if (error.getClass().equals(TimeoutError.class)) {
-                            Toast.makeText(context, "No se pudo conectar con el servidor", Toast.LENGTH_LONG).show();
+                            errorMensaje[1] = "No se pudo conectar con el servidor, time out error";
                         } else if (error.networkResponse != null) {
-                            switch (error.networkResponse.statusCode) {
-                                case 502:
-                                    Toast.makeText(context, "Error servidor 502", Toast.LENGTH_LONG).show();
-                                    break;
+                            int codigoError = error.networkResponse.statusCode;
+                            if (codigoError >= 500) {
+                                errorMensaje[1] = "Error en el lado del servidor, código " + codigoError + "\nPor favor comuníquelo a su superior.";
+                            } else if (codigoError >= 400) {
+                                errorMensaje[1] = "Error en el lado del cliente, código " + codigoError + "\nPor favor comuníquelo a su superior.";
+                            } else {
+                                errorMensaje[1] = "Error, código " + codigoError + "\nPor favor comuníquelo  a su superior.";
                             }
                         } else {
-                            Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
+                            errorMensaje[1] = "No hay conexión a internet, compruebe que el dispositivo esté conectado a una red.";
                         }
+                        activity.alert(activity, errorMensaje, null);
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);

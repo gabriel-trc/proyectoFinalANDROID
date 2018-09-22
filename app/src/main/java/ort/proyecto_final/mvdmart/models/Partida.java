@@ -1,6 +1,5 @@
 package ort.proyecto_final.mvdmart.models;
 
-import android.provider.Telephony;
 import android.support.annotation.NonNull;
 
 import org.json.JSONArray;
@@ -8,7 +7,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -151,17 +149,17 @@ public class Partida implements Comparable<Partida> {
         this.hora = pHora;
     }
 
-    public static String[] validar(int cantConservadoras, int temperatura/*, int pesoTotal*/, String numeroCote, int idFrigorifico) throws JSONException {
+    public static String[] validar(int cantConservadoras, int temperatura/*, int pesoTotal*/, String numeroCote, int idFrigorifico) {
         String camposIncorrectos = "Debe arreglar los siguientes campos:\n";
         int largoStringCampos = camposIncorrectos.length();
         if (idFrigorifico == -1)
             camposIncorrectos += "Frigorifico invalido.\n";
-        if (cantConservadoras < 0 || cantConservadoras > 100)
+        if (cantConservadoras < 1 || cantConservadoras > 100)
             camposIncorrectos += "La cantidad de conservadoras debe estar entre 1 y 100.\n";
-        if (temperatura < 0 || temperatura > 100)
+        if (temperatura < 0 || temperatura > 40)
             camposIncorrectos += "La temperatura debe estar entre 0 y 40.\n";
         if (numeroCote.length() > 50)
-            camposIncorrectos += "El número de cote, de tenerlo, debe tener un máximo de 50 caracteres.\n";
+            camposIncorrectos += "El número de cote puede tener un máximo de 50 caracteres.\n";
 //        if (pesoTotal < 0 || pesoTotal > 100)
 //            camposIncorrectos += "El peso debe estar entre 0 y 100.\n";
         if (camposIncorrectos.length() == largoStringCampos) {
@@ -185,6 +183,22 @@ public class Partida implements Comparable<Partida> {
         }
         return jsonBody;
     }
+
+    public static Partida fromJSONObject(JSONObject object) {
+        Partida partida = new Partida();
+
+
+        try {
+            partida.nombreFrigorifico = object.getJSONObject("frigorifico").getString("nombre");
+            String []fecha = object.getString("fecha").substring(0,10).split("-");
+            partida.fecha = fecha[2] + "-" + fecha[1] + "-" + fecha[0];
+            partida.id = object.getInt("id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return partida;
+    }
+
 
 //    public static ArrayList<Partida> partidasParaSeparar(JSONArray partidasConBolsas) throws JSONException {
 //        ArrayList<Partida> partidasParaSeparar = new ArrayList<>();
@@ -222,7 +236,6 @@ public class Partida implements Comparable<Partida> {
 
     @Override
     public int compareTo(@NonNull Partida p) {
-
         if (this.fecha.compareTo(p.fecha) != 0) {
             return this.fecha.compareTo(p.fecha);
         } else if (this.nombreFrigorifico.compareTo(p.nombreFrigorifico) != 0) {
@@ -230,8 +243,5 @@ public class Partida implements Comparable<Partida> {
         } else {
             return this.nombreFrigorifico.compareTo(p.nombreFrigorifico);
         }
-        //return Comparator.comparing(Partida::getNombreFrigorifico).thenComparing(Partida::getFecha).thenComparing(Partida::getHora).compare(this,p);
-//        return this.nombreFrigorifico.compareTo(p.nombreFrigorifico);
-
     }
 }

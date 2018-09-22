@@ -12,15 +12,15 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
+import ort.proyecto_final.mvdmart.activities.Separacion;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 
 public class ObtenerBotellasDeSueroServerCall {
-    private SeparacionSueroActivity activity;
+    private Separacion activity;
     private Context context;
 
-    public ObtenerBotellasDeSueroServerCall(final SeparacionSueroActivity activity) {
+    public ObtenerBotellasDeSueroServerCall(final Separacion activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/botelladesuero/disponibles/" + Config.getNumeroOperario(activity);
@@ -55,6 +55,6 @@ public class ObtenerBotellasDeSueroServerCall {
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        VolleyRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

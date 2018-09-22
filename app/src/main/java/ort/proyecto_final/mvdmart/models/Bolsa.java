@@ -65,10 +65,7 @@ public class Bolsa implements Comparable<Bolsa> {
     }
 
     public static boolean validar(Double pPeso) {
-        if (pPeso >= 0 && pPeso <= 2000)
-            return true;
-        else
-            return false;
+        return pPeso >= 1 && pPeso <= 2000;
     }
 
     public JSONObject toJSONObject() {

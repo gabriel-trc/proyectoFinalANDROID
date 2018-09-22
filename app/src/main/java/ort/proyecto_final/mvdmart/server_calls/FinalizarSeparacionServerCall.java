@@ -2,7 +2,6 @@ package ort.proyecto_final.mvdmart.server_calls;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -16,19 +15,18 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
+import ort.proyecto_final.mvdmart.activities.Separacion;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
-import ort.proyecto_final.mvdmart.models.Item;
 
 public class FinalizarSeparacionServerCall {
 
-    private SeparacionSueroActivity activity;
+    private Separacion activity;
     private Context context;
     private HashMap<String, String> params;
 
-    public FinalizarSeparacionServerCall(final SeparacionSueroActivity activity, final JSONArray extraccionesSuero, final JSONArray extraccionesMezcla) {
+    public FinalizarSeparacionServerCall(final Separacion activity, final JSONArray extraccionesSuero, final JSONArray extraccionesMezcla) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
 
@@ -49,7 +47,7 @@ public class FinalizarSeparacionServerCall {
                         try {
                             activity.finalizarLoader();
                             if (response.getBoolean("suceso")) {
-                                activity.alertCheck(activity,null);
+                                activity.alertCheck(activity,null, true);
                             } else {
                                 activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")), null);
                             }
@@ -81,6 +79,6 @@ public class FinalizarSeparacionServerCall {
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        VolleyRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

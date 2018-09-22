@@ -92,7 +92,6 @@ public class Item {
             String llaveBotellas = num + " - " + "Botellas de mezcla";
             itemsParaIdentificar.put(llaveBotellas, botellasDeMezcla);
         }
-        ;
         return itemsParaIdentificar;
     }
 
@@ -113,6 +112,7 @@ public class Item {
             String[] splitFecha = partidaJSON.getString("fechaCompleta").split("T");
             String[] fecha = splitFecha[0].split("-");
             String hora = splitFecha[1].substring(0, 5);
+            //todo poner codigo de frigorifico entre parentesis delante del nombre
             listaPartidas.add(new Partida(partidaJSON.getInt("id"), partidaJSON.getJSONObject("frigorifico").getString("nombre"), partidaJSON.getString("numeroDeCote"), fecha[2] + "-" + fecha[1] + "-" + fecha[0], hora, bolsasDeSangre));
             Collections.sort(listaPartidas);
         }

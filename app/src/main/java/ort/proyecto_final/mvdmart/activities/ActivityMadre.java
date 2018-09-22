@@ -55,7 +55,7 @@ public abstract class ActivityMadre extends AppCompatActivity implements View.On
         alert.show();
     }
 
-    public void alertCheck(Context contexto, String[] mensaje) {
+    public void alertCheck(Context contexto, String[] mensaje, final boolean finalizar) {
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(contexto);
 //        builder.setTitle(Html.fromHtml("<font color='#00FF00'>" + mensaje[0].toUpperCase() + "</font>"));
 //        builder.setMessage(mensaje[1]);
@@ -65,7 +65,8 @@ public abstract class ActivityMadre extends AppCompatActivity implements View.On
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
-                finish();
+                if(finalizar)
+                    finish();
             }
         });
         android.app.AlertDialog alert = builder.create();
@@ -113,7 +114,7 @@ public abstract class ActivityMadre extends AppCompatActivity implements View.On
     public void onBackPressed() {
         HashMap<String, String> obj = new HashMap<>();
         obj.put("funcion", "-1");
-        alertDosBotones(ActivityMadre.this, new String[]{"Atención: esta saliendo de la actividad.", "¡Perderá los cambios que no haya finalizado!"}, obj);
+        alertDosBotones(ActivityMadre.this, new String[]{"Atención: esta saliendo de la actividad.", "Si los hay, perderá los registros que no haya finalizado"}, obj);
     }
 
 }

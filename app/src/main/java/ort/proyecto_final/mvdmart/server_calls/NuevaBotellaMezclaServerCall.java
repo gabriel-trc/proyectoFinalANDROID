@@ -12,7 +12,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
+import ort.proyecto_final.mvdmart.activities.Separacion;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
@@ -20,10 +20,10 @@ import ort.proyecto_final.mvdmart.models.Item;
 
 public class NuevaBotellaMezclaServerCall {
 
-    private SeparacionSueroActivity activity;
+    private Separacion activity;
     private Context context;
 
-    public NuevaBotellaMezclaServerCall(final SeparacionSueroActivity activity) {
+    public NuevaBotellaMezclaServerCall(final Separacion activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/botellademezcla/nueva/" + Config.getNumeroOperario(activity);
@@ -37,7 +37,7 @@ public class NuevaBotellaMezclaServerCall {
                             if (response.getBoolean("suceso")) {
                                 Item nuevaBotellaMezcla = new Item(response.getString("retorno"), 1);
                                 activity.setNuevaBotellaDeMezclaSeleccionada(nuevaBotellaMezcla);
-                                if (activity.getBotellaMezclaSeleccionada() != null && activity.getReferenciasEnVista().containsKey(activity.getBotellaMezclaSeleccionada().getCodigo()) && activity.getReferenciasEnVista().get(activity.getBotellaMezclaSeleccionada().getCodigo()) == 1)
+                                if (activity.getBotellaMezclaSeleccionada() != null && activity.getHashMapReferenciasEnVista().containsKey(activity.getBotellaMezclaSeleccionada().getCodigo()) && activity.getHashMapReferenciasEnVista().get(activity.getBotellaMezclaSeleccionada().getCodigo()) == 1)
                                     new CambiarBotellaDeMezclaSeleccionadaServerCall(activity, activity.getBotellaMezclaSeleccionada(), nuevaBotellaMezcla);
                                 else {
                                     activity.botellaDeMezclaSeleccionada();
@@ -67,6 +67,6 @@ public class NuevaBotellaMezclaServerCall {
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        VolleyRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

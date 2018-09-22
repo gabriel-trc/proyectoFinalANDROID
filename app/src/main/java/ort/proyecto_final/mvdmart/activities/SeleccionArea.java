@@ -23,14 +23,15 @@ import ort.proyecto_final.mvdmart.R;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.helpers.StringWithTag;
 import ort.proyecto_final.mvdmart.server_calls.ComenzarIdentificacionPartidaServerCall;
+import ort.proyecto_final.mvdmart.server_calls.LogoutUsuarioServerCall;
 import ort.proyecto_final.mvdmart.server_calls.ObtenerLasPartidasPendientesParaIdentificarServerCall;
 import ort.proyecto_final.mvdmart.server_calls.ObtenerLosFrigorificosServerCall;
 
-public class SelectAreaActivity extends ActivityMadre {
+public class SeleccionArea extends ActivityMadre {
 
     private Button btnLogout, btnRegistroSeparacion, btnIdentificacionBolsa, btnRegistroMaterias;
     private TextView txtOperario;
-    private int idPartidaSelecionada = -1;
+    private int idPartidaSelecionada;
 
 
     @Override
@@ -44,7 +45,7 @@ public class SelectAreaActivity extends ActivityMadre {
 
     public void inicializarVistas() {
         txtOperario = findViewById(R.id.txtOperario);
-        txtOperario.setText(Config.getNombreOperario(SelectAreaActivity.this) + " (" + Config.getNumeroOperario(SelectAreaActivity.this) + ")");
+        txtOperario.setText(Config.getNombreOperario(SeleccionArea.this) + " (" + Config.getNumeroOperario(SeleccionArea.this) + ")");
         txtOperario.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 36);
 
         btnLogout = findViewById(R.id.btn_sa_Logout);
@@ -59,6 +60,7 @@ public class SelectAreaActivity extends ActivityMadre {
 
     //TODO en caso de reusar el sialogo con single chice, refactoring del metodo para poder rutilizarlo
     public void alertSelectPartida() {
+        idPartidaSelecionada = -1;
         List<StringWithTag> partidas = null;
         try {
             JSONArray obj = new JSONArray(Config.getPartidasPendientes(this));
@@ -67,7 +69,7 @@ public class SelectAreaActivity extends ActivityMadre {
             Log.e("My App", "Could not parse malformed JSON: \"" + Config.getPartidasPendientes(this) + "\"");
         }
         final ListAdapter adaptador = new ArrayAdapter<StringWithTag>(this, android.R.layout.select_dialog_singlechoice, partidas);
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(SelectAreaActivity.this);
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(SeleccionArea.this);
         mBuilder.setTitle("Seleccione una partida");
         if (adaptador.getCount() > 0) {
             mBuilder.setSingleChoiceItems(adaptador, -1, new DialogInterface.OnClickListener() {
@@ -89,8 +91,11 @@ public class SelectAreaActivity extends ActivityMadre {
         mBuilder.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (adaptador.getCount() != 0 && idPartidaSelecionada != -1) {
-                    new ComenzarIdentificacionPartidaServerCall(SelectAreaActivity.this, idPartidaSelecionada);
+                if (adaptador.getCount() != 0 && idPartidaSelecionada != -1)
+                    new ComenzarIdentificacionPartidaServerCall(SeleccionArea.this, idPartidaSelecionada);
+                else {
+                    if(adaptador.getCount() != 0)
+                        alert(SeleccionArea.this, new String[]{"Atención", "No a seleccionado ninguna partida."}, null);
                 }
                 dialog.dismiss();
             }
@@ -109,9 +114,7 @@ public class SelectAreaActivity extends ActivityMadre {
 
     @Override
     public void backButtonFunction() {
-        Intent goToNextActivity = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(goToNextActivity);
-        finish();
+        new LogoutUsuarioServerCall(SeleccionArea.this);
     }
 
     @Override
@@ -136,13 +139,13 @@ public class SelectAreaActivity extends ActivityMadre {
                         onBackPressed();
                         break;
                     case R.id.btn_sa_RegistroMaterias:
-                        startActivity(new Intent(getApplicationContext(), RegistroMateriasPrimasActivity.class));
+                        startActivity(new Intent(getApplicationContext(), RegistrosMateriaPrima.class));
                         break;
                     case R.id.btn_sa_IdentificacionBolsa:
-                        new ObtenerLasPartidasPendientesParaIdentificarServerCall(SelectAreaActivity.this);
+                        new ObtenerLasPartidasPendientesParaIdentificarServerCall(SeleccionArea.this);
                         break;
                     case R.id.btn_sa_RegistroSeparacion:
-                        startActivity(new Intent(getApplicationContext(), SeparacionSueroActivity.class));
+                        startActivity(new Intent(getApplicationContext(), Separacion.class));
                         break;
                 }
             }

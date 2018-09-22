@@ -13,18 +13,17 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.SeparacionSueroActivity;
+import ort.proyecto_final.mvdmart.activities.Separacion;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
-import ort.proyecto_final.mvdmart.models.BotellaSuero;
 
 public class SeleccionarBotellaDeSueroServerCall {
 
-    private SeparacionSueroActivity activity;
+    private Separacion activity;
     private Context context;
 
-    public SeleccionarBotellaDeSueroServerCall(final SeparacionSueroActivity activity, final String codigoBotella) {
+    public SeleccionarBotellaDeSueroServerCall(final Separacion activity, final String codigoBotella) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/botelladesuero/seleccionar";
@@ -70,6 +69,6 @@ public class SeleccionarBotellaDeSueroServerCall {
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        VolleyRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

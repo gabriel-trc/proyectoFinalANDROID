@@ -11,15 +11,15 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.SelectAreaActivity;
+import ort.proyecto_final.mvdmart.activities.SeleccionArea;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 
 public class ObtenerLasPartidasPendientesParaIdentificarServerCall {
-    private SelectAreaActivity activity;
+    private SeleccionArea activity;
     private Context context;
 
-    public ObtenerLasPartidasPendientesParaIdentificarServerCall(final SelectAreaActivity activity) {
+    public ObtenerLasPartidasPendientesParaIdentificarServerCall(final SeleccionArea activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/partida/pendientes/" + Config.getNumeroOperario(activity);
@@ -64,6 +64,6 @@ public class ObtenerLasPartidasPendientesParaIdentificarServerCall {
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        VolleyRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

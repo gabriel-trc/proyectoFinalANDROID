@@ -12,17 +12,17 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import ort.proyecto_final.mvdmart.activities.IdentificacionBolsasActivity;
+import ort.proyecto_final.mvdmart.activities.Identificacion;
 import ort.proyecto_final.mvdmart.config.Config;
 import ort.proyecto_final.mvdmart.config.Constants;
 import ort.proyecto_final.mvdmart.helpers.HelpersFunctions;
 
 public class CancelarIdentificacionPartidaServerCall {
 
-    private IdentificacionBolsasActivity activity;
+    private Identificacion activity;
     private Context context;
 
-    public CancelarIdentificacionPartidaServerCall(final IdentificacionBolsasActivity activity, final int idPartida) {
+    public CancelarIdentificacionPartidaServerCall(final Identificacion activity, final int idPartida) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         String url = Constants.DOMAIN + "/api/partida/cancelaridentificacion/" + idPartida + "/" + Config.getNumeroOperario(activity);
@@ -36,8 +36,7 @@ public class CancelarIdentificacionPartidaServerCall {
                             if (response.getBoolean("suceso")) {
                                 activity.finish();
                             } else {
-                                //TODO no muestra el alert aca
-                                activity.alert(context, HelpersFunctions.errores(response.getJSONArray("mensajes")), null);
+                                activity.alert(activity, HelpersFunctions.errores(response.getJSONArray("mensajes")), null);
                             }
                         } catch (Throwable t) {
                             Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
@@ -61,6 +60,6 @@ public class CancelarIdentificacionPartidaServerCall {
                     }
                 });
         jsonObjectRequest.setRetryPolicy(Constants.mRetryPolicy);
-        MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        VolleyRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

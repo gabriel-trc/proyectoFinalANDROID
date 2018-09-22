@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activities.SelectAreaActivity"
+    tools:context=".activities.SeleccionArea"
     tools:layout_editor_absoluteY="25dp"
     tools:showIn="@layout/activity_select_area">
 
@@ -72,7 +72,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
         android:background="@color/colorBtnCancelar"
-        android:text="Finalizar Turno"
+        android:text="Cerrar sesión"
         android:textColor="@color/colorBlanco"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

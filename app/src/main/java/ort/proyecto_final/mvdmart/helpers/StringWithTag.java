@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.CollationElementIterator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class StringWithTag {
             stringList += ". Fecha: " + fecha[2] + "-" + fecha[1] + "-" + fecha[0];
             ret.add(new StringWithTag(stringList,  object.getInt("id")));
         }
+
         return ret;
     }
 

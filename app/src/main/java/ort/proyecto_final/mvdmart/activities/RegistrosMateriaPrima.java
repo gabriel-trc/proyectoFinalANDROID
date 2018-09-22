@@ -22,10 +22,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +37,7 @@ import ort.proyecto_final.mvdmart.helpers.StringWithTag;
 import ort.proyecto_final.mvdmart.models.Partida;
 import ort.proyecto_final.mvdmart.server_calls.RegistroMateriasPrimasServerCall;
 
-public class RegistroMateriasPrimasActivity extends ActivityMadre {
+public class RegistrosMateriaPrima extends ActivityMadre {
 
     private Partida partidaParaModificar = null;
     private TextView txtFecha, txtHora;
@@ -102,7 +100,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
         txtHora.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TimePickerDialog timePickerDialog = new TimePickerDialog(RegistroMateriasPrimasActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                TimePickerDialog timePickerDialog = new TimePickerDialog(RegistrosMateriaPrima.this, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         txtHora.setText(HelpersFunctions.horaEnFormato(hourOfDay, minute));
@@ -116,7 +114,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
         txtFecha.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(RegistroMateriasPrimasActivity.this, new DatePickerDialog.OnDateSetListener() {
+                DatePickerDialog datePickerDialog = new DatePickerDialog(RegistrosMateriaPrima.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         txtFecha.setText(HelpersFunctions.fechaEnFormato(year, month, dayOfMonth));
@@ -136,7 +134,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    esconderTecado(RegistroMateriasPrimasActivity.this);
+                    esconderTecado(RegistrosMateriaPrima.this);
                 }
                 return false;
             }
@@ -152,20 +150,20 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
             String numeroCote = txtNCote.getText().toString().replaceAll("\\s+", "");
             String fecha = txtFecha.getText().toString();
             String hora = txtHora.getText().toString();
-            try {
-                String[] esValida = Partida.validar(cantConservadoras, temperatura, /*pesoTotal,*/ numeroCote, idFrigorifico);
-                if (esValida[1] == "Ok") {
+//            try {
+            String[] esValida = Partida.validar(cantConservadoras, temperatura, /*pesoTotal,*/ numeroCote, idFrigorifico);
+            if (esValida[1] == "Ok") {
 //                    if (true) {
-                    Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, /*pesoTotal,*/ temperatura, fecha, hora, numeroCote);
-                    partidas.add(partida);
-                    limpiarCampos();
-                    crearTablaRegistroPartidas();
-                } else {
-                    alert(RegistroMateriasPrimasActivity.this, esValida, null);
-                }
-            } catch (JSONException e) {
-                alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", "Campos mal formateados. Si perciste comunicarlo."}, null);
+                Partida partida = new Partida(idFrigorifico, posFrigorifico, cantConservadoras, /*pesoTotal,*/ temperatura, fecha, hora, numeroCote);
+                partidas.add(partida);
+                limpiarCampos();
+                crearTablaRegistroPartidas();
+            } else {
+                alert(RegistrosMateriaPrima.this, esValida, null);
             }
+//            } catch (JSONException e) {
+//                alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", "Campos mal formateados. Si perciste comunicarlo."}, null);
+//            }
         }
     }
 
@@ -178,37 +176,37 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                 }
                 new RegistroMateriasPrimasServerCall(this, jsonPartidas);
             } else {
-                alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", "Debes terminar de modificar la partida."}, null);
+                alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", "Debes terminar de modificar la partida."}, null);
             }
         } else {
-            alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", "No tienes ningun registro cargado."}, null);
+            alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", "No tienes ningun registro cargado."}, null);
         }
     }
 
     private void modificarPartida() {
         if (partidaParaModificar != null && chequearCamposCompletosYTiposDatos()) {
-            try {
-                String[] esValida = Partida.validar(Integer.parseInt(txtCantConservadoras.getText().toString()), Integer.parseInt(txtTemperatura.getText().toString()), /*Integer.parseInt(txtPeso.getText().toString()),*/ txtNCote.getText().toString(), idFrigorifico);
-                if (esValida[1] == "Ok") {
-                    partidaParaModificar.setCantConservadoras(Integer.parseInt(txtCantConservadoras.getText().toString()));
+//            try {
+            String[] esValida = Partida.validar(Integer.parseInt(txtCantConservadoras.getText().toString()), Integer.parseInt(txtTemperatura.getText().toString()), /*Integer.parseInt(txtPeso.getText().toString()),*/ txtNCote.getText().toString(), idFrigorifico);
+            if (esValida[1] == "Ok") {
+                partidaParaModificar.setCantConservadoras(Integer.parseInt(txtCantConservadoras.getText().toString()));
 //                    partidaParaModificar.setPeso(Integer.parseInt(txtPeso.getText().toString()));
-                    partidaParaModificar.setTemperatura(Integer.parseInt(txtTemperatura.getText().toString()));
-                    partidaParaModificar.setNumCote(txtNCote.getText().toString());
-                    partidaParaModificar.setIdFrigorifico(idFrigorifico);
-                    partidaParaModificar.setPosFrigorifico(posFrigorifico);
-                    partidaParaModificar.setFecha(txtFecha.getText().toString());
-                    partidaParaModificar.setHora(txtHora.getText().toString());
-                    crearTablaRegistroPartidas();
-                    limpiarCampos();
-                    btnAgregar.setText(R.string.btnAgregar);
-                    btnAgregar.setBackgroundResource(android.R.color.holo_green_dark);
-                    partidaParaModificar = null;
-                } else {
-                    alert(RegistroMateriasPrimasActivity.this, esValida, null);
-                }
-            } catch (JSONException e) {
-                alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", "Campos mal formateados. Si perciste comunicarlo."}, null);
+                partidaParaModificar.setTemperatura(Integer.parseInt(txtTemperatura.getText().toString()));
+                partidaParaModificar.setNumCote(txtNCote.getText().toString());
+                partidaParaModificar.setIdFrigorifico(idFrigorifico);
+                partidaParaModificar.setPosFrigorifico(posFrigorifico);
+                partidaParaModificar.setFecha(txtFecha.getText().toString());
+                partidaParaModificar.setHora(txtHora.getText().toString());
+                crearTablaRegistroPartidas();
+                limpiarCampos();
+                btnAgregar.setText(R.string.btnAgregar);
+                btnAgregar.setBackgroundResource(android.R.color.holo_green_dark);
+                partidaParaModificar = null;
+            } else {
+                alert(RegistrosMateriaPrima.this, esValida, null);
             }
+//            } catch (JSONException e) {
+//                alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", "Campos mal formateados. Si perciste comunicarlo."}, null);
+//            }
         }
     }
 
@@ -226,7 +224,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
             camposIncompletos += " temperatura.";
         if (camposIncompletos.length() != largoStringCampos) {
             camposCompletos = false;
-            alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", camposIncompletos}, null);
+            alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", camposIncompletos}, null);
         }
         return camposCompletos;
     }
@@ -340,7 +338,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"ATENCIÓN", "¿Quiere editar este registro?"}, hashMapCustomAlertFunction);
+                                    alertDosBotones(RegistrosMateriaPrima.this, new String[]{"ATENCIÓN", "¿Quiere editar este registro?"}, hashMapCustomAlertFunction);
                                 }
                             }, 300);
                         }
@@ -372,7 +370,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    alertDosBotones(RegistroMateriasPrimasActivity.this, new String[]{"ATENCIÓN", "¿Quiere editar este registro?"}, hashMapCustomAlertFunction);
+                                    alertDosBotones(RegistrosMateriaPrima.this, new String[]{"ATENCIÓN", "¿Quiere editar este registro?"}, hashMapCustomAlertFunction);
                                 }
                             }, 300);
                         }
@@ -445,7 +443,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                     btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
                     setearPartida(partidaParaModificar);
                 } else {
-                    alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", "Ya se encuentra modificando un registro, termine con ese para poder continuar."}, null);
+                    alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", "Ya se encuentra modificando un registro, termine con ese para poder continuar."}, null);
                 }
                 break;
             case "1":
@@ -453,7 +451,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                     partidas.remove(getPartidaById(Integer.parseInt(hashMap.get("id"))));
                     crearTablaRegistroPartidas();
                 } else {
-                    alert(RegistroMateriasPrimasActivity.this, new String[]{"ATENCION", "Se encuentra modificando un registro, debe termianr para poder usar esta funcionalidad."}, null);
+                    alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", "Se encuentra modificando un registro, debe termianr para poder usar esta funcionalidad."}, null);
                 }
                 break;
         }
@@ -487,7 +485,7 @@ public class RegistroMateriasPrimasActivity extends ActivityMadre {
                             agregarPartida();
                         else
                             modificarPartida();
-                        esconderTecado(RegistroMateriasPrimasActivity.this);
+                        esconderTecado(RegistrosMateriaPrima.this);
                         break;
                     case R.id.btn_rmp_Cancelar:
                         onBackPressed();

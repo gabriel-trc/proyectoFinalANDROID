@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.IdentificacionBolsasActivity">
+    tools:context=".activities.Identificacion">
     <include layout="@layout/content_identificacion_bolsas" />
 
     <include layout="@layout/spinner_loader" />
