@@ -149,11 +149,11 @@ public class Identificacion extends ActivityMadre {
                 TableRow fila = new TableRow(this);
                 fila.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT, 15.5f));
                 if (i < 0)
-                    fila.setBackgroundColor(Color.rgb(36, 123, 160));
+                    fila.setBackgroundColor(getResources().getColor(R.color.colorTituloTabla));
                 else {
                     bolsas.get(i).setLocalId(i);
                     fila.setId(i/*partidas.get(i).getLocalId()*/);
-                    fila.setBackgroundColor((i % 2 == 0) ? Color.rgb(112, 193, 179) : Color.rgb(178, 219, 191));
+                    fila.setBackgroundColor((i % 2 == 0) ? getResources().getColor(R.color.colorFilaImpar) : getResources().getColor(R.color.colorFilaPar));
                 }
 
                 TextView columnaCodigo = new TextView(this.getApplicationContext());
@@ -290,8 +290,8 @@ public class Identificacion extends ActivityMadre {
                 TableRow.LayoutParams tvSepLay = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
                 tvSepLay.span = 6;
                 tvSep.setLayoutParams(tvSepLay);
-                tvSep.setBackgroundColor(Color.rgb(243, 255, 189));
-                tvSep.setHeight(2);
+                tvSep.setBackgroundColor(Color.BLACK);
+                tvSep.setHeight(1);
                 trSep.addView(tvSep);
                 tablaBolsas.addView(trSep, trParamsSep);
             }

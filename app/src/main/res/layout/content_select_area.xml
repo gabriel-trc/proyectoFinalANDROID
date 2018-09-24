@@ -21,10 +21,11 @@
 
     <Button
         android:id="@+id/btn_sa_RegistroSeparacion"
-        android:layout_width="200dp"
+        android:layout_width="230dp"
         android:layout_height="200dp"
-        android:background="@android:color/holo_orange_dark"
+        android:background="@color/colorTituloTabla"
         android:text="@string/title_activity_separacion_suero"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/colorBlanco"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -34,10 +35,11 @@
 
     <Button
         android:id="@+id/btn_sa_IdentificacionBolsa"
-        android:layout_width="200dp"
+        android:layout_width="230dp"
         android:layout_height="200dp"
-        android:background="@android:color/holo_blue_dark"
+        android:background="@color/colorTituloTabla"
         android:text="@string/title_activity_identificacion_bolsas"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/colorBlanco"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_sa_RegistroSeparacion"
@@ -47,10 +49,11 @@
 
     <Button
         android:id="@+id/btn_sa_RegistroMaterias"
-        android:layout_width="200dp"
+        android:layout_width="230dp"
         android:layout_height="200dp"
-        android:background="@android:color/holo_green_dark"
+        android:background="@color/colorTituloTabla"
         android:text="@string/title_activity_registro_materias_primas"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/colorBlanco"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_sa_IdentificacionBolsa"

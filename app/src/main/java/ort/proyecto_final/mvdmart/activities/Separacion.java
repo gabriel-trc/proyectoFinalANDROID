@@ -548,12 +548,12 @@ public class Separacion extends ActivityMadre {
                 TableRow fila = new TableRow(this);
                 fila.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT, 11f));
                 if (i < 0)
-                    fila.setBackgroundColor(Color.rgb(36, 123, 160));
+                    fila.setBackgroundColor(getResources().getColor(R.color.colorTituloTabla));
                 else {
                     extraccionesSuero.get(i).setLocalId(i);
                     fila.setId(i);
                     fila.setTag(extraccionesSuero.get(i).getCodigo());
-                    fila.setBackgroundColor((i % 2 == 0) ? Color.rgb(112, 193, 179) : Color.rgb(178, 219, 191));
+                    fila.setBackgroundColor((i % 2 == 0) ? getResources().getColor(R.color.colorFilaImpar) : getResources().getColor(R.color.colorFilaPar));
                 }
 
                 TextView columnaCodigoItem = new TextView(this.getApplicationContext());
@@ -692,8 +692,8 @@ public class Separacion extends ActivityMadre {
                 TableRow.LayoutParams tvSepLay = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
                 tvSepLay.span = 6;
                 tvSep.setLayoutParams(tvSepLay);
-                tvSep.setBackgroundColor(Color.rgb(243, 255, 189));
-                tvSep.setHeight(3);
+                tvSep.setBackgroundColor(Color.BLACK);
+                tvSep.setHeight(1);
                 trSep.addView(tvSep);
                 tablaExtraccionesSuero.addView(trSep, trParamsSep);
             }
@@ -729,12 +729,12 @@ public class Separacion extends ActivityMadre {
                 TableRow fila = new TableRow(this);
                 fila.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT, 8.5f));
                 if (i < 0)
-                    fila.setBackgroundColor(Color.rgb(36, 123, 160));
+                    fila.setBackgroundColor(getResources().getColor(R.color.colorTituloTabla));
                 else {
                     extraccionesMezcla.get(i).setLocalId(i);
                     fila.setId(i);
                     fila.setTag(extraccionesMezcla.get(i).getCodigoBotellaMezcla());
-                    fila.setBackgroundColor((i % 2 == 0) ? Color.rgb(112, 193, 179) : Color.rgb(178, 219, 191));
+                    fila.setBackgroundColor((i % 2 == 0) ? getResources().getColor(R.color.colorFilaImpar) : getResources().getColor(R.color.colorFilaPar));
                 }
                 TextView columnaCodigoItem = new TextView(this.getApplicationContext());
                 if (i < 0)
@@ -850,14 +850,14 @@ public class Separacion extends ActivityMadre {
                 TableRow.LayoutParams tvSepLay = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
                 tvSepLay.span = 5;
                 tvSep.setLayoutParams(tvSepLay);
-                tvSep.setBackgroundColor(Color.rgb(243, 255, 189));
-                tvSep.setHeight(3);
+                tvSep.setBackgroundColor(Color.BLACK);
+                tvSep.setHeight(1);
                 trSep.addView(tvSep);
                 tablaExtraccionesMezcla.addView(trSep, trParamsSep);
             }
         }
     }
-
+//todo numero integer mayor a max int
     @Override
     public void limpiarCampos() {
         txtCantidadSueroExtraido.setText("");

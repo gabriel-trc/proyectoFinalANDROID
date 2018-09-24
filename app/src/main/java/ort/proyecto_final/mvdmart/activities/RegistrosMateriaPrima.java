@@ -237,16 +237,16 @@ public class RegistrosMateriaPrima extends ActivityMadre {
                 TableRow fila = new TableRow(this);
                 fila.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT, 14f));
                 if (i < 0)
-                    fila.setBackgroundColor(Color.rgb(36, 123, 160));
+                    fila.setBackgroundColor(getResources().getColor(R.color.colorTituloTabla));
                 else {
                     partidas.get(i).setLocalId(i);
                     fila.setId(i/*partidas.get(i).getLocalId()*/);
-                    fila.setBackgroundColor((i % 2 == 0) ? Color.rgb(112, 193, 179) : Color.rgb(178, 219, 191));
+                    fila.setBackgroundColor((i % 2 == 0) ? getResources().getColor(R.color.colorFilaImpar) : getResources().getColor(R.color.colorFilaPar));
                 }
 
                 TextView columnaFrigorifico = new TextView(this.getApplicationContext());
                 if (i < 0)
-                    columnaFrigorifico.setText("Frigorifico");
+                    columnaFrigorifico.setText("Frigorífico");
                 else
                     columnaFrigorifico.setText(frigorificosArray.getItem(partidas.get(i).getPosFrigorifico()).string);
                 columnaFrigorifico.setTextColor(getResources().getColor(R.color.colorBlanco));
@@ -370,7 +370,7 @@ public class RegistrosMateriaPrima extends ActivityMadre {
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    alertDosBotones(RegistrosMateriaPrima.this, new String[]{"ATENCIÓN", "¿Quiere editar este registro?"}, hashMapCustomAlertFunction);
+                                    alertDosBotones(RegistrosMateriaPrima.this, new String[]{"ATENCIÓN", "¿Quiere borrar este registro?"}, hashMapCustomAlertFunction);
                                 }
                             }, 300);
                         }
@@ -388,8 +388,8 @@ public class RegistrosMateriaPrima extends ActivityMadre {
                 TableRow.LayoutParams tvSepLay = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
                 tvSepLay.span = 9;
                 tvSep.setLayoutParams(tvSepLay);
-                tvSep.setBackgroundColor(Color.rgb(243, 255, 189));
-                tvSep.setHeight(4);
+                tvSep.setBackgroundColor(Color.BLACK);
+                tvSep.setHeight(1);
                 trSep.addView(tvSep);
                 tablaRegistroPartidas.addView(trSep, trParamsSep);
             }
