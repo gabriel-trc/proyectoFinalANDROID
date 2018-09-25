@@ -56,7 +56,7 @@ public class Login extends ActivityMadre {
 
     public void ingresar() {
         if (!HelpersFunctions.isIntegerParseInt(txtNumeroOperario.getText().toString())) {
-            alert(Login.this, new String[]{"ATENCION", "Ingrese correctamente su número de operario."}, null);
+            alert(Login.this, new String[]{"ATENCIÓN", "Ingrese correctamente su número de operario."}, null);
         } else {
             new LoginUsuarioServerCall(this, txtNumeroOperario.getText().toString());
         }

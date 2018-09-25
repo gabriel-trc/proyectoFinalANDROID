@@ -242,7 +242,7 @@ public class Identificacion extends ActivityMadre {
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    alertDosBotones(Identificacion.this, new String[]{"Atención", "¿Quiere editar este registro?"}, hashMapCustomAlertFunction);
+                                    alertDosBotones(Identificacion.this, new String[]{"ATENCIÓN", "¿Quiere editar este registro?"}, hashMapCustomAlertFunction);
                                 }
                             }, 300);
                         }
@@ -273,7 +273,7 @@ public class Identificacion extends ActivityMadre {
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    alertDosBotones(Identificacion.this, new String[]{"Atención", "¿Quiere borrar este registro?"}, hashMapCustomAlertFunction);
+                                    alertDosBotones(Identificacion.this, new String[]{"ATENCIÓN", "¿Quiere borrar este registro?"}, hashMapCustomAlertFunction);
                                 }
                             }, 300);
                         }
@@ -302,9 +302,9 @@ public class Identificacion extends ActivityMadre {
         bolsa = getBolsaById(bolsaId);
         final Button btnDescartar = findViewById(idBtn);
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Atención: Registrando Descarte");
+        alert.setTitle("DESCARTE DE BOLSA DE SANGRE");
         alert.setIcon(R.drawable.ic_alert);
-        alert.setMessage("¿Porque se esta descartando la bolsa de sangre?");
+        alert.setMessage("Se descartará la bolsa de sangre." + bolsa.getCodigoBolsa() + "\nRazón de descarte:");
         final EditText razonDescarte = new EditText(this);
         android.widget.LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(100, 60);
         razonDescarte.setLayoutParams(lp);
@@ -316,7 +316,7 @@ public class Identificacion extends ActivityMadre {
                     alert(Identificacion.this, new String[]{"ATENCIÓN", "El informe de descarte supero el largo permitido de 500 caracteres."}, null);
                 } else {
                     if (value.length() == 0)
-                        value = "No especificada.";
+                        value = "No específicada.";
                     bolsa.setRazonDescarte(value);
                     btnDescartar.setBackgroundResource(android.R.color.holo_red_light);
                     btnDescartar.setText("DESCARTADA");
@@ -333,7 +333,7 @@ public class Identificacion extends ActivityMadre {
 
         if (bolsa.getRazonDescarte() != "") {
             razonDescarte.setText(bolsa.getRazonDescarte());
-            alert.setNeutralButton("Cancelar Descarte", new DialogInterface.OnClickListener() {
+            alert.setNeutralButton("Anular Descarte", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     bolsa.setRazonDescarte("");
                     Button btnDescarte = findViewById(idBtn);
@@ -414,7 +414,7 @@ public class Identificacion extends ActivityMadre {
                     btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
                     setearBolsa(bolsa);
                 } else
-                    alert(Identificacion.this, new String[]{"ATENCIÓN", "Ya estas modificando un registro, primero debes terminarlo."}, null);
+                    alert(Identificacion.this, new String[]{"ATENCIÓN", "Ya estas modificando un registro."}, null);
                 break;
             case "1":
                 if (btnAgregar.getText().equals(getResources().getString(R.string.btnAgregar))) {

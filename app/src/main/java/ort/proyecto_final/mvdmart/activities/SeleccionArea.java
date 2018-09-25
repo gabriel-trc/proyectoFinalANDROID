@@ -70,7 +70,7 @@ public class SeleccionArea extends ActivityMadre {
         }
         final ListAdapter adaptador = new ArrayAdapter<StringWithTag>(this, android.R.layout.select_dialog_singlechoice, partidas);
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(SeleccionArea.this);
-        mBuilder.setTitle("Seleccione una partida");
+        mBuilder.setTitle("SELECCIÓN DE PARTIDA PARA IDENTIFICAR");
         if (adaptador.getCount() > 0) {
             mBuilder.setSingleChoiceItems(adaptador, -1, new DialogInterface.OnClickListener() {
                 @Override
@@ -95,7 +95,7 @@ public class SeleccionArea extends ActivityMadre {
                     new ComenzarIdentificacionPartidaServerCall(SeleccionArea.this, idPartidaSelecionada);
                 else {
                     if(adaptador.getCount() != 0)
-                        alert(SeleccionArea.this, new String[]{"Atención", "No a seleccionado ninguna partida."}, null);
+                        alert(SeleccionArea.this, new String[]{"ATENCIÓN", "No a seleccionado ninguna partida para identificar."}, null);
                 }
                 dialog.dismiss();
             }

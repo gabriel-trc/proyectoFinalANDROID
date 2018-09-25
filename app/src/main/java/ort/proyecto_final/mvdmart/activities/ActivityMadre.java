@@ -59,7 +59,7 @@ public abstract class ActivityMadre extends AppCompatActivity implements View.On
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(contexto);
 //        builder.setTitle(Html.fromHtml("<font color='#00FF00'>" + mensaje[0].toUpperCase() + "</font>"));
 //        builder.setMessage(mensaje[1]);
-        builder.setTitle(Html.fromHtml("<font color='#00FF00'>Registros guardados</font>"));
+        builder.setTitle(Html.fromHtml("<font color='#43A047'>REGISTROS GUARDADOS</font>"));
         builder.setMessage("Se han guardado todos los registros correctamente.");
         builder.setIcon(R.drawable.ic_check);
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -114,7 +114,7 @@ public abstract class ActivityMadre extends AppCompatActivity implements View.On
     public void onBackPressed() {
         HashMap<String, String> obj = new HashMap<>();
         obj.put("funcion", "-1");
-        alertDosBotones(ActivityMadre.this, new String[]{"Atención: esta saliendo de la actividad.", "Si los hay, perderá los registros que no haya finalizado"}, obj);
+        alertDosBotones(ActivityMadre.this, new String[]{"<font color='#FF0000'>ATENCIÓN</font>", "Perderá los registros no guardados.\n¿Desea continuar?"}, obj);
     }
 
 }

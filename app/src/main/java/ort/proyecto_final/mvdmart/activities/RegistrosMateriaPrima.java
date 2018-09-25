@@ -162,7 +162,7 @@ public class RegistrosMateriaPrima extends ActivityMadre {
                 alert(RegistrosMateriaPrima.this, esValida, null);
             }
 //            } catch (JSONException e) {
-//                alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", "Campos mal formateados. Si perciste comunicarlo."}, null);
+//                alert(RegistrosMateriaPrima.this, new String[]{"ATENCIÓN", "Campos mal formateados. Si perciste comunicarlo."}, null);
 //            }
         }
     }
@@ -176,10 +176,10 @@ public class RegistrosMateriaPrima extends ActivityMadre {
                 }
                 new RegistroMateriasPrimasServerCall(this, jsonPartidas);
             } else {
-                alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", "Debes terminar de modificar la partida."}, null);
+                alert(RegistrosMateriaPrima.this, new String[]{"ATENCIÓN", "Debes terminar de modificar la partida."}, null);
             }
         } else {
-            alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", "No tienes ningun registro cargado."}, null);
+            alert(RegistrosMateriaPrima.this, new String[]{"ATENCIÓN", "No tienes ningun registro ingresado."}, null);
         }
     }
 
@@ -205,7 +205,7 @@ public class RegistrosMateriaPrima extends ActivityMadre {
                 alert(RegistrosMateriaPrima.this, esValida, null);
             }
 //            } catch (JSONException e) {
-//                alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", "Campos mal formateados. Si perciste comunicarlo."}, null);
+//                alert(RegistrosMateriaPrima.this, new String[]{"ATENCIÓN", "Campos mal formateados. Si perciste comunicarlo."}, null);
 //            }
         }
     }
@@ -224,7 +224,7 @@ public class RegistrosMateriaPrima extends ActivityMadre {
             camposIncompletos += " temperatura.";
         if (camposIncompletos.length() != largoStringCampos) {
             camposCompletos = false;
-            alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", camposIncompletos}, null);
+            alert(RegistrosMateriaPrima.this, new String[]{"ATENCIÓN", camposIncompletos}, null);
         }
         return camposCompletos;
     }
@@ -443,7 +443,7 @@ public class RegistrosMateriaPrima extends ActivityMadre {
                     btnAgregar.setBackgroundResource(android.R.color.holo_orange_dark);
                     setearPartida(partidaParaModificar);
                 } else {
-                    alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", "Ya se encuentra modificando un registro, termine con ese para poder continuar."}, null);
+                    alert(RegistrosMateriaPrima.this, new String[]{"ATENCIÓN", "Ya se encuentra modificando un registro."}, null);
                 }
                 break;
             case "1":
@@ -451,7 +451,7 @@ public class RegistrosMateriaPrima extends ActivityMadre {
                     partidas.remove(getPartidaById(Integer.parseInt(hashMap.get("id"))));
                     crearTablaRegistroPartidas();
                 } else {
-                    alert(RegistrosMateriaPrima.this, new String[]{"ATENCION", "Se encuentra modificando un registro, debe termianr para poder usar esta funcionalidad."}, null);
+                    alert(RegistrosMateriaPrima.this, new String[]{"ATENCIÓN", "Se encuentra modificando un registro."}, null);
                 }
                 break;
         }
